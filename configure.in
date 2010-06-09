@@ -514,6 +514,13 @@ case $host_os in
 	AC_DEFINE(OS_LINUX)
 	;;
 
+    *darwin*)
+
+	# Define a configure preprocessor directive
+
+	AC_DEFINE(OS_MAC_OS_X)
+	;;
+
     *windows*)
 
 	# Define a configure preprocessor directive
