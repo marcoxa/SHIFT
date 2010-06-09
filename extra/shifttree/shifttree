@@ -1,0 +1,613 @@
+#!/bin/sh
+#the next line restarts using tclsh \
+exec tclsh8.0 "$0" "$@"
+
+# -*- Mode: Tcl -*-
+#
+# shifttree.tcl --
+#
+# Copyright (c) 1996, 1997 Regents of the University of California.
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. All advertising materials mentioning features or use of this software
+#    must display the following acknowledgement:
+#      This product includes software developed by the University of
+#      California, Berkeley and the California PATH Program.
+# 4. Neither the name of the University nor of the California PATH
+#    Program may be used to endorse or promote products derived from
+#    this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+# SUCH DAMAGE.
+
+
+## Last update is performed by Tolga on 110497:
+## finished commenting the code
+
+
+#####  Global Variables  #####
+
+set prgname [file tail $argv0]
+set cpp_file __${prgname}0000.tmp
+
+set CHECK_CYCLE 0
+set CPP_ERR 1
+set VERBOSE 0
+set CPP_INCLUDE ""
+set OUTPUT_FILE stdout
+set LOG_FILE ""
+
+
+##########################################################################
+# main --
+#
+#       Main setup routine
+#
+# Arguments:
+#
+# Results:
+# 
+# (Tolga 103097) #########################################################
+
+proc main {} {
+    global argc argv env
+    global temp_files prgname
+    global cpp_file
+    global CPP_ERR CPP_INCLUDE VERBOSE OUTPUT_FILE LOG_FILE
+
+    if {$argc == 0} {
+	displayHelp
+	exit
+    }
+
+    set file_list ""
+
+    foreach master $argv { 
+
+	if {[string index $master 0] == "-"} {
+	    set opt [string range $master 1 end]
+	    SetOptions $opt
+	    continue
+	}
+	
+	if {[file isdirectory $master]} {
+	    append file_list "\n[exec find $master -name "*.hs"]"
+	} elseif {[file isfile $master]} {
+	    if {[file extension $master] == ".hs"} {
+		append file_list "\n$master"
+	    } else {
+		puts stderr "Warning: <$master> is not SHIFT code (Skipping)."
+	    }
+	} else {
+	    puts stderr "Warning: <$master> does not exist (Skipping)."
+	}
+    }
+
+    if {$OUTPUT_FILE != "stdout"} {
+	set out_id [openFile $OUTPUT_FILE w exit]
+	if {$out_id != -1} {
+	    set OUTPUT_FILE $out_id
+	}
+    }
+
+    if {$LOG_FILE != ""} {
+	set log_id [openFile $LOG_FILE w return]
+	if {$log_id != -1} {
+	    set LOG_FILE $log_id
+	}
+    }
+
+    if {$VERBOSE} {
+	puts stderr ""
+	puts -nonewline stderr "Files to be scanned:"
+	puts stderr $file_list
+	if {$LOG_FILE != ""} {
+	    puts $LOG_FILE ""
+	    puts -nonewline $LOG_FILE "Files to be scanned:"
+	    puts $LOG_FILE $file_list
+	}
+    }
+
+    set flist [split $file_list "\n"]
+
+    foreach file_name $flist {
+
+	if {$file_name == ""} {
+	    continue
+	}
+
+	if {$VERBOSE} {
+	    puts stderr ""
+	    puts stderr "Scanning:  $file_name"
+	    if {$LOG_FILE != ""} {
+		puts $LOG_FILE ""
+		puts $LOG_FILE "Scanning:  $file_name"
+	    }
+	}
+
+	if {[catch {eval {exec} "$env(CPP) -B $CPP_INCLUDE $file_name $cpp_file"} error]} {
+	    if {$CPP_ERR} {
+		puts stderr "\[CPP\] $error"
+		if {$LOG_FILE != ""} {
+		    puts $LOG_FILE "\[CPP\] $error"
+		}
+	    }
+	}
+    
+	set in_id [openFile [lindex $cpp_file 0] r exit]
+	
+	if {$in_id != -1} {
+	    ScanFile $in_id
+	    close $in_id
+	    file delete $cpp_file
+	}
+    }
+
+    displayForest
+
+    puts stderr "\n$prgname finished successfully."
+    if {$LOG_FILE != ""} {
+	puts $LOG_FILE "\n$prgname finished successfully."
+    }
+
+    Cleanup
+}
+
+
+###########################################################################
+# openFile --
+#
+#       This is a general purpose procedure to open files in a secure way.
+#
+# Arguments:
+#       filename     Name of the file to be opened (complete path).
+#	mode         File I/O mode needed for "open" command.
+#       failcmd      Specifies what to do on failure. 
+#                        exit    exits the program
+#                        return  returns -1 as the file id
+# Results:
+#       Returns the file id upon success. Else it performs the action specified
+#       in failcmd argument.
+#
+# (Tolga 103097) #########################################################
+
+proc openFile {filename mode failcmd} {
+    
+    if {[catch {open $filename $mode} fid]} {
+	switch -exact -- $failcmd {
+	    exit {
+		puts stderr "Fatal: Cannot open <$filename>."
+		exit
+	    }
+	    return {
+		puts stderr "Warning: Cannot open <$filename>."
+		return -1
+	    }
+	}
+    } else {
+	return $fid
+    }
+}
+
+##########################################################################
+# getToken --
+#
+#       Cuts out the first word from a string
+#
+# Arguments:
+#       buffer     Contains the string from which the word is extracted
+#       
+# Results:
+#       Returns the word and puts the remaining string into buffer.
+#
+# (Tolga 103097) #########################################################
+
+proc getToken { buffer } {
+    upvar $buffer bf
+
+    set bf [string trim $bf]
+
+    set i [string wordend $bf 0]
+    set token [string range $bf 0 [expr $i-1]]
+
+    set bf [string trim [string range $bf [expr $i] end]]
+
+    return $token
+}
+
+
+
+##########################################################################
+# ScanFile --
+#
+#       Scans a source file to extract the inheritance hierarchy
+#
+# Arguments:
+#
+#       in_id     File id for of the source file
+#
+# Results:
+# 
+#       Fills up the tree array structure and puts the possible roots found in the
+#       source into root array.
+#
+# (Tolga 103097) #########################################################
+
+proc ScanFile {in_id} {
+    global tree root buffer
+
+    if {$in_id != -1} {
+	while { ![eof $in_id] } {
+	    gets $in_id buffer
+
+	    # get rid of leading and following white spaces
+	    set buffer [string trim $buffer]
+
+	    set token [getToken buffer]
+
+	    # If this line is a preprocessor command, ignore it.
+	    # (cpp produces such lines)
+	    if {[string index $token 0] == "#"} {
+		continue
+	    }
+
+	    # Look for "type". Resume, if not found.
+	    if {$token == "type"} {
+
+		global VERBOSE
+		if {$VERBOSE} {
+		    puts -nonewline stderr "."
+		    global LOG_FILE
+		    if {$LOG_FILE != ""} {
+			puts -nonewline $LOG_FILE "."
+		    }
+		}
+
+		while {1} {
+		    set i [string first "\{" $buffer]
+		    if { $i == -1} {
+			gets $in_id t_buffer
+			append buffer $t_buffer
+		    } else {
+			set buffer [string range $buffer 0 [expr $i-1]]
+			break
+		    }
+		}
+		## We assume that in the while loop above we cannot hit
+		## EOF since each type definition should be complete.
+		
+		set buffer [string trim $buffer] 
+
+		## Look for ":"
+		set cindex [string first : $buffer]
+		if {$cindex != -1} {
+		    set new_type [string trim [string range $buffer 0 [expr $cindex-1]]]
+		    set parent [string trim [string range $buffer [expr $cindex+1] end]]
+		    
+		    if {[info exist tree($parent)]} {
+			if {[lsearch -exact $tree($parent) $new_type] == -1} {
+			    lappend tree($parent) $new_type
+			}
+		    } else {
+			lappend tree($parent) $new_type
+		    }			
+
+		    if {![info exist tree($new_type)]} {
+			set tree($new_type) {}
+		    }
+
+		    set root($new_type) 0
+
+		    if {![info exist root($parent)]} {
+			set root($parent) 1
+		    }
+		    
+		} else {
+		    set token [getToken buffer]
+		
+		    ## This is supposed to be the declaration of this type.
+		    ## So we assume that the array entry does not exist.
+
+		    ## ^--  WRONG!!! Multiple definitions occur because of include files
+		    if {![info exist tree($token)]} {
+			set tree($token) {}
+			set root($token) 1
+		    }
+		}
+		
+	    }
+	}
+    }
+}
+
+
+##########################################################################
+# displayForest --
+#
+#       Displays the whole inheritance hierarchy
+#
+# Arguments:
+#       
+# Results:
+#
+#
+# (Tolga 103097) #########################################################
+
+proc displayForest {} {
+    global root
+    global tab
+    global VERBOSE OUTPUT_FILE LOG_FILE
+
+    if {$VERBOSE} {
+	puts stderr "\n"
+	puts stderr "Producing output:"
+	if {$LOG_FILE != ""} {
+	    puts $LOG_FILE "\n"
+	    puts $LOG_FILE "Producing output:" 
+	}
+    }
+
+    set rlist [lsort [array names root *]]
+    foreach item $rlist {
+	if {$root($item)} {
+	    if {$VERBOSE} {
+		puts -nonewline stderr "#"
+		if {$LOG_FILE != ""} {
+		    puts -nonewline $LOG_FILE "#"
+		}
+	    }
+	    puts $OUTPUT_FILE ""
+	    puts $OUTPUT_FILE $item
+	    displayTree $item 1
+	}
+    }
+
+    if {$VERBOSE} {
+	puts stderr ""
+	if {$LOG_FILE != ""} {
+	    puts $LOG_FILE ""
+	}
+    }
+}
+
+
+##########################################################################
+# displayTree --
+#
+#       Displays the tree rooted at root using Depth First Search (dfs)
+#
+# Arguments:
+#       root     Root of the tree being displayed
+#       level    Level of recursion used for indentation
+#
+# Results:
+#
+# (Tolga 103097) #########################################################
+
+proc displayTree { root level } {
+    global tree
+    global tab
+    global CHECK_CYCLE VERBOSE OUTPUT_FILE LOG_FILE
+
+    set clist $tree($root)
+    foreach child $clist {
+	if {$tree($child) == ":"} {
+	    puts stderr "Fatal: Cycle detected in <$child>."
+	    Cleanup
+	    exit
+	}
+	puts $OUTPUT_FILE [format "%*s%s" [expr $level*4] " " $child]
+
+	if {$VERBOSE} {
+	    puts -nonewline stderr "."
+	    if {$LOG_FILE != ""} {
+		puts -nonewline $LOG_FILE "."
+	    }
+	}	
+
+	if {[catch {displayTree $child [expr $level+1]} error]} {
+	    puts stderr "TCL_ERROR:  $error"
+	    exit
+	}
+	if {$CHECK_CYCLE} {
+	    set tree($child) :
+	}
+    }
+}
+
+
+##########################################################################
+# bgerror --
+#
+#       Detects and reports the background errors raised by Tcl
+#
+# Arguments:
+#       msg     Tcl error message
+#
+# Results:
+#
+# (Tolga 103097) #########################################################
+
+proc bgerror {msg} {
+    global errorInfo errorCode LOG_FILE
+    
+    puts stderr "BACKGROUND ERROR"
+    puts stderr "ErrorInfo: $errorInfo"
+    puts stderr "ErrorCode: $errorCode"
+    puts stderr "Message: $msg"
+
+    if {$LOG_FILE != ""} {
+	puts $LOG_FILE "BACKGROUND ERROR"
+	puts $LOG_FILE "ErrorInfo: $errorInfo"
+	puts $LOG_FILE "ErrorCode: $errorCode"
+	puts $LOG_FILE "Message: $msg"
+    }
+    
+    update
+
+    return
+}
+
+
+##########################################################################
+# Cleanup --
+#
+#       Performs final cleanup
+#
+# Arguments:
+#
+# Results:
+#       Deletes temporary files and closes ouput and log files.
+#
+# (Tolga 103097) #########################################################
+
+proc Cleanup {} {
+    global cpp_file
+    global VERBOSE OUTPUT_FILE LOG_FILE
+
+    if {[file exists $cpp_file]} {
+	file delete $cpp_file
+    }
+
+    if {$OUTPUT_FILE != "stdout"} {
+	close $OUTPUT_FILE
+    }
+    
+    if {$LOG_FILE != ""} {
+	close $LOG_FILE
+    }
+}
+
+
+##########################################################################
+# SetOptions --
+#
+#       Sets the command line options
+#
+# Arguments:
+#       optlist     option item extracted in main
+#
+# Results:
+#       Interprets the command line arguments passed and sets the corresponding 
+#       option values.
+#
+# (Tolga 103097) #########################################################
+
+proc SetOptions {optlist} {
+    global LOG_FILE
+
+    if {[string index $optlist 0] == "I"} {
+	global CPP_INCLUDE
+	append CPP_INCLUDE "-$optlist "
+	return
+    }
+
+    if {[string index $optlist 0] == "S"} {
+	global OUTPUT_FILE
+	set OUTPUT_FILE [string range $optlist 1 end]
+	return
+    }
+
+    if {[string index $optlist 0] == "L"} {
+	global LOG_FILE
+	set LOG_FILE [string range $optlist 1 end]
+	return
+    }
+
+    set olist [split $optlist ""]
+    foreach opt $olist {
+	switch -exact -- $opt {
+	    c {
+		global CHECK_CYCLE
+		set CHECK_CYCLE 1
+	    }
+	    v {
+		global VERBOSE
+		set VERBOSE 1
+	    }
+	    h {
+		displayHelp
+		Cleanup
+		exit
+	    }
+	    E {
+		global CPP_ERR
+		set CPP_ERR 0
+	    }
+	    I {
+		puts stderr "Warning: Illegal use of option >I<."
+		if {$LOG_FILE != ""} {
+		    puts stderr "Warning: Illegal use of option >I<."
+		}
+	    }
+	    S {
+		puts stderr "Warning: Illegal use of option >S<."
+		if {$LOG_FILE != ""} {
+		    puts stderr "Warning: Illegal use of option >S<."
+		}
+	    }
+	    L {
+		puts stderr "Warning: Illegal use of option >L<."
+		if {$LOG_FILE != ""} {
+		    puts stderr "Warning: Illegal use of option >L<."
+		}
+	    }
+	    default {
+		puts stderr "Fatal: Unknown option >$opt<"
+		exit
+	    }
+	}
+    }
+
+    return
+}
+
+
+##########################################################################
+# displayHelp --
+#
+#       Displays help information
+#
+# Arguments:
+#
+# Results:
+#
+# (Tolga 103097) #########################################################
+
+proc displayHelp {} {
+    global prgname
+
+    puts stderr "USAGE: "
+    puts "  $prgname \[-cvhE\] \[\[-Idirectory\]...\] \[-Sfile\] \[-Lfile\] \[dirname-or-file...\]\n"
+    puts stderr "OPTIONS:"
+    puts stderr "\t -c\t\tPerform cycle check."
+    puts stderr "\t -v\t\tVerbose mode."
+    puts stderr "\t -h\t\tHelp."	
+    puts stderr "\t -E\t\tSuppress CPP error messages."
+    puts stderr "\t -Idirectory\tAdd directory into include search list (for CPP)."
+    puts stderr "\t -Sfile\t\tSave output into file instead of stdout."
+    puts stderr "\t -Lfile\t\tSave log into file in addition to stderr."
+}
+
+
+#######   Global Code  ########
+
+main
+

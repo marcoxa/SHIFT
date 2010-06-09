@@ -1,0 +1,257 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+
+<HEAD>
+
+<TITLE> Shiftdoc: enforcing public interfaces in Shift types </title>
+
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#00000" LINK="#0000A0" VLINK="#C00000"
+ALINK="#FF8000">
+
+<P>
+
+<CENTER>
+<H2> Shiftdoc: enforcing public interfaces in Shift types </H2>
+
+<H3>Marco Zandonadi</H3>
+</CENTER>
+
+<H3> What </H3>
+<B>Shiftdoc</B> is a tool to extract HTML reference documentation from
+a Shift source file. The idea behind it is that of being able to maintain 
+a single source, both for a program and for its documentation. 
+
+<P>
+
+The documentation informations must be contained inside special comments,
+called <I>doc-comments</I>. When the user wants to add to the HTML reference
+file some documentation for a Shift syntactic entity (e.g. a transition), he
+or she just needs to write a <I>doc-comment</I> before that entity in
+the Shift source.
+
+<H3> Why </H3>
+An object-oriented software system can be studied through its interfaces. 
+Tipically, interfaces can be private or public (actually other kinds of 
+interfaces exist, but they won't be covered here).
+
+<P>
+
+Private interfaces are used by the programmers of the system to obtain an 
+implementation. Public ones are used by the end-users of the system. If 
+data-hiding is available, the end-users cannot access the private interface.
+
+<P>
+
+The documentation of a software system is also divided in two parts. The
+private interface is tipically described with comments inside the source.
+The public one is described both with comments and with reference manuals.
+It turns out that most of the informations inside the public-interface 
+comments are the same as those inside the reference manuals. 
+
+<P>
+
+This brings up the two reasons why <B>Shiftdoc</B> was written:
+<UL>
+
+<LI> 
+the ability to keep reference documentation and public-interface 
+comments in one place (the <I>doc-comments</I>). This avoids duplication 
+of information.
+</LI>
+
+<P>
+
+<LI>
+most importantly, the ability to distinguish between public and private
+interfaces (which is a feature that Shift doesn't support directly).
+All entities belonging to the public interface should be described by 
+<I>doc-comments</I>. Other entities can be described with normal comments.
+In this way the HTML reference - which is public by nature - can be
+obtained automatically from the source file.
+</LI>
+
+</UL>
+
+<H3> How </H3>
+
+A <I>doc-comment</I> is sintactically similar to a normal comment. It has
+the following format: <BR>
+<PRE> /** <I>doc-body</I> */ </PRE> <BR>
+The <I>doc-body</I> can contain text and newline characters. Be careful: 
+unlike normal comments a space or tab is required between the <I>doc-body</I>
+and the */.
+
+<P>
+
+The <I>doc-body</I> can also contain special commands:
+
+<UL>
+
+<LI>
+<PRE> $AUTHOR <I>name</I>$ </PRE> Inserts the name of the author.
+This command is tipically used in <I>doc-comments</I> for types.
+</LI>
+
+<P>
+
+<LI>
+<PRE> $VERSION <I>version number</I>$ </PRE> inserts the version number.
+This command is tipically used in <I>doc-comments</I> for types.
+</LI>
+
+<P>
+
+<LI>
+<PRE> $SINCE <I>date</I>$ </PRE> Inserts the date since when the 
+commented feature was available.
+</LI>
+
+<P>
+
+<LI>
+<PRE> $SEE <I>type-name</I>$ </PRE> Inserts an hyper-link to the HTML
+reference of  type <I>type-name</I>.
+</LI>
+
+</UL>
+
+Inside a <I>doc-body</I>, any sequence of leading asterisks, preceded by 
+zero or more space or tabs and followed by at least one space or tab, 
+is discarded. This feature can be used for esthetic purposes: <BR>
+
+<PRE>
+discrete
+	/**
+	 *  Documentation for state dummy.
+	 */
+	dummy
+</PRE>
+
+HTML tags can be embedded within the <I>doc-body</I>, however the use
+of H<I>x</I> tags is discouraged, because it interferes with the standard
+formatting of the HTML document.
+
+<P>
+
+<I>Doc-comments</I> must be used before the syntactic entity they
+describe. 
+
+<P>
+
+<STRONG> NOTE: </STRONG> <B>Shiftdoc</B> version 0.8 and earlier had a bug,
+that raised an exception to the previous rule: <I>doc-comments</I> for types
+had to be written before the type body. In version 0.9 the bug has been
+fixed: now <I>doc-comments</I> for types are placed before the type 
+declaration, just like you do for other syntactic entities.
+
+<P>
+
+<B>Shiftdoc</B> generates one HTML file per type in the current
+directory. It is called in the following way:
+<PRE>shiftdoc <I>sourcefile</I>.hs </PRE>
+To view the version number:
+<PRE>shiftdoc -v </PRE>
+
+
+<HR>
+
+<P>
+
+Here follows a sample doc-commented Shift source file.
+<PRE>
+ 
+global Foo m := create(Foo);
+
+global set(Bar) S;
+
+ 
+/**
+ * $AUTHOR Marco Zandonadi$ 
+ * $VERSION 93.39$
+ * You can read $SEE Bar$ as well.
+ * 
+ */ 
+type Foo 
+{
+	output 
+		continuous number x;
+}
+
+/** 
+ * $SEE Foo$ is the parent of this type.
+ */ 
+type Bar : Foo
+{
+	setup
+		do {
+			/** Did you know that k=x? */
+			/* A normal comment here   */
+			k:=x;	
+		};
+
+
+	output 
+		/** 
+	 	 **** Some leading asterisks
+	 	 */ 
+		continuous number x := -1, k, h;
+
+
+	flow	
+		/** Description of default flow    */
+		default {
+			/** A flow equation */
+			x = if h=0 then 7 else 8;
+		};
+
+
+	discrete
+		/** State s is very important      */
+		s;
+
+
+	export
+		/** This event is called e         */
+		e;
+
+
+	transition
+		/** A transition from s to s.
+		 *  $SINCE 12-13-1970$
+		 */
+		s -> s {
+			/** It synchronizes with e */
+			e
+		} 
+
+		when x > .7 
+
+		do { 	
+			/** A do action */
+			x := -x; 
+		};
+}
+
+</PRE>
+
+<HR>
+
+<EM>
+Copyright &copy; 1996-97,
+<a href="http://www.path.berkeley.edu"> California PATH UC Berkeley </a>,
+<a href="mailto:shift-dev@path.berkeley.edu"> <strong> SHIFT Team </strong> </a>
+
+<BR>
+
+Last modified: September 24th, 1997
+</EM>
+
+
+</body>
+
+</html>
+
+
+

@@ -1,0 +1,8 @@
+SHIFTDOC
+
+Shiftdoc is installed by the main Shift Makefile, but can be also
+compiled, installed and uninstalled using the Makefile in this
+directory.
+
+To read the Shiftdoc user manual open file shiftdoc.html.
+

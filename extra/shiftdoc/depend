@@ -1,0 +1,85 @@
+main.o: main.c \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/stdio.h \
+ /usr/include/sys/feature_tests.h /usr/include/sys/va_list.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/unistd.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/sys/types.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/sys/isa_defs.h \
+ /usr/include/sys/machtypes.h /usr/include/sys/select.h \
+ /usr/include/sys/time.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/time.h \
+ /usr/include/sys/siginfo.h /usr/include/sys/machsig.h \
+ /usr/include/sys/unistd.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/string.h \
+ /usr/include/strings.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/stdlib.h \
+ /software/public/gcc/sparc-sun-solaris2.5.1/include/assert.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/sys/stat.h \
+ lisp.h scanner.h parser.h shic.h dcScanaux.h
+scanaux.o: scanaux.c \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/stdio.h \
+ /usr/include/sys/feature_tests.h /usr/include/sys/va_list.h lisp.h \
+ scanner.h parser.h shic.h
+lisp.o: lisp.c \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/unistd.h \
+ /usr/include/sys/feature_tests.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/sys/types.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/sys/isa_defs.h \
+ /usr/include/sys/machtypes.h /usr/include/sys/select.h \
+ /usr/include/sys/time.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/time.h \
+ /usr/include/sys/siginfo.h /usr/include/sys/machsig.h \
+ /usr/include/sys/unistd.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/stdlib.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/stdio.h \
+ /usr/include/sys/va_list.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/string.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/stdarg.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/va-sparc.h \
+ /software/public/gcc/sparc-sun-solaris2.5.1/include/assert.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/limits.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/syslimits.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/ctype.h \
+ lisp.h
+dcScanaux.o: dcScanaux.c \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/stdio.h \
+ /usr/include/sys/feature_tests.h /usr/include/sys/va_list.h lisp.h \
+ scanner.h parser.h dcScanaux.h
+check.o: check.c \
+ /software/public/gcc/sparc-sun-solaris2.5.1/include/assert.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/stdio.h \
+ /usr/include/sys/feature_tests.h /usr/include/sys/va_list.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/stdarg.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/va-sparc.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/limits.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/syslimits.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/sys/isa_defs.h \
+ lisp.h shic.h
+type.o: type.c \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/stdio.h \
+ /usr/include/sys/feature_tests.h /usr/include/sys/va_list.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/stdarg.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/va-sparc.h \
+ /software/public/gcc/sparc-sun-solaris2.5.1/include/assert.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/limits.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/syslimits.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/sys/isa_defs.h \
+ lisp.h shic.h
+transform.o: transform.c \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/stdio.h \
+ /usr/include/sys/feature_tests.h /usr/include/sys/va_list.h \
+ /software/public/gcc/sparc-sun-solaris2.5.1/include/assert.h lisp.h \
+ shic.h
+scanner.o: scanner.c \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/stdio.h \
+ /usr/include/sys/feature_tests.h /usr/include/sys/va_list.h \
+ /usr/include/strings.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/string.h \
+ lisp.h scanner.h parser.h dcScanaux.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/stdlib.h
+parser.o: parser.c \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/stdio.h \
+ /usr/include/sys/feature_tests.h /usr/include/sys/va_list.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/stdlib.h \
+ lisp.h scanner.h parser.h shic.h dcScanaux.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/string.h \
+ /software/public/gcc/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.2/include/values.h

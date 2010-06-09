@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+   <TITLE> Shiftdoc: enforcing public interfaces in Shift types </TITLE>
+   <META NAME="GENERATOR" CONTENT="Mozilla/3.01Gold (X11; I; SunOS 5.5.1 sun4m) [Netscape]">
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000A0" VLINK="#C00000" ALINK="#FF8000">
+
+<CENTER><P><IMG SRC="../PathLogo.gif" ALT="California PATH Program -- UC Berkeley -- Logo" HEIGHT=32 WIDTH=32>
+<BR>
+<BR>
+<BR>
+</P></CENTER>
+
+<H2 ALIGN=CENTER>shifttree<BR>
+<BR>
+</H2>
+
+<H3 ALIGN=CENTER>Tolga Goktekin<BR>
+<BR>
+</H3>
+
+<H3>Usage:</H3>
+
+<UL>
+<P><B>shifttree </B>[ -<A HREF="#-c">c</A><A HREF="#-v">v</A><A HREF="#-h">h</A><A HREF="#-E">E</A>
+] [ [ -<A HREF="#-Idirectory">I<I>directory</I></A><I> </I>]... ] [ -<A HREF="#-Sfile">S<I>file</I></A><I>
+</I>] [ -<A HREF="#-Lfile">L<I>file</I></A><I> </I>] [ <I>dirname... </I>]
+[ <I>file... </I>]<BR>
+<BR>
+<BR>
+</P>
+</UL>
+
+<H3>What is it?</H3>
+
+<P><B>shifttree</B> is a tool to extract inheritance hierarchy from a set
+of Shift source files. The output is a text file usually rendering an inheritance
+forest (a set of inheritance trees) where each parent represents the base
+class and its children represent the inherited classes. The level of indentation
+in each line indicates the level of each node in the corresponding tree.</P>
+
+<CENTER><P><IMG SRC="tree.gif" HEIGHT=171 WIDTH=386></P></CENTER>
+
+<P>For example,<B> shifttree</B> generates the following output for the
+forest above:</P>
+
+<PRE>A
+        B
+                D
+        C
+                E
+                F
+
+G
+        H
+        I
+
+
+</PRE>
+
+<H3>How does it work?</H3>
+
+<P><B>shifttree</B> first forms a list of files to scan by adding source
+files specified by each <I>file</I> argument and by searching for additional
+source files recursively through the directories specified by each <I>dirname</I>
+argument. Then, it passes each file in the list through the C preprocessor
+(cpp(1)) to eliminate the comments. Finally, it scans the uncommented version
+of each source file to extract the inheritance hierarchy. If the -<A HREF="#-Sfile">S<I>file</I></A><I>
+</I>option is specified, then the output is saved into <I>file</I>. Otherwise,
+it is redirected to the standart output. </P>
+
+<H3><BR>
+<BR>
+Options:</H3>
+
+<UL>
+<P><A NAME="-c"></A>-<B>c<SPACER TYPE=HORIZONTAL SIZE=62></B>Performs a
+cyle check while preparing the output.</P>
+</UL>
+
+<UL>
+<P><A NAME="-v"></A>-<B>v<SPACER TYPE=HORIZONTAL SIZE=62></B>Sets verbose
+mode on.</P>
+
+<P><A NAME="-h"></A>-<B>h<SPACER TYPE=HORIZONTAL SIZE=62></B>Displays help
+information.</P>
+
+<P><A NAME="-E"></A>-<B>E<SPACER TYPE=HORIZONTAL SIZE=61></B>Subpresses
+messages sent by C preprocessor (cpp(1)).</P>
+
+<P><A NAME="-Idirectory"></A>-<B>I<I>directory<SPACER TYPE=HORIZONTAL SIZE=20></I></B>Adds
+<I>directory</I> into the include search list of the C preprocessor (cpp(1)).</P>
+
+<P><A NAME="-Sfile"></A>-<B>S<I>file<SPACER TYPE=HORIZONTAL SIZE=46></I></B>Saves
+the output into <I>file</I> instead of redirecting it to the standard output.</P>
+
+<P><A NAME="-Lfile"></A>-<B>L<I>file<SPACER TYPE=HORIZONTAL SIZE=46></I></B>Saves
+the log into <I>file</I> in addition to redirecting it to the standard
+error.</P>
+</UL>
+
+<H3><BR>
+<BR>
+Known Problems:</H3>
+
+<OL>
+<LI>If you try to extract a hierarchy that contains a cycle without specifying
+the -<A HREF="#-c">c</A> option, shifttree will go into an infinite loop.</LI>
+
+<LI><B>shifttree</B> uses CPP environement variable to invoke cpp(1). Make
+sure that it is set to a version of cpp(1) that supports the -B option.</LI>
+</OL>
+
+<P><BR>
+</P>
+
+<P>
+<HR WIDTH="100%">Please send any comments and bug reports to <A HREF="mailto:goktekin@path.berkeley.edu">goktekin@path.berkeley.edu
+
+<HR></A><I>Copyright &copy; 1996-97, <A HREF="http://www.path.berkeley.edu">California
+PATH UC Berkeley </A>, <B><A HREF="mailto:shift-dev@path.berkeley.edu">SHIFT
+Team <BR>
+</A></B>Last modified: November 4th, 1997 </I></P>
+
+</BODY>
+</HTML>
