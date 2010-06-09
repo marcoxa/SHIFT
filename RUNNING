@@ -1,0 +1,78 @@
+Copyright ©1996, 1997, 1998 The Regents of the University of
+California (Regents). All Rights Reserved. 
+
+Permission to use, copy, modify, and distribute this software and its
+documentation for educational, research, and not-for-profit purposes,
+without fee and without a signed licensing agreement, is hereby
+granted, provided that the above copyright notice, this paragraph and
+the following two paragraphs appear in all copies, modifications, and
+distributions. 
+
+Contact The Office of Technology Licensing, UC Berkeley, 2150 Shattuck
+Avenue, Suite 510, Berkeley, CA 94720-1620, (510) 643-7201, for
+commercial licensing opportunities. 
+
+IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
+ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
+REGENTS HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+  
+REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE.  THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF
+ANY, PROVIDED HEREUNDER IS PROVIDED "AS IS". REGENTS HAS NO OBLIGATION
+TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+MODIFICATIONS. 
+
+# RUNNING $Id: RUNNING 1.3 Wed, 17 Jun 1998 14:50:41 -0700 marcoz $
+
+QUICK INSTRUCTIONS FOR RUNNING SHIFT
+
+The building process will install the compile 'shic' in the proper
+locations and leave a copy in the source directory.
+
+There are two ways of running the SHIFT compiler.
+
+1 - The file 'shift.mk' is a template Makefile which will give you an idea
+    about how to compile and run a SHIFT program.  A SHIFT file has the
+    extension '.hs'.  The output of 'shic' is a C file which must be
+    linked with a few libraries.  If you are using the template file you
+    will produce executables with the '.sim' exension. These files are the
+    runnable simulations.
+
+2 - the 'cshift' command which has the following usage.
+
+    Usage: cshift <filename>.hs [options] [[-ff|--foreign-files] <files>
+       <options> are:
+       [-h|--help]           prints this message
+       [-v|--version]        prints the version number
+       [--config]            prints the current configuration of script
+       -I<include dir>        (repeatable)
+       -L<library dir>        (repeatable)
+       -l<library name>       (repeatable)
+       -CPP=<C preprocessor command>
+       -CC=<C compiler command>
+       -SC=<SHIFT compiler command>
+       C preprocessor and C compiler options
+
+As an example, suppose to have a file 'system.hs' which relies on some
+extra C files named 'hairy.c' and 'furry.c'.  You can either modify
+the 'shift.mk' makefile to reflect this dependency or you can run the
+following command (assuming 'cshift' is in your path.)
+
+	your-prompt> cshift system.hs -g -O -ff hairy.c furry.c
+
+If 'furry.c' has already been compiled into a 'furry.o' the command
+
+	your-prompt> cshift system.hs -g -O -ff furry.o hairy.c
+
+will sort the same effect.
+
+The result of this process is an executable file 'system.sim' which
+will run the simulation whose model is in 'system.hs'.
+
+
+Please refer to the extra documentation about running the tty debugger
+and the Tk GUI interface.
+
+The SHIFT Team

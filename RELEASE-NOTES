@@ -1,0 +1,316 @@
+Copyright ©1996, 1997, 1998 The Regents of the University of
+California (Regents). All Rights Reserved. 
+
+Permission to use, copy, modify, and distribute this software and its
+documentation for educational, research, and not-for-profit purposes,
+without fee and without a signed licensing agreement, is hereby
+granted, provided that the above copyright notice, this paragraph and
+the following two paragraphs appear in all copies, modifications, and
+distributions. 
+
+Contact The Office of Technology Licensing, UC Berkeley, 2150 Shattuck
+Avenue, Suite 510, Berkeley, CA 94720-1620, (510) 643-7201, for
+commercial licensing opportunities. 
+
+IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
+ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
+REGENTS HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+  
+REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE.  THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF
+ANY, PROVIDED HEREUNDER IS PROVIDED "AS IS". REGENTS HAS NO OBLIGATION
+TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+MODIFICATIONS. 
+
+
+------------------------------------------------------------------------------
+# RELEASE-NOTES for SHIFT ProjectVersion: 3.2 
+
+1 SHIFT now compiles properly without the GUI.
+
+2 SHIFT now compiles under IRIX 6.2 with 'cc'.
+
+3 The reference manual has been updated to reflect all outstanding
+  changes.
+
+4 EXPORT events are now allowed to be of one of two types: OPEN,
+  CLOSED.  See the reference manual for a description.
+
+5 External types may be declared to be used in conjunction with the
+  foreign function interface of SHIFT.  See the reference manual for a
+  description of the syntax and semantics of these types.
+
+6 The SETUP clause has been added to the global namespace.
+
+7 A new built-in function has been added for run-time 'type'
+  checking.  The function 'components(T)' evaluates to a set of type T
+  containing all the components that are of type T (or inherited from T).
+  See the reference manual for further information.
+
+8 Several bug fixes.
+
+------------------------------------------------------------------------------
+# RELEASE-NOTES for SHIFT ProjectVersion: 3.1 
+
+1 All outstanding synchronization bugs have been fixed.
+
+2 Inheritance has been overhauled and is now in line with standard 
+  Object Oriented Practice.
+
+3 A new tool has been added, ShiftDoc.  Which produces HTML pages
+  directly from comments in SHIFT Code.  Documentation is online at
+  HTTP://www.path.berkeley.edu/shift/doc/shiftdocs.html
+
+
+------------------------------------------------------------------------------
+# RELEASE-NOTES for SHIFT 2.11
+
+1 NEW OPERATIONS OVER SETS AND ARRAYS HAVE BEEN INTRODUCED
+
+SHIFT now contains a few new operations which will make it easier to
+program while also improving the efficiency of the run time.
+
+1.a Adding and Removing elements from a set can now be accomplished
+    using the '+:=' and '-:=' operators. E.g. given
+
+	set(number) S := { 1, 3, 44, 90 };
+
+    the action
+
+	S +:= 56;
+
+    will effectively add the number 56 to the set.
+    Previously this effect could have only be achieved by reassigning
+    the S slot with a new (union) set.
+
+	S := S + {56};
+
+    which is a rather expensive operation.
+
+    Deleting via '-:=' is analogous.
+
+
+1b The new operators FIND, COUNT and CHOOSE have been introduced,
+   based on the set former syntax.  They will facilitate writing
+   programs which need to extract given elements from a set or counting
+   how many elements in the set satisfy a given property.  E.g. given
+   the previous set 'S', the action
+
+	bign := count { o : o in S | n > 10 };
+
+   will store the number 2 into 'bign'.
+
+
+2 REFERENCE MANUAL
+
+  The reference manual is now automatically included in the
+  distribution.
+
+
+3 FIXES
+
+  Several bugs fixes went into this distribution.  Most of them should
+  be totally transparent to the end user.
+
+
+------------------------------------------------------------------------------
+# RELEASE-NOTES for SHIFT $ProjectVersion: 5.59 $
+
+1 DEPENDENCIES on [incr tcl] and [incr tk] ELIMINATED
+
+The SHIFT GUI (TkShift) does not need [incr tcl] and [incr tk]
+anymore.  You do not need to install them in your system before
+running TkShift.  However, you still need BLT (most likely the
+BLT8.0-unoff version if you are running Tcl 8.0).
+
+
+2 FOREIGN FUNCTION INTERFACE IMPROVED AND EXPANDED.
+
+You can now declare foreign function (C functions) which accept
+pointer parameters in order to simulate copy-in/copy-out operations.
+
+E.g. you can now define a C function which analyzes an array of data
+points and returns average, median and standard deviation.
+
+	function statistics(array(number) data_points;
+                            number data_points_dim;
+                            number out average;
+                            number out median;
+                            number out stddev)
+		 -> number;
+
+The C function will have the following signature
+
+	double
+	statistics(double data_points[],
+		   double data_points_dim,
+		   double* average,
+		   double* median,
+		   double* stddev);
+
+
+3 SHIFT API RELEASED
+
+SHIFT now comes with a C API that allows you to run and control SHIFT
+simulations from C Programs.  Check the WEB pages at
+
+	http://www.path.berkeley.edu/shift
+
+for extended documentation on this feature.
+
+
+------------------------------------------------------------------------------
+# RELEASE-NOTES for SHIFT ProjectVersion: 3.98
+
+1 SET/ARRAY FORMERS AND RANGES
+
+SHIFT now has set/array formers expressions in the spirit of SETL (if
+you know anything about this language.) I.e. you can now write
+something like
+
+	...
+
+	define
+	  {
+	    set(number) s := {x * 2 : x in {2, 4, 6}};
+	  }
+
+	...
+
+The result is of course to store '{4, 8, 16}' in 's'.
+
+A different example is the following
+
+	define
+	  {
+	    array(number) N := [i : i in [0 .. 1000]]
+	  }
+
+which generates an array containing all the numbers from 0 to 1000
+(the '[ x1 .. x2 ]' form is a 'range'.)
+
+Please consult the reference manual for more information about the
+array and set formers.
+
+
+2 SYNTAX.
+
+This version of SHIFT contains two major non-backward compatible
+syntax changes.
+
+The first one is in the 'define' clause of setup and transition
+actions.
+
+Whereas in previous SHIFT version you could write
+
+	define
+	  {
+	     x := 4.3;
+	     c := create(component, xd := 8.0);
+             s := { create(c1), create(c1) };
+          }
+        do
+          {
+		...
+	  }
+
+Now you must also specify the type of the variable.  I.e. the previous
+example will become:
+
+	define
+	  {
+	     number x    := 4.3;
+	     component c := create(component, xd := 8.0);
+             set(c1) s   := { create(c1), create(c1) };
+          }
+        do
+          {
+		...
+	  }
+
+We believe that this will make the language more consistent.  The scope
+rules do not change.
+
+The second change concerns the set up of input/output connections and
+synchronizations among several components.
+
+In the previous version of SHIFT, the setup clause could contain the
+following statements in a 'do' clause
+
+	...
+	do
+	  {
+	    x := 33.0;                        // 1
+	    v(something) := 44.8;             // 2
+            y(something) = y(something_else); // 3
+	    y:alpha <-> whatever:beta;        // 4
+            zz := get_this_from(whatever);    // 5
+	  }
+
+The intended sequence of executions would delay the set up of the
+"connection" between 'y(something)' and 'y(something_else)' (statement
+3) and of the synchronization 4, after the execution of actions 1,2,
+and 5.
+
+Since the equation notation is in this case used mostly for making I/O
+connections, we decided to make such use explicit.  To achieve this
+goal we introduced a new bit of syntax in the form of an extra clause
+in the setup where all the I/O connections are made using a new (and
+hopefully more explicit) syntax.  The above example would be written
+as
+
+	...
+	do
+	  {
+	    x := 33.0;                        // 1
+	    v(something) := 44.8;             // 2
+            zz := get_this_from(whatever);    // 5
+	  }
+	connect
+	  {	  
+            y:alpha <-> whatever:beta;         // 3
+            y(something) <- y(something_else); // 4
+	  }
+
+The scoping rules do not change, but now the order of "execution" is
+explicit and visually immediate.  Note also the use of the new
+operator '<-' instead of '='.
+
+It goes without saying that all the old SHIFT programs will have to be
+rewritten, but we felt that we are early enough in the distribution
+process that this would not affect too many people.
+
+
+3 PORTS AND COMPATIBILITY
+
+The current version of SHIFT (compiler and runtime only) has been
+succesfulyy built on the following architectures using the following
+tools
+
+	Machine			OS		Tools
+	=======================================================
+	Sun SPARC 4m,4u		Solaris 2.5.*	GNU C, GNU Make
+				SunOS 4.1.*	GNU C, GNU Make
+	-------------------------------------------------------
+	Intel x86		FreeBSD		GNU C, GNU Make
+	-------------------------------------------------------
+	SGI			IRIX 5.3(*)	GNU C, GNU Make
+						SGI C, GNU Make
+	-------------------------------------------------------
+	IBM RS6000		AIX 4.1		GNU C, GNU Make
+	=======================================================	
+
+(*) IRIX 6.[23] will be tested soon.
+
+
+4 KNOWN BUGS AND UNIMPLEMENTED FEATURES
+
+a - '<->' still has some problems due to a leftover bug in the
+    implementation of the I/O connections
+
+b - Ranges for 'exists' queries are not yet implemented.
+
+
+The SHIFT Team, 19970131

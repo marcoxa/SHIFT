@@ -1,0 +1,273 @@
+Copyright (c)1996, 1997, 1998 The Regents of the University of
+California (Regents). All Rights Reserved. 
+
+Permission to use, copy, modify, and distribute this software and its
+documentation for educational, research, and not-for-profit purposes,
+without fee and without a signed licensing agreement, is hereby
+granted, provided that the above copyright notice, this paragraph and
+the following two paragraphs appear in all copies, modifications, and
+distributions. 
+
+Contact The Office of Technology Licensing, UC Berkeley, 2150 Shattuck
+Avenue, Suite 510, Berkeley, CA 94720-1620, (510) 643-7201, for
+commercial licensing opportunities. 
+
+IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
+ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
+REGENTS HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+  
+REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF
+ANY, PROVIDED HEREUNDER IS PROVIDED "AS IS". REGENTS HAS NO OBLIGATION
+TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+MODIFICATIONS. 
+
+
+
+Description of ljoin.hs
+(This program is contributed by Lokesh Balaj)
+
+	
+	The Shift program ljoin.hs is an example of component
+synchronization in SHIFT. The various components such as Supervisor,
+JoinInitiator, JoinResponder, and Regulator work together to implement
+the join protocol between two platoons.  A join protocol is initiated
+when the back car of one platoon and the front car of another platoon
+know about each other. The supervisors of the platoon leaders have to
+agree that a join will take place. If they can agree, the
+JoinInitiator of the back platoon and the JoinResponder of the front
+platoon will coordinate. The JoinInitiator of the back platoon will
+coordinate with its Regulator to accelerate and merge into the front
+platoon. Once the platoons have merged they update there variables and
+become a single platoon. But the protocol can abort at any instance
+due to external circumstances. If that happens they still remain 2
+different platoons.
+
+	In our program the Init component is used to start the program
+and create other components. There is nothing significant about the
+Init component itself other than the fact that it helps create other
+components. Presently it creates three different supervisor components
+called v1, v2, v3. In our setup the three supervisors can see each
+other. Hence v1 has v2 behind it and v2 has v3 behind it.  Since we
+don't have any actual simulation running we have set it up arbitrarily
+to test the algorithm. Each car is an individual platoon. We expect
+that the three cars will eventually form a single platoon.
+
+	The Supervisor component is used to coordinate with other cars
+and to initiate the join maneuver. It keeps several variables which
+keep track of its state. The "leader" is the platoon leader of the
+platoon to which the car belongs.  Currently in our example each
+supervisor is its own leader. At the conclusion we expect the v1 to be
+the leader of v2 and v3. The "follower" variable for a supervisor
+keeps track of all the cars which are behind it and in the same
+platoon. Initially none of the cars have any followers. At the
+conclusion v2 and v3 will be followers of v1, v3 will be a follower of
+v2 and v3 will not have any followers. The "jinit" is the
+JoinInitiator for each supervisor.  It is used when the leader of a
+platoon is merging with the platoon in front of it. The "jresp" is the
+JoinResponder for each supervisor. It is used when the leader of a
+platoon has a back platoon which is merging into it. The "frontCar" is
+set with the supervisor of the car in front. This is done by the
+sensors of the car. At this time the sensor modules are not
+available. Hence the "frontCar" is set arbitrarily at this time as we
+saw in the Init component.  The "backCar" is set with the supervisor
+of the car which is behind.  Just as with the "frontCar" this is set
+arbitrarily at this time. The "platInMan" keeps track of which
+supervisor we are maneuvering with. And the "backPlat" is used to keep
+track of the platoon behind us in certain situations. Initially every
+supervisor starts out withe the discrete state of "Leader". The next
+discrete states depends upon the cars that the supervisor sees in
+front or behind it. Look at the comments in the code for an
+examination of how the supervisor moves through discrete states.
+
+	The JoinInitiator is used by the leader of the back platoon
+which is merging with the platoon in front of it. Initially it is
+idle. When the Supervisor sets the "jresp" with which it will
+coordinate it can start initiating the join maneuver. The
+JoinResponder is used by the leader of the platoon into which the back
+platoon is merging. Initially it is idle until there is a "jinit" with
+which we can coordinate. For the trasition between discrete states
+look at the program.
+
+	The Regulator component exerts the physical controls on the
+actual vehicle.  For now, these are set arbitrarily. For example the
+functions InitLead, InitMerge, AccelToMerge, and InitFollow are
+supposed to exercise various controls on the vehicle. Presently they
+don't do anything. The indicator variables SafeToMerge, SafeToAMerge,
+and CompleteMerge tell whether or not certain actions are safe to
+initiate or certain actions have been complete. For instance
+SafeToMerge tells wheter or not it is safe to merge with the platoon
+in front. SafeToAMerge tells if the car should abort its
+join. CompleteMerge tells if the merge has been completed. Presently
+these are hardcoded.
+
+	As you can see there are various simplifying assumptions that
+have been made. Firstly we don't have any sensor information. All the
+sensor information is presently hard coded into the program. Secondly
+we don't have any communication network between the different
+components. All message passing is currently done by coordinating
+between individual components of each car. The regulation of the cars
+have also been hard coded as we are not simulating the actual cars. We
+are just simulating the merge protocol. Hence commands for actually
+merging, leading the platoon, of folowing the car in front don't do
+anything. The indicators that tell us various information about the
+maneuver have also been hardcoded. For instance, the indicator that it
+is safe to merge is already 1. Hence a car will always see that it is
+safe to merge and will merge. Finally we have only three cars in our
+simulations which have been hardcoded so that one follows the other.
+
+	When the program is finally run, the three cars do merge with
+each other and form a single platoon. In the end v1 will be the leader
+with v2 behind it.  Finally v3 will be behind v2.
+
+--------------------------------------------------
+Output from Simulating the Program:
+
+The Supervisor look like the following when the program starts.
+
+{Supervisor 0 
+     {maxPlatoonSize 5.000000}
+     {leader Supervisor0 339064}
+     {followers {}}
+     {jinit JoinInitiator0 342632}
+     {jresp JoinResponder0 344144}
+     {regulator Regulator0 345656}
+     {frontCar }
+     {backCar Supervisor1 346832}
+     {platInMan }
+     {backPlat }
+     {discrete Leader}
+ }
+
+{Supervisor 1 
+     {maxPlatoonSize 5.000000}
+     {leader Supervisor1 346832}
+     {followers {}}
+     {jinit JoinInitiator1 350400}
+     {jresp JoinResponder1 351912}
+     {regulator Regulator1 353424}
+     {frontCar Supervisor0 339064}
+     {backCar Supervisor2 354600}
+     {platInMan }
+     {backPlat }
+     {discrete Leader}
+ }
+
+{Supervisor 2 
+     {maxPlatoonSize 5.000000}
+     {leader Supervisor2 354600}
+     {followers {}}
+     {jinit JoinInitiator2 358168}
+     {jresp JoinResponder2 359696}
+     {regulator Regulator2 361208}
+     {frontCar Supervisor1 346832}
+     {backCar }
+     {platInMan }
+     {backPlat }
+     {discrete Leader}
+ }
+
+
+Supervisor 2 will merge into Supervisor 1 and form a single platoon.
+At time step 12, the join is complete and Supervisor 1 has started
+to merge into Supervisor 0. The following are the states of the
+supervisor at that time.
+
+{Supervisor 0 
+     {maxPlatoonSize 5.000000}
+     {leader Supervisor0 339064}
+     {followers {}}
+     {jinit JoinInitiator0 342632}
+     {jresp JoinResponder0 344144}
+     {regulator Regulator0 345656}
+     {frontCar }
+     {backCar Supervisor1 346832}
+     {platInMan Supervisor1 346832}
+     {backPlat }
+     {discrete FollowingPlatoonJoining}
+ }
+
+{Supervisor 1 
+     {maxPlatoonSize 5.000000}
+     {leader Supervisor1 346832}
+     {followers {Supervisor2 354600}}
+     {jinit JoinInitiator1 350400}
+     {jresp JoinResponder1 351912}
+     {regulator Regulator1 353424}
+     {frontCar Supervisor0 339064}
+     {backCar Supervisor2 354600}
+     {platInMan Supervisor0 339064}
+     {backPlat }
+     {discrete Joining}
+ }
+
+{Supervisor 2 
+     {maxPlatoonSize 5.000000}
+     {leader Supervisor1 346832}
+     {followers {}}
+     {jinit JoinInitiator2 358168}
+     {jresp JoinResponder2 359696}
+     {regulator Regulator2 361208}
+     {frontCar Supervisor1 346832}
+     {backCar }
+     {platInMan }
+     {backPlat }
+     {discrete Follower}
+ }
+
+The supervisors look like the following when Supervisor 1 has
+merged into Supervisor 0.
+
+{Supervisor 0 
+     {maxPlatoonSize 5.000000}
+     {leader Supervisor0 339064}
+     {followers {Supervisor2 354600, Supervisor1 346832}}
+     {jinit JoinInitiator0 342632}
+     {jresp JoinResponder0 344144}
+     {regulator Regulator0 345656}
+     {frontCar }
+     {backCar Supervisor1 346832}
+     {platInMan }
+     {backPlat }
+     {discrete Leader}
+ }
+
+{Supervisor 1 
+     {maxPlatoonSize 5.000000}
+     {leader Supervisor0 339064}
+     {followers {Supervisor2 354600}}
+     {jinit JoinInitiator1 350400}
+     {jresp JoinResponder1 351912}
+     {regulator Regulator1 353424}
+     {frontCar Supervisor0 339064}
+     {backCar Supervisor2 354600}
+     {platInMan }
+     {backPlat }
+     {discrete Follower}
+ }
+
+{Supervisor 2 
+     {maxPlatoonSize 5.000000}
+     {leader Supervisor0 339064}
+     {followers {}}
+     {jinit JoinInitiator2 358168}
+     {jresp JoinResponder2 359696}
+     {regulator Regulator2 361208}
+     {frontCar Supervisor1 346832}
+     {backCar }
+     {platInMan }
+     {backPlat }
+     {discrete Follower}
+ }
+
+Another way to follow this program is to look at all
+the discrete transitions that take place. But this
+outputs a lot of data. If you are interested you can
+run it with the following debug commands:
+
+dtracetype Supervisor
+dtracetype JoinInitiator
+dtracetype JoinResponder
+dtracetype Regulator

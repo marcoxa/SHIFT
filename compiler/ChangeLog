@@ -1,0 +1,338 @@
+Copyright (c)1996, 1997, 1998 The Regents of the University of
+California (Regents). All Rights Reserved. 
+
+Permission to use, copy, modify, and distribute this software and its
+documentation for educational, research, and not-for-profit purposes,
+without fee and without a signed licensing agreement, is hereby
+granted, provided that the above copyright notice, this paragraph and
+the following two paragraphs appear in all copies, modifications, and
+distributions. 
+
+Contact The Office of Technology Licensing, UC Berkeley, 2150 Shattuck
+Avenue, Suite 510, Berkeley, CA 94720-1620, (510) 643-7201, for
+commercial licensing opportunities. 
+
+IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
+ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
+REGENTS HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+  
+REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF
+ANY, PROVIDED HEREUNDER IS PROVIDED "AS IS". REGENTS HAS NO OBLIGATION
+TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+MODIFICATIONS.
+
+	
+Wed Apr 15 10:45:44 1998  Tunc Simsek  <simsek@maruti.PATH.berkeley.edu>
+
+	* generate.c (generate_flow_function_type): Code generation
+	support for external data types.  Checks that external data is not
+	used in flow functions.
+	(generate_type_descriptor): Code generation support for external
+	data types.  Makes sure that ComponentTypeDescriptors are not
+	generated for external types.
+	(generate_component_type_descriptor_list): More support for
+	external data types.  Do not generate ComponentTypeDescriptors for
+	external data types.
+	(generate): Same as above.
+	(generate_type): Generate the appropriate TYPE for external
+	types.  Note that FOREIGN_TYPE is defined in the shifttypes.h
+	headerfile.
+
+	* ffi-generators.c (generate_ffi_type_type): Code generation
+	support for external data types.
+
+	* parser.y: Added @exttypedef to the list of top level nodes. This
+	top-level node is for externally defined types (i.e. those passed
+	as parameters to or returned by external functions.).
+
+Tue Dec 23 15:34:38 1997  Tunc Simsek  <simsek@maruti.PATH.berkeley.edu>
+
+	* generate.c (generate_event_descriptor): Modified this function
+	so that the spewed EventDescriptor has a new field accomodating
+	for the type of an event.
+
+Sun Nov 23 18:09:42 1997  Tunc Simsek  <simsek@maruti.PATH.berkeley.edu>
+
+	* generate.c (generate): Removing the call to
+	uniformized_modes_down.  This call is redundant and is producing
+	unnecessary overhead of complexity o(n).  It is basically
+	redundant because you can never use a parent instead of a child,
+	where as uniformize_modes_up is necessary because you can insert a
+	child instead of a parent.
+
+	* check.c (patch_differential_variables): Removing the call from
+	main to this function because set_id_mode in generate.c has been
+	fixed. 
+
+	* generate.c (set_id_mode): Fixed a very silly error in this
+	function that was causing the problem with the @algebraic and
+	@differential attributes of inherited variables.  This function is
+	supposed to recursively traverse the inheritance tree to
+	uniformize these attrbiutes in inherited variables but was not
+	working because of a badly written C code segment.
+
+Tue Nov 11 10:39:55 1997  Tunc Simsek  <simsek@maruti.PATH.berkeley.edu>
+
+	* main.c (parse_cmd_line_args): Isolating the command line parsing
+	routine from "main".
+
+	* utilities.c (verbose_list_data_fields): Added this function for
+	the development of JAWS, which requires a dump of program data 
+	fields.
+
+Thu Nov  6 16:05:27 1997  Tunc Simsek  <simsek@maruti.PATH.berkeley.edu>
+
+	* check.c (patch_differential_variables): This function is added
+	to provide a temporary relief for the inheritance bug regarding
+	the accessing of @differential variables.
+
+Tue Nov  4 14:36:37 1997  Tunc Simsek  <simsek@maruti.PATH.berkeley.edu>
+
+	* check.c (create_in_expression_p): Added this function to check
+	whether an expression contains a create statment.
+	(check_uncountable_create): This function is added to provide an
+	interface for create_in_expression_p.
+	(check_flow): Added check after rewrites to check for dynamic
+	creates in flows.
+	(check_typedef): Added checks after rewrites to check for dynamic
+	creates in flows, invariants, and guards.
+	(check_transition): Added check after rewrites to check for
+	dynamic creates in guards.
+
+Mon Oct 27 15:17:52 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* generate.c (generate_symbols): modified generation of
+	'__const__' qualifier to 'const'.  By now it seems more portable.
+
+Mon Oct 27 12:13:50 1997  Tunc Simsek  <simsek@maruti.PATH.berkeley.edu>
+
+	* check.c (check_inheritance): Decided that STATE variables need
+	not be inherited or typechecked for the contravariance (depth
+	subtyping) rule.
+
+Fri Oct 24 11:37:02 1997  Tunc Simsek  <simsek@maruti.PATH.berkeley.edu>
+
+	* check.c (rewrite_equality): Providing a temporary relief to the
+	"=" operator overloading bug.  SHIC cannot determine early enough
+	whether the "=" operator is used in a flow or bool.  In the case
+	of the bool it shouldn't matter whether the lhs is a supertype of
+	the rhs.  The problem is not fixed but a more suggestive error
+	message is provided.
+
+
+Thu Oct 23 15:14:50 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* lisp.c: added list of all the "exported" functions at the
+	beginning of the file.  This is somewhat redundant, but it clearly
+	separates the "internals" from the "externals".
+
+	* lisp.h: made all the declarations 'extern'.  This has several
+	advantages, including the avoidance of multiple declarations.
+
+	* ffi-generators.c: Moved some declarations around (mostly all the
+	"internal" functions declarations have been put at the top
+	level).  There are several duplications at this point, but they do
+	not really hurt.  They should be removed to really have a clean
+	code.
+
+Fri Oct  3 10:05:02 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* ffi-generators.c (generate_ffi_return_value_expr): Added case
+	checking for the generation of 'logical' (i.e. boolean) return
+	values. Also added error message generation.
+
+	* type.c (internal_error): Modified printing of error message.
+
+>>>>>>> compiler/ChangeLog Fri, 24 Oct 1997 16:02:34 -0700 marcoxa (SHIC/b/0_ChangeLog 1.14.1.3 644) 4.124
+Fri Sep 19 13:51:11 1997  Tunc Simsek  <simsek@saab.PATH.Berkeley.EDU>
+
+	* check.c (check_transition_event_spec): Bug fix.  Added the
+	necessary lines so that SHIC can detect if and when a variable
+	that is not an @export is used in place of an event.
+
+Thu Sep 18 09:54:09 1997  Tunc Simsek  <simsek@PATH.Berkeley.EDU>
+
+	* check.c (check_hierarchy): Modified the algorithm that checks
+	for loops in the inheritance chain.  Previously, SHIC could not
+	detect certain loops (specifically if a grandchild was declared
+	before a grandparent) - and hence SHIC would go into an infinite
+	loop while traversing the inheritance graph.
+	(check_loop): Re-wrote this recursive procedure to
+	accomodate the modified algo. for checking loops in the
+	inheritance graph.  Specifically, a temporary name space is
+	created in addition to the marking of nodes to keep track of the
+	previously visited nodes.
+	(define_id2): Changed add_attr to set_attr.  Since an @id node is
+	in general defined in more than one namespace it was the case that
+	each time that @id node is defined in another namespace it would
+	keep on adding redundant @type and @entity attributes to its
+	attributes list (i.e. only the first instances of these attributes
+	are utilized).
+	
+Fri Sep 12 14:35:13 1997  Tunc Simsek  <simsek@PATH.Berkeley.EDU>
+
+	* check.c (check_inheritance): Fixed the inheritance
+	mechanism. The two functions listed below were added where the
+	distinction between the two are in the fact that one is for
+	@id lists and the other is for @declare lists.
+	* check.c (inherit_var_decl_list): Function added to support
+	the inheritance of @state, @input and @output variables.
+	* check.c (inherit_event_decl_list): Function added to support
+	the inheritance of @export events.
+
+Fri Aug 29 15:22:18 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+	* generate.c (compute_member_lists): Reorganized the "inheritance
+	tree" traversal mechanism to compute the public and private 
+ 	member lists for each @type top-level node.  Note the traversal
+	mechanism:  Each node must be visited once and only once(by use
+	of the mark_node machinery); If a parent exists and has been 
+	processed than simply inherit the parents public and private 
+	member lists.
+
+	* gen-iterators.c (generate_range_loop_header): Fixed C generation
+	bug.  Whene the 'for' loop for an array is generated, the cursor
+	variable is declared immediately before.  However, this requires a
+	new fresh block to enclose it, since C (unlike C++) does not
+	accept declarations intermixed with code.
+
+	* Tracked down all the instances of 'auxiliary' and temporary
+	variables which were named @t, @m, @ff and so on.  They caused
+	many problems with the current inheritance scheme.  As a side
+	effect the resulting C code may also be a little more readable.
+
+Tue Aug 26 11:20:23 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* generate.c (generate): Conditionalized the definitions of
+	'rint' and 'round'. See comment below.
+
+	* check.c (initialize_check): Conditionalized the definitions of
+	'rint' and 'round'.  They do not seem to be in the ANSI/IEEE
+	suite, and so they are not available under MS Windows VC++.
+
+Mon Aug 25 13:55:51 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* check.c (collect_typedef_sections): new name given to 'one_roof'.
+
+	* generate.c (generate_creation_functions): Changed generation of
+	creation function.  Instead of 'bzero' use now 'memset' which is
+	ISO standard ('bzero' is not).
+
+Thu Aug  7 10:02:42 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* generate.c (call_generator2): Fixed nasty and subtle bug in the
+	code generation for function arguments.  When a function (mainly
+	the variable and index accessors) are used on the LHS of an
+	assignment we must take precautions to ensure that the actual
+	arguments are evaluated as R-values and not as L-values.
+
+Wed Jul 30 15:03:18 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* generate.c (find_subexpressions): modified tratment of node
+	arguments.  Lists are now taken in consideration.  Same change
+	affected 'hash_cons_types'.  Why this worked up to now is a
+	mystery.
+	(find_symbols): Same as above.
+
+Mon Jul 28 14:34:08 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* parser.y: changed scheme by which the default value of special
+	forms is passed around.  This led to changes in 'check.c',
+	'generate.c' and 'gen-special-forms.c' as well.  Now, if a special form
+	has no default value, the node will have a single argument.
+
+Thu Jul 24 10:45:57 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* check.c (check_op_assignment): Added code to check the
+	use of '+:=' and -:=' with sets.
+
+	* generate.c (generate_op_assignment): Added generation for
+	'multiple' set insertions and removals via '+:=' and -:='.
+
+Wed Jul 23 15:39:29 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* check.c (rewrite_setcons): fixed in order to find the type of
+	the common ancestor in case of multiple instances.
+
+	* type.c (find_types_ancestor): fixed in order to find the proper
+	common ancestor.
+
+	* Changed the name of the node marking functions and moved them
+	from 'check.c' to 'lisp.c'.
+
+Mon Jul 21 16:14:26 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* check.c (check_assignment): Modified to use
+	'type_compatible_with_p'. Also moved up empty set/array hack,
+	since 'type_compatible_with_p' assumes completely filled type
+	designators.
+	(rewrite_setcons): rewritten test for checking of set elements.
+	Now it is possible to write enumerated sets which contain
+	heterogenous elements descending from a single ancestor.
+
+	* type.c (type_compatible_with_p): Added this function.
+
+Wed Jul 16 16:01:03 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* parser.y (yywarn): Changed format of warning and error printouts
+ 	so that now it conforms with the GNU coding standards and it
+ 	facilitates its interaction with Emacs based tools.
+
+Mon Jul  7 11:05:59 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* Added support for 'default' values in FIND and CHOOSE forms.
+  	The files affected are 'scanaux.c', 'parser.y', 'check.c',
+ 	'generate.c' and 'gen-special-forms.c'.
+
+Thu Jul  3 11:20:47 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* Added support for new operations on sets: FIND, COUNT, and
+	CHOOSE. Cfr. the reference for more info.
+
+	* Added support for new operators on sets (+:= and -:=) which add
+	and remove elements from sets without consing.
+
+Mon Jun 23 10:57:18 1997  Daniel Wiesmann  <danielw@alfa.PATH.Berkeley.EDU>
+
+	* generate.c (generate_type_descriptor): Fixed the generation of
+	type descriptors when '@null_sets' and '@empty_array' are
+	present.  This is a patch.  The problems run deep in the hashing
+	of types during the rewriting and generation phases.  More
+	problems may develop later.
+
+Thu Jun 19 11:35:08 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* Added 'ceil' and 'rint' to list of predefined functions.
+
+	* type.c (user_error): fixed bug that made this function break for
+	'id's withouth a file and line information.
+
+	* added missing conversion functions for symbols and logicals in
+	FFI.  Also fixed broken generation.
+	Still Missing:  conversion functions for arrays rank > 2.
+
+Thu Jun 12 10:01:53 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* generate.c (push_action_variables): Added special handling of
+	'nil' and empty set and array constants.  Otherwise, 'type_size'
+	would break down afterward, given that the type info of these
+	constants is 'nil'.
+
+	* Changed generation of set membership testing in 'generate.c'.
+	See 'gen(in, set_membership_generation)' line and friends.
+
+Mon May 19 16:59:10 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* Added generation of "external event functions" which will
+	substitute references to variables in external events.
+	Note however that the old scheme (with identifier offsets) is
+	still in place.  Once the system based on "external event
+	functions" will work reasonably we will phase out the 'offsets'
+	stuff.
+	
+
+
+
+	

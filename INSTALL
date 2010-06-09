@@ -1,0 +1,177 @@
+Copyright ©1996, 1997, 1998 The Regents of the University of
+California (Regents). All Rights Reserved. 
+
+Permission to use, copy, modify, and distribute this software and its
+documentation for educational, research, and not-for-profit purposes,
+without fee and without a signed licensing agreement, is hereby
+granted, provided that the above copyright notice, this paragraph and
+the following two paragraphs appear in all copies, modifications, and
+distributions. 
+
+Contact The Office of Technology Licensing, UC Berkeley, 2150 Shattuck
+Avenue, Suite 510, Berkeley, CA 94720-1620, (510) 643-7201, for
+commercial licensing opportunities. 
+
+IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
+ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
+REGENTS HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+  
+REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE.  THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF
+ANY, PROVIDED HEREUNDER IS PROVIDED "AS IS". REGENTS HAS NO OBLIGATION
+TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+MODIFICATIONS. 
+
+# INSTALL $Id: INSTALL 1.7 Wed, 17 Jun 1998 14:50:41 -0700 marcoz $
+
+SHIFT INSTALLATION
+
+These are the instructions for installing the SHIFT source
+distribution on your system.
+
+The distribution comes in a tar.gz package which you should have
+unpacked in the current directory (which you probably have since you
+are reading this.)
+
+To install shift in a simple way, follow the sequence of commands
+listed hereafter.  Most likely you will need write permissions to
+'/usr/local/bin' and '/usr/local/lib' and other "standard"
+locations. in this case.  If you don't, you will need to read on the
+rest of the instructions.
+
+The sequence of commands is:
+
+	your-prompt> ./configure
+	# various stuff
+
+	your-prompt> gmake # or make
+	# more stuff
+
+	your-prompt> gmake install # or make install
+
+will usually make (and install) the programs and the libraries.
+
+However, your local setup might require some more tuning of the
+installation procedure.  See section (2) of this document for details
+on the installation procedure.
+
+
+1. Prerequisites
+
+1.1 Make and GNU Make
+
+If you want to run the tty only debugger there are no particular
+prerequisites apart from GNU 'Make'.  Standard 'make' should also work
+but it might break down somewhere along the lines.  If this happens
+try to comment out the '.PHONY' lines in the 'Makefile.in' various
+directories.
+
+1.2 Other Libraries
+
+If you want to run the Tk based graphic environment, you will need the
+following packages installed:
+
+	1 - Tcl			version 7.5
+	2 - Tk			version 4.1
+	3 - [incr tcl] (also known as Itcl)	version 2.1
+	4 - [incr tk]  (also known as Itk)	version 2.1
+	5 - BLT					version 2.1
+
+The 'configure' script will try to detect these packages and will
+produce 'Makefile's which will not compile the Graphic Environment is
+any of them is missing.
+
+Please refer to, e.g.,
+	
+	http://www.sunlabs.com:80/research/tcl
+	http://www.tcltk.com
+
+for information about how to get and install these packages.
+
+
+2. Running 'configure'
+
+The 'configure' script that comes with the distribution will generally
+build the system without problems provided that you have write
+permissions to '/usr/local'.  If you cannot write in '/usr/local'  you
+can specify the standard 'configure' argument '--prefix'.
+
+	your-prompt> ./configure --prefix=~/iamistallingshifthere
+
+which will set (internally) the variable 'prefix' (cf. the 'Autoconf'
+and 'Configure' manual and info pages for more details on the standard
+command line options.)
+
+The 'configure' script assumes that you have the following directory
+structure set up
+
+	${prefix}/bin
+	${prefix}/lib
+	${prefix}/include
+	${prefix}/man
+
+2.1 Special Command Line Options
+
+The command
+
+	your-prompt> ./configure --help
+
+will print out all the possible command line options for the
+configuration script.  The special SHIFT only command line options are
+the following:
+
+  --enable-graphic-env    build the Graphic Environment (default)
+  --disable-graphic-env   do not build the Graphic Environment
+  --with-libtcl-loc       location of libtcl  (default = EPREFIX/lib)
+  --with-libtk-loc        location of libtk   (default = libtcl-loc)
+  --with-incltcl-loc      location of tcl include  (default = PREFIX/include)
+  --with-incltk-loc       location of tk include   (default = incltcl-loc)
+  --with-libitcl-loc      location of libitcl (default = libtcl-loc)
+  --with-libitk-loc       location of libitk  (default = libitcl-loc)
+  --with-inclitcl-loc     location of itcl include  (default = PREFIX/include)
+  --with-inclitk-loc      location of itk include   (default = inclitcl-loc)
+  --with-libBLT-loc       location of libBLT  (default = libitk-loc)
+  --with-inclBLT-loc      location of BLT include  (default = inclitk-loc)
+  --with-itkwidgets-loc	  location of Itk Widgets
+					 (default = libitk-loc/iwidgets2.1.0)
+  
+
+where PREFIX is either '/usr/local' (the default) or the value
+specified in the '--prefix' command line option, and EPREFIX is
+usually PREFIX or the value specified in '--exec-prefix' (cf. the
+'Autoconf' or 'Configure' manuals.)
+
+Each '--with-*' command line option can be used to specify the special
+location of the various libraries.  E.g.
+
+	your-prompt> ./configure --prefix=/zut \
+	                         --with-libtcl-loc=/zot/TCLSTUFF/lib
+
+will produce makefiles which contain special flags for the C compiler
+and the loader to look for the Tcl library in '/zot/TCLSTUFF/lib'
+(note also that many of the values default to some other one.)
+
+
+2.2 BLT problems.
+
+BLT may not compile properly on systems which do not have 'strerror'
+in the C library.  Nevertheless, SHIFT may compile on these systems.
+This is a problem with the BLT distribution and you can avoid it by
+specifying the configure command line option
+
+	--enable-BLT-testing=no
+
+(yes being the default.)  This will skip the BLT testing in the
+absence of 'strerror'.
+
+
+3. Bugs in the Configuration and Installation Process.
+
+The configuration process may still contain bugs.  If you find
+them, please send an email to
+
+	marcoxa@fiat.its.berkeley.edu
+
+The Shift Team.

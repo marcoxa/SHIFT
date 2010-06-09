@@ -1,0 +1,499 @@
+#! /bin/csh -f
+
+# cshift --
+#
+# Copyright (c)1996, 1997, 1998 The Regents of the University of
+# California (Regents). All Rights Reserved. 
+#
+# Permission to use, copy, modify, and distribute this software and its
+# documentation for educational, research, and not-for-profit purposes,
+# without fee and without a signed licensing agreement, is hereby
+# granted, provided that the above copyright notice, this paragraph and
+# the following two paragraphs appear in all copies, modifications, and
+# distributions. 
+#
+# Contact The Office of Technology Licensing, UC Berkeley, 2150 Shattuck
+# Avenue, Suite 510, Berkeley, CA 94720-1620, (510) 643-7201, for
+# commercial licensing opportunities. 
+#
+# IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+# SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
+# ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
+# REGENTS HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+#
+# REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE.  THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF
+# ANY, PROVIDED HEREUNDER IS PROVIDED "AS IS". REGENTS HAS NO OBLIGATION
+# TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+# MODIFICATIONS. 
+
+
+# Shell script to be used as a driver for the compilation process of a
+# SHIFT program (from source to executable.)
+# @configure_input@
+
+
+#------------------------------------------------------------------------------
+# Setup
+
+set cshift_debugging = 0
+
+
+set prefix      = @prefix@
+set exec_prefix = @exec_prefix@
+
+set bindir      = @bindir@
+set libdir      = @libdir@
+set includedir  = @includedir@
+
+
+set shic_prg    = @bindir@/shic
+
+set CC  = "@CC@"
+if (! $?CPP ) then
+    set cpreproc = "@CPP@"
+else
+    set cpreproc = "$CPP"
+endif
+
+
+set x_includes      = @x_includes@
+set x_libraries     = @x_libraries@
+
+set TCLLIBPATH      = @TCLLIBPATH@
+set TCLINCLUDEPATH  = @TCLINCLUDEPATH@
+
+set TKLIBPATH       = @TKLIBPATH@
+set TKINCLUDEPATH   = @TKINCLUDEPATH@
+
+set BLTLIBPATH      = @BLTLIBPATH@
+set BLTINCLUDEPATH  = @BLTINCLUDEPATH@
+
+set GCLIBPATH       = @GCLIBPATH@
+set GCINCLUDEPATH   = @GCINCLUDEPATH@
+
+set SHIFT_GUI_SETUP_P   = @SETUP_SHIFT_GUI_P@
+set BLT_CHECKED_P       = @CHECK_BLT_INSTALLED_P@
+set ENABLE_GC_USE_P     = @ENABLE_GC_SUPPORT_P@
+
+set LIBS = ( @LIBS@ )
+
+set configuration     = @CONFIGURATION_TARGET@
+
+
+
+# Setting up monitoring.
+# These variables contain templates for the call to the profiler and
+# the memory scanner (we kind of assume 'quantify' and 'purify').
+
+set profiler = ""
+set memory_scanner = ""
+
+
+# Setting -I and -L options
+
+# Dealing with GUI
+
+if ( $configuration == ttyonly ) then
+    set I_options = ( -I$includedir )
+    set L_options = ( -L$libdir )
+else
+    set I_options = ( -I$includedir \
+		      -I$BLTINCLUDEPATH \
+		      -I$TKINCLUDEPATH \
+		      -I$TCLINCLUDEPATH \
+		      -I$x_includes \
+		    )
+
+    set L_options = ( -L$libdir \
+		      -L$BLTLIBPATH \
+                      -L$TKLIBPATH \
+                      -L$TCLLIBPATH \
+                      -L$x_libraries \
+		    )
+endif
+
+# Dealing with GC
+
+if ($ENABLE_GC_USE_P == yes) then
+    set I_options = ( ${I_options[1]} -I$GCINCLUDEPATH ${I_options[2-]} )
+    set L_options = ( ${L_options[1]} -L$GCLIBPATH ${L_options[2-]} )
+endif
+
+
+set CPP_options = ()
+
+# The cc linker complains if no -w option is present
+if ( $CC == "cc" ) then
+    set CC_options  = (-w)
+else
+    set CC_options  = ()
+endif
+
+set extra_libraries = ()
+set shift_only_p    = 0
+
+set quantify_options = ()
+set purify_options   = ()
+
+if ($?SHIFT_LIBS) then
+    set shift_libraries = ( $SHIFT_LIBS )
+else
+    set shift_libraries = ( $libdir/shift.a $libdir/libDebug.a )
+    if ( $configuration == graphic.env ) then
+	set shift_libraries = ( $shift_libraries $libdir/libSocket.a )
+    endif
+    if ( $ENABLE_GC_USE_P == yes ) then
+	set shift_libraries = ( $GCLIBPATH/gc.a $shift_libraries )
+    endif
+endif
+set foreign_files = ()
+
+
+#------------------------------------------------------------------------------
+# Command line option processing
+# The list is traversed many times but it should not be too time consuming.
+
+if ( $#argv == 0 ) then
+    goto print_help
+endif
+
+
+# Print help message and exit if '-h' or '--help' switches have been given,
+# or print configure message if '--config' switch has been given.
+
+foreach cmd_opt ( $argv )
+    if ( "$cmd_opt" == '-h' || "$cmd_opt" == '--help') goto print_help
+    if ( "$cmd_opt" == '--config' ) goto print_config
+    if ( "$cmd_opt" == '-v' || "$cmd_opt" == '--version' ) then
+	shic -v
+	exit 0
+    endif
+end
+
+set HS_file = $argv[1] ; shift argv
+
+if ( ! -r $HS_file ) then
+     echo cshift: no SHIFT file named $HS_file found.
+     echo ''
+     exit 1
+endif
+
+set SIM_file = ${HS_file:r}.sim
+
+
+# Process other options
+
+set option_used_p = no
+set cmd_options = ( $argv )
+foreach cmd_opt ( $argv )
+
+    if ( $option_used_p == yes ) then
+	set option_used_p = no
+	continue
+    endif
+
+    switch ( "$cmd_opt" )
+    case -I*:
+	set I_options = ( $I_options "$cmd_opt" )
+	breaksw
+
+    case -L*:
+	set L_options = ( $L_options "$cmd_opt" )
+	breaksw
+
+    case -l*:
+	set extra_libraries = ( $extra_libraries "$cmd_opt" )
+
+    case -CPP=*:
+	set cpreproc = "`echo ${cmd_opt} | sed s/-CPP=//`"
+	breaksw
+
+    case -CC=*:
+	set CC = "`echo ${cmd_opt} | sed s/-CC=//`"
+	breaksw
+
+    case -SC=*:
+	set shic_prg = "`echo ${cmd_opt} | sed s/-SC=//`"
+	breaksw
+
+    case -SL=*:
+    case --shift-libraries=*:
+	set sed_cmd = "sed -e s/-SL=// -e s/--shift-libraries// -e s/:/\ /"
+	set shift_libraries = ( `echo ${cmd_opt} | ${sed_cmd}` )
+	breaksw
+
+    case -ff:
+    case --foreign-files:
+	shift cmd_options
+	set foreign_files = ( $cmd_options[*] )
+	break
+	breaksw
+
+    case -so:
+    case --shift-only:
+	# This shifting might be an error.
+	shift cmd_options
+	set shift_only_p = 1
+	breaksw
+
+    case -o:
+	shift cmd_options
+	set SIM_file = $cmd_options[1]
+	set option_used_p = yes
+	breaksw
+
+    case --profile=*:
+	set profiler = "`echo ${cmd_opt} | sed s/^--profile=//`"
+	breaksw
+
+    case --memory-scanner=*
+	set memory_scanner = "`echo ${cmd_opt} | sed s/^--memory-scanner=//`"
+	breaksw
+
+    # Recognized CPP command line switches
+
+    case -B:
+    case -C:
+    case -p:
+    case -P:
+    case -R:
+    case -T:
+    case -undef:
+    case -D*:
+    case -U*:
+    case -Y*:
+	set CPP_options = ( $CPP_options "$cmd_opt" )
+	breaksw
+
+    # Unrecognized CPP command line switches
+    case -H:
+    case -M:
+	echo "cshift: unusable CPP option: $cmd_opt"
+	exit 1
+	breaksw
+
+    # Recognized 'quantify' and 'purify' command line switches
+    case -cache-dir=*:
+    case -always-use-cache-dir*:
+    case -linker=*:
+    case '-g++'*:
+	set purify_options = ( $purify_options "${cmd_opt}" )
+	set quantify_options = ( $quantify_options "${cmd_opt}" )
+	breaksw
+
+    case -ignore-runtime-environment*:
+    case -use-machine=*:
+    case -collection-granularity=*:
+    case -collector=*:
+    case -print-home-dir:
+	set quantify_options = ( $quantify_options "${cmd_opt}" )
+	breaksw
+
+    # All the remaining options are assumed to be C options (this is
+    # really to accommodate the godzillion options of 'gcc'.
+
+    # Unrecognized command line switches
+    default:
+	# echo "cshift: unrecognized command line option $cmd_opt"
+	# echo ''
+	# exit 1
+	# breaksw
+	set CC_options = ( $CC_options "$cmd_opt" )
+	breaksw
+    endsw
+    shift cmd_options
+end
+
+
+# Check which profiler and memory scanner we are using
+
+if ($profiler != quantify && $#quantify_options != 0) then
+    echo 'cshift: warning: discarding the profiler options:'
+    echo "        $quantify_options"
+    set quantify_options = ()
+endif
+
+if ($memory_scanner != purify && $#purify_options != 0) then
+    echo 'cshift: warning: discarding the memory scanner options:'
+    echo "        $purify_options"
+    set purify_options = ()
+endif
+
+
+# Make sure the '-B' option is within the CPP option list.
+# This might be a bogus setup with some C preprocessors, but we do not
+# have a better idea.
+
+# set CPP_options = (-B $CPP_options)
+set CPP_options = ()
+
+if ( $cshift_debugging ) then
+    echo IOPT = $I_options
+    echo LOPT = $L_options
+    echo FF   = $foreign_files
+    echo CC   = $CC
+    echo CPP  = $cpreproc
+    echo CPP_options = $CPP_options
+    echo CC_options = $CC_options
+    echo shift_libraries = $shift_libraries
+    echo extra_libraries = $extra_libraries
+    echo LIBS  = $LIBS
+endif
+
+#------------------------------------------------------------------------------
+# Preprocessing and Compiling
+# In order not to change the main of the 'shic' program we do this
+# trick with environment variables
+
+set c_compiler_error = 0
+set c_compiler_status = 0
+
+set shic_error = 0
+set shic_ret_status = 0
+
+
+# Check for tester program
+
+set tester_prg  = ""
+set tester_opts = ()
+
+if ("$memory_scanner" != "" && "$profiler" != "") then
+    echo 'cshift: error: both options --profile and --memory-scanner'
+    echo '               have been passed on the command line.'
+    echo ''
+    exit 1
+else if ("$memory_scanner" != "") then
+    set tester_prg  = $memory_scanner
+    set tester_opts = $purify_options
+else if ("$profiler" != "") then
+    set tester_prg  = $profiler
+    set tester_opts = $quantify_options
+endif
+
+
+# $CPP $CPP_options $I_options $HS_file ${HS_file:r}.hsp
+# setenv CPP "$cpreproc $CPP_options $I_options"
+
+echo "cshift: compiling to C..."
+
+# $shic_prg ${HS_file:r}.hsp
+env CPP="$cpreproc $CPP_options $I_options" ${shic_prg} "${HS_file}"
+
+if ($status != 0) then
+    set shic_ret_status = $status
+    set shic_error = 1
+else if (! $shift_only_p ) then
+    if ("${tester_prg}" != "") then
+	echo -n "cshift: compiling C intermediate code (instrumenting with "
+	echo "$tester_prg)..."
+	env CPP="$cpreproc" \
+	    $tester_prg $tester_opts $CC -o $SIM_file  \
+		$CC_options          \
+		$CPP_options         \
+		$I_options           \
+		$L_options           \
+		${HS_file:r}.c       \
+		$foreign_files       \
+		$shift_libraries     \
+		$extra_libraries     \
+		$LIBS
+	if ($status != 0) then
+	    set c_compiler_status = $status
+	    set c_compiler_error = 1
+	endif
+    else
+	echo "cshift: compiling C intermediate code..."
+	env CPP="$cpreproc" \
+	    $CC -o $SIM_file  \
+		$CC_options          \
+		$CPP_options         \
+		$I_options           \
+		$L_options           \
+		${HS_file:r}.c       \
+		$foreign_files       \
+		$shift_libraries     \
+		$extra_libraries     \
+		$LIBS
+	if ($status != 0) then
+	    set c_compiler_status = $status
+	    set c_compiler_error = 1
+	endif
+    endif
+endif
+
+#------------------------------------------------------------------------------
+# Wrapup
+
+if ($shic_error) then
+    echo "cshift: error: the SHIFT compiler generated an error."
+    echo "        The return status was [$shic_ret_status]."
+    exit 1
+else if ($c_compiler_error) then
+    echo "cshift: error: the C compiler generated an error."
+    echo "        The return status was [$c_compiler_status]."
+    exit 1
+else
+    echo "cshift: done compiling the SHIFT file $HS_file."
+    echo "        the resulting executable simulation  was left"
+    echo "        in file $SIM_file."
+    echo ''
+    exit 0
+endif
+
+
+#------------------------------------------------------------------------------
+# Special code chunks (this is a simple 'csh' script: no "functions" are
+# available, so 'gotos' are used.)
+
+print_help:
+
+set noglob
+echo 'Usage: cshift <filename>.hs [options] [[-ff|--foreign-files] <files>'
+echo '       <options> are:'
+echo '       [-h|--help]           prints this message'
+echo '       [-v|--version]        prints the version number'
+echo '       [--config]            prints the current configuration of script'
+echo '       [-so|--shift-only]    do not run the C compiler'
+echo '       -I<include dir>        (repeatable)'
+echo '       -L<library dir>        (repeatable)'
+echo '       -l<library name>       (repeatable)'
+echo '       -CPP=<C preprocessor command>'
+echo '       -CC=<C compiler command>'
+echo '       -SC=<SHIFT compiler command>'
+echo '       --profile=<profiler command> (e.g. "quantify")'
+echo '       --memory-scanner=<memory scanner command> (e.g. "purify")'
+echo '       "quantify" or "purify" options'
+echo '       C preprocessor and C compiler options'
+echo ''
+unset noglob
+exit 0
+
+
+print_config:
+
+set noglob
+echo 'cshift current configuration:'
+echo "       command used:                "`which $0`
+echo "       C compiler command:          $CC"
+echo "       C preprocessor command:      $CPP"
+echo "       graphic environment enabled: $SHIFT_GUI_SETUP_P"
+if ( $SHIFT_GUI_SETUP_P == yes ) then
+    echo "       Tcl Library Location:            $TCLLIBPATH"
+    echo "       Tcl Include Dir Location:        $TCLINCLUDEPATH"
+    echo "       Tk  Library Location:            $TKLIBPATH"
+    echo "       Tk  Include Dir Location:        $TKINCLUDEPATH"
+
+    if ( $BLT_CHECKED_P == yes ) then
+	# This is disgusting!
+	echo "       BLT Library Location:            $BLTLIBPATH"
+	echo "       BLT Include Dir Location:        $BLTINCLUDEPATH"
+    endif
+endif
+echo ''
+unset noglob
+exit 0
+
+# end of file -- cshift --
+# @configure_input@

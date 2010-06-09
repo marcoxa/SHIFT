@@ -1,0 +1,745 @@
+#! /bin/sh
+# -*- Mode: Shell-script -*-
+
+# Copyright (c)1996, 1997, 1998 The Regents of the University of
+# California (Regents). All Rights Reserved. 
+#
+# Permission to use, copy, modify, and distribute this software and its
+# documentation for educational, research, and not-for-profit purposes,
+# without fee and without a signed licensing agreement, is hereby
+# granted, provided that the above copyright notice, this paragraph and
+# the following two paragraphs appear in all copies, modifications, and
+# distributions. 
+#
+# Contact The Office of Technology Licensing, UC Berkeley, 2150 Shattuck
+# Avenue, Suite 510, Berkeley, CA 94720-1620, (510) 643-7201, for
+# commercial licensing opportunities. 
+#
+# IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+# SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
+# ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
+# REGENTS HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+#
+# REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE.  THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF
+# ANY, PROVIDED HEREUNDER IS PROVIDED "AS IS". REGENTS HAS NO OBLIGATION
+# TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+# MODIFICATIONS. 
+
+
+
+dnl configure.in
+dnl Process this file with autoconf to produce a configure script.
+
+dnl The structure of this 'configure.in' is roughly divided into three
+dnl parts.  First Various PATHS and command line arguments are checked
+dnl and set up.  Second various tests for the presence of libraries
+dnl and functions are performed.  Finally, some extra processing is
+dnl done in order to ensure that the various libraries variables are
+dnl set up in the proper way.
+
+dnl Notes:
+dnl - Variables prefixed by 'ac_cv_' are generated automatically by autoconf.
+dnl - Variables prefixed by 'shift_conf_' are special to the SHIFT
+dnl   configuration process.
+
+AC_PREREQ(2.10)
+
+dnl Initialize various things
+
+AC_INIT(compiler/generate.c)
+AC_CANONICAL_HOST
+
+
+AC_CONFIG_HEADER(include/shift_config.h)
+
+
+dnl Configuring subdirectories.
+
+AC_CONFIG_SUBDIRS(extra/mat2scalar)
+
+
+dnl Checks for programs.
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_LEX
+
+dnl Make sure to issue a warning if the lexer does not find the proper library.
+
+if test "x${LEX}" = "xflex" -a "x${LEXLIB}" = ""; then
+    AC_MSG_WARN(The lexer is set to flex, but the library libfl.a)
+    AC_MSG_WARN(was not found)
+fi
+
+
+dnl The standard autoconf macro defaults to 'bison -y' if this program
+dnl is present.  However, our parser contains some '@' characters
+dnl which bison does not like.  Therefore we just default to 'yacc'
+dnl AC_PROG_YACC
+
+YACC=yacc
+
+AC_PROG_YACC
+
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
+
+dnl Check for special AIX case
+dnl AC_AIX
+
+# Check for current X include and libraries pathnames
+
+AC_PATH_X
+AC_SUBST(x_libraries)
+AC_SUBST(x_includes)
+
+
+# PREFIX -- The configuration process may break if this
+# variable contains relative components. So, let us try to put a patch
+# if this is the case (as a matter of fact, also related variables
+# like 'includedir' would break the configuration in this case, but we
+# limit the checks for the time being.)
+#
+# Note: We could probably resort to some Autoconf Macros for this, but
+#       it seemed simpler to just write out the shell lines.
+
+# Save the current directory and get an absolute pathname with 'pwd'.
+
+shift_conf_saved_dir=`pwd`
+shift_conf_current_dir=
+if test "x$prefix" != xNONE
+then
+
+    # cd to the prefix dir and get an absolute pathname.
+    cd $prefix
+    shift_conf_current_dir=`pwd`
+    # The only thing we disallow is to try to configure and install in
+    # the current directory
+    if test $shift_conf_saved_dir = $shift_conf_current_dir
+    then
+	cd $shift_conf_saved_dir    #  really useless, but what the heck!
+	AC_MSG_ERROR(\'prefix\' cannot be equal to the configuration directory \($shift_conf_current_dir\))
+    fi
+    
+    # 'prefix' (as specified) is fine. We just make sure that we have
+    # an absolute path.
+    prefix=$shift_conf_current_dir
+    cd $shift_conf_saved_dir
+fi
+
+
+# PREFIX and EPREFIX --
+# Now check that the standard locations, 'bin', 'man', 'include', and
+# 'lib' exists and are writeable.
+
+shift_config_prefix=
+shift_config_exec_prefix=
+
+if test "x$prefix" = xNONE
+then
+    shift_config_prefix=$ac_default_prefix
+else
+    shift_config_prefix=$prefix
+fi
+
+if test "x$exec_prefix" = xNONE
+then
+    if test "x$prefix" = xNONE
+    then
+	shift_config_exec_prefix=$ac_default_prefix
+    else
+	shift_config_exec_prefix=$prefix
+    fi
+else
+    shift_config_exec_prefix=$exec_prefix
+fi
+
+dnl echo "SHIFT CONFIG: Testing PREFIX ($shift_config_prefix) and EPREFIX ($shift_config_exec_prefix)."
+
+test -d $shift_config_exec_prefix/bin -a -r $shift_config_exec_prefix/bin \
+|| AC_MSG_ERROR($shift_config_exec_prefix/bin is not accessible for configuration)
+
+test -d $shift_config_exec_prefix/lib -a -r $shift_config_exec_prefix/lib \
+|| AC_MSG_ERROR($shift_config_exec_prefix/lib is not accessible for configuration)
+
+test -d $shift_config_prefix/include -a -r $shift_config_prefix/include \
+|| AC_MSG_ERROR($shift_config_prefix/include is not accessible for configuration)
+
+test -d $shift_config_prefix/man -a -r $shift_config_prefix/man \
+|| AC_MSG_ERROR($shift_config_prefix/man is not accessible for configuration)
+
+
+# =============================================================================
+# Checks for special arguments
+
+dnl Help Message.
+dnl 'enable-' argument is ignored.  I need it to set up a proper message
+
+AC_ARG_ENABLE(graphic-env-help,
+[
+Graphic Environment Build Options:])
+
+
+if test $"no_x" != yes
+then
+    AC_ARG_ENABLE(graphic-env,
+    [  --enable-graphic-env    build the Graphic Environment],
+                  SETUP_SHIFT_GUI_P=$enableval,
+                  SETUP_SHIFT_GUI_P=yes)
+else
+    SETUP_SHIFT_GUI_P=no
+fi
+
+if test $SETUP_SHIFT_GUI_P = yes
+then
+    # Setting up Tcl/Tk
+
+    # Library paths
+    AC_ARG_WITH(libtcl-loc,
+    [  --with-libtcl-loc       location of libtcl  (default = EPREFIX/lib)],
+                TCLLIBPATH=$withval,
+		# No argument was given.  We should set TCLLIBPATH to $libdir,
+		# however the value of this variable is not yet usable.
+		# Hence the following kruft
+		if test "x$exec_prefix" = xNONE
+		then
+		    if test "x$prefix" = xNONE
+		    then
+			TCLLIBPATH=$ac_default_prefix/lib
+		    else
+			TCLLIBPATH=$prefix/lib
+		    fi
+		else
+		    TCLLIBPATH=$exec_prefix/lib
+		fi
+		)
+
+    test -d "$TCLLIBPATH" \
+    || AC_MSG_ERROR(--with-libtcl-loc=$TCLLIBPATH is an invalid library path)
+
+    AC_ARG_WITH(libtk-loc,
+    [  --with-libtk-loc        location of libtk   (default = libtcl-loc)],
+                TKLIBPATH=$withval,
+                TKLIBPATH=$TCLLIBPATH)
+    test -d "$TKLIBPATH" \
+    || AC_MSG_ERROR(--with-libtk-loc=$TKLIBPATH is an invalid library path)
+
+    # Include paths
+    AC_ARG_WITH(incltcl-loc,
+    [  --with-incltcl-loc      location of tcl include  (default = PREFIX/include)],
+                TCLINCLUDEPATH=$withval,
+		# Again, no argument was given.  We should set
+		# TCLLIBPATH to $include, however the value of this
+		# variable isalso not yet usable.
+		# Hence the following kruft
+		if test "x$prefix" = xNONE
+		then
+		    TCLINCLUDEPATH=$ac_default_prefix/include
+		else
+		    TCLINCLUDEPATH=$prefix/include
+		fi
+		)
+    test -d "$TCLINCLUDEPATH" \
+    || AC_MSG_ERROR(--with-incltcl-loc=$TCLINCLUDEPATH is an invalid include path)
+
+    AC_ARG_WITH(incltk-loc,
+    [  --with-incltk-loc       location of tk include   (default = incltcl-loc)],
+                TKINCLUDEPATH=$withval,
+                TKINCLUDEPATH=$TCLINCLUDEPATH)
+    test -d "$TKINCLUDEPATH" \
+    || AC_MSG_ERROR(--with-incltk-loc=$TKINCLUDEPATH is an invalid include path)
+
+
+    # Setting up BLT
+
+    # Library Path
+    AC_ARG_WITH(libBLT-loc,
+    [  --with-libBLT-loc       location of libBLT  (default = libTK-loc)],
+                BLTLIBPATH=$withval,
+                BLTLIBPATH=$TKLIBPATH)
+    test -d "$BLTLIBPATH" \
+    || AC_MSG_ERROR(--with-libBLT-loc=$BLTLIBPATH is an invalid library path)
+
+    AC_ARG_WITH(inclBLT-loc,
+    [  --with-inclBLT-loc      location of BLT include  (default = inclTK-loc)],
+                BLTINCLUDEPATH=$withval,
+                BLTINCLUDEPATH=$TKINCLUDEPATH)
+    test -d "$BLTINCLUDEPATH" \
+    || AC_MSG_ERROR(--with-inclBLT-loc=$BLTINCLUDEPATH is an invalid include path)
+
+
+    dnl The following is a monstrosity but it is the easy way out of a
+    dnl messy situation that the developers of BLT should fix with
+    dnl respect the configuration of the library with or without
+    dnl 'strerror'
+
+    AC_ARG_ENABLE(BLT-testing,
+    [  --enable-BLT-testing    if 'yes' then BLT will be checked by configure;
+                          otherwise the test will be skipped, assuming
+                          that BLT has been properly installed
+                          (this is a problem due to an incorrect
+                          assumption made about 'strerror' by the
+                          BLT developers -- since there is no easy way
+                          out to make 'configure' believe that
+                          everything is fine, we provide this as a
+                          possible way out when your system seems
+                          to bail out on BLT)],
+		  CHECK_BLT_INSTALLED_P=$enableval,
+		  CHECK_BLT_INSTALLED_P=yes)
+
+fi  # test $SETUP_SHIFT_GUI_P
+
+
+# Checking for GC support
+
+AC_ARG_ENABLE(gc,
+[  --enable-gc             if 'yes' then support for the Boehm C
+                          Garbage Collector will be compiled in the SHIFT
+                          compiler and run time (default is 'no')],
+              ENABLE_GC_SUPPORT_P=$enableval,
+              ENABLE_GC_SUPPORT_P=no)
+
+if test $ENABLE_GC_SUPPORT_P != no
+then 
+   AC_ARG_WITH(inclgc-loc,
+    [  --with-inclgc-loc       location of GC include (default = PREFIX/include)],
+                GCINCLUDEPATH=$withval,
+		# Again, no argument was given.  We should set
+		# GCINCLUDEPATH to $include, however the value of this
+		# variable is also not yet usable.
+		# Hence the following kruft
+		if test "x$prefix" = xNONE
+		then
+		    GCINCLUDEPATH=$ac_default_prefix/include
+		else
+		    GCINCLUDEPATH=$prefix/include
+		fi
+		)
+    test -d "$GCINCLUDEPATH" \
+    || AC_MSG_ERROR(--with-inclgc-loc=$GCINCLUDEPATH is an invalid include path)
+
+    AC_ARG_WITH(gclib-loc,
+    [  --with-gclib-loc        location of GC library (default = EPREFIX/lib)],
+                GCLIBPATH=$withval,
+		# Same as above
+		if test "x$exec_prefix" = xNONE
+		then
+		    if test "x$prefix" = xNONE
+		    then
+			GCLIBPATH=$ac_default_prefix/lib
+		    else
+			GCLIBPATH=$prefix/lib
+		    fi
+		else
+		    GCLIBPATH=$exec_prefix/lib
+		fi)
+    test -d "$GCLIBPATH" \
+    || AC_MSG_ERROR(--with-gclib-loc=$GCLIBPATH is an invalid library path)
+fi
+
+
+# Temporary test for new hash table code
+
+AC_ARG_ENABLE(new-hash, [  --enable-new-hash        enable for new hash code])
+if test "$enableval" != no
+then
+    AC_DEFINE(HAVE_NEW_HASH_P)
+fi
+
+
+# =============================================================================
+# Checks for libraries and include files
+
+# LDFLAGS -- First of all export the variable LDFLAGS
+
+export LDFLAGS
+AC_SUBST(LDFLAGS)
+
+
+# LD_LIBRARY_PATH -- Export also LD_LIBRARY_PATH (no need to SUBST it.)
+
+export LD_LIBRARY_PATH
+
+
+# We need special LD_LIBRARY_PATH and LDFLAGS in order to make sure
+# that we can test the X dependent libraries depending on the result
+# of AC_PATH_X here above
+# 
+# Note that the following might not work if configuring for a non
+# UN*X system
+
+if test "$no_x" != yes
+then
+    if test "$LD_LIBRARY_PATH"
+    then
+	if test "x$x_libraries" != xNONE
+	then
+	    LD_LIBRARY_PATH=$x_libraries
+	fi
+    else
+	if test "x$x_libraries" != xNONE
+	then
+	    LD_LIBRARY_PATH=$x_libraries:$LD_LIBRARY_PATH
+	fi
+    fi
+
+    if test -z "$LDFLAGS"
+    then
+	if test "x$x_includes" != xNONE
+	then
+	    LDFLAGS=-I$x_includes
+	fi
+    else
+        if test "x$x_includes" != xNONE
+	then
+	    LDFLAGS="-I$x_includes $LDFLAGS"
+	fi
+    fi
+fi
+
+
+dnl # Checking for YACC library
+
+AC_CHECK_LIB(y, main, YACCLIB="-ly", YACCLIB="")
+AC_SUBST(YACCLIB)
+
+
+# Checking for dynamic loader
+
+AC_CHECK_LIB(dl, dlopen)
+
+
+# Checking for Math library
+
+AC_CHECK_LIB(m, sin)
+
+
+# Checking for GC library
+# The test is very rough. It should be rewritten using AC_TRY_CPP and
+# AC_TRY_LINK.
+
+if test $ENABLE_GC_SUPPORT_P != no
+then
+    AC_MSG_CHECKING(for gc library)
+    if test \( -f "$GCLIBPATH/gc.a" \) -a \( -f "$GCINCLUDEPATH/gc.h" \)
+    then
+	AC_DEFINE(USE_GC_SUPPORT_P)
+    
+	# We need to stick the 'gc.a' library in the link path.  However
+	# this library is not in the form 'libgc.a' so we have to
+	# directly enter its name.
+	
+	GCLIBRARY="$GCLIBPATH/gc.a"
+	AC_MSG_RESULT(yes)
+    elif test \( -f "$GCLIBPATH/libGC.a" \) -a \( -f "$GCINCLUDEPATH/gc.h" \)
+    then
+	# Just in case we did have the GC library in "libGC.a" form.
+	AC_DEFINE(USE_GC_SUPPORT_P)
+	GCLIBRARY="-lGC"
+	AC_MSG_RESULT(yes)
+    else
+	ENABLE_GC_SUPPORT_P=no
+	GCLIBRARY=""
+	AC_MSG_RESULT(no)
+    fi
+else
+    GCLIBRARY=""
+fi
+
+
+# Checking for nsl and socket libraries under a given OS
+
+case $host_os in
+    solaris2.*)
+
+	# Define a configure preprocessor directive
+
+	AC_DEFINE(OS_SOLARIS)
+	AC_DEFINE(OS_SUNOS5)
+
+	# Checking for nsl library
+
+	if test $SETUP_SHIFT_GUI_P = yes
+	then
+	    AC_CHECK_LIB(nsl, doconfig)
+	    if test "$ac_cv_lib_nsl_doconfig" = no
+	    then
+		AC_MSG_WARN(the graphic environment cannot be built)
+		AC_MSG_WARN(without the nsl library)
+		SETUP_SHIFT_GUI_P=no
+	    fi
+	fi
+
+
+	# Checking for socket library
+
+	if test $SETUP_SHIFT_GUI_P = yes
+	then
+	    AC_CHECK_LIB(socket, socket)
+	    if test "$ac_cv_lib_socket_socket" = no
+	    then
+		AC_MSG_WARN(the graphic environment cannot be built)
+		AC_MSG_WARN(without the socket library)
+		SETUP_SHIFT_GUI_P=no
+	    fi
+	fi
+	;;
+
+    sunos4.*)
+
+	# Define a configure preprocessor directive
+
+	AC_DEFINE(OS_SUNOS4)
+	;;
+
+    irix*)
+
+	# Define a configure preprocessor directive
+
+	AC_DEFINE(OS_IRIX)
+	;;
+
+    *freebsd*)
+
+	# Define a configure preprocessor directive
+
+	AC_DEFINE(OS_FREEBSD)
+	;;
+
+    *linux*)
+
+	# Define a configure preprocessor directive
+
+	AC_DEFINE(OS_LINUX)
+	;;
+
+    *windows*)
+
+	# Define a configure preprocessor directive
+
+	AC_DEFINE(OS_MSWINDOWS)
+	AC_DEFINE(WIN32)
+	;;
+
+    *) # default
+
+	# Define a configure preprocessor directive
+	AC_MSG_WARN(OS ${host_os} not yet handled.)
+	AC_MSG_WARN(Compilation and Runtime may break down later on.)
+	AC_DEFINE(OS_OTHER)
+esac
+
+
+# Checking for X system
+
+if test $SETUP_SHIFT_GUI_P = yes
+then
+    AC_CHECK_LIB(X11, XOpenDisplay)
+fi
+
+
+# Checking for Tcl, Tk
+# Instead of changing LD_LIBRARY_PATH, we make sure that
+# the LDFLAGS are set in a sensible way.
+
+if test $SETUP_SHIFT_GUI_P = yes
+then
+    # Include options for 'ld' (note that we are not using the env var
+    # LD_OPTIONS)
+
+    LDFLAGS="-I$BLTINCLUDEPATH $LDFLAGS"
+    LDFLAGS="-I$TKINCLUDEPATH -I$TCLINCLUDEPATH $LDFLAGS"
+
+    # Library LD Options (note that we are not using the env var
+    # LD_OPTIONS)
+    # Order is very important.
+
+    LDFLAGS="-L$BLTLIBPATH $LDFLAGS"
+    LDFLAGS="-L$TKLIBPATH -L$TCLLIBPATH $LDFLAGS"
+fi				# test $SETUP_SHIFT_GUI_P = yes
+
+
+# Tcl
+if test $SETUP_SHIFT_GUI_P = yes
+then
+    AC_CHECK_LIB(tcl, TclInterpInit)
+    if test $ac_cv_lib_tcl_TclInterpInit = no
+    then
+	SETUP_SHIFT_GUI_P=no
+	AC_MSG_WARN(the graphic environment cannot be built without Tcl)
+    fi	
+    AC_SUBST(TCLINCLUDEPATH)
+    AC_SUBST(TCLLIBPATH)
+fi
+
+# Tk
+if test $SETUP_SHIFT_GUI_P = yes
+then
+    AC_CHECK_LIB(tk, Tk_Init)
+    if test $ac_cv_lib_tk_Tk_Init = no
+    then
+	SETUP_SHIFT_GUI_P=no
+	AC_MSG_WARN(the graphic environment cannot be built without Tk)
+    fi
+    AC_SUBST(TKINCLUDEPATH)
+    AC_SUBST(TKLIBPATH)
+fi
+
+
+# Checking for BLT Tcl library
+# This test is complex because the BLT library may have to be compiled
+# with the 'strerror' function which is not available everywhere.
+
+if test $SETUP_SHIFT_GUI_P = yes
+then
+
+    dnl AC_REPLACE_FUNCS(strerror)
+    dnl echo \[SHIFT Config\] LIBOBJS = $LIBOBJS
+
+    AC_CHECK_FUNC(strerror,
+		  AC_DEFINE(HAVE_STRERROR)
+                  shift_config_have_strerror=yes,
+                  shift_config_have_strerror=no)
+
+    if test $shift_config_have_strerror = yes
+    then
+	CHECK_BLT_INSTALLED_P=yes
+    fi
+
+    if test $CHECK_BLT_INSTALLED_P = yes
+    then
+	AC_CHECK_LIB(BLT, Blt_Init)
+	if test $ac_cv_lib_BLT_Blt_Init = no
+	then
+	    SETUP_SHIFT_GUI_P=no
+	    AC_MSG_WARN(the graphic environment cannot be built without BLT)
+	fi
+    else
+	AC_MSG_WARN([Configuring with 'libBLT' testing disabled])
+	AC_MSG_WARN([the graphic environment will be built anyway.])
+	if test $shift_config_have_strerror = no
+	then
+	    AC_MSG_WARN([However, it looks like your system is missing])
+	    AC_MSG_WARN(['strerror', which may cause problems later on.])
+	fi
+	dnl Make sure to update LIBS later.  We cannot do it here
+	dnl otherwise the configuration process may break in the
+	dnl following. We know this is disgusting but there are no easy ways
+	dnl out. Complain to the BLT developers.
+	dnl LIBS="-lBLT $LIBS"
+    fi
+    AC_SUBST(BLTINCLUDEPATH)
+    AC_SUBST(BLTLIBPATH)
+fi
+
+
+# Final Test for CPP macro HAVE_SHIFT_GUI_P
+
+if test $SETUP_SHIFT_GUI_P = yes
+then
+    AC_DEFINE(HAVE_SHIFT_GUI_P)
+fi
+
+
+# Checks for header files.
+
+AC_HEADER_STDC
+AC_CHECK_HEADERS(fcntl.h sys/ioctl.h sys/time.h unistd.h)
+
+# Checks for typedefs, structures, and compiler characteristics.
+
+AC_C_CONST
+AC_C_INLINE
+AC_HEADER_TIME
+AC_STRUCT_TM
+AC_FUNC_VPRINTF
+
+# Checks for library functions.
+
+AC_PROG_GCC_TRADITIONAL
+
+dnl Check for 'drand48' will work because we already checked for '-lm'.
+AC_CHECK_FUNC(drand48, AC_DEFINE(HAVE_DRAND48))
+
+
+AC_CHECK_FUNCS(gettimeofday socket strdup)
+
+
+# Final preprocessing
+
+# Generating the proper specialized targets for the Makefiles.
+# The following names are used as 'conditional' targets in the
+# Makefiles
+# - ttyonly
+# - graphic.env
+
+if test $SETUP_SHIFT_GUI_P = yes
+then
+    CONFIGURATION_TARGET=graphic.env
+else
+    CONFIGURATION_TARGET=ttyonly
+fi
+
+
+# In order to use the simplest possible Makefiles we define the
+# following substitution for those which need to build selective parts
+# of the distribution.
+# The Makefile.in (e.g. in 'libDebug') will have to define the
+# BASE_OBJS and GUI_OBJS variables.
+
+if test $SETUP_SHIFT_GUI_P = yes
+then
+    CONFIGURATION_OBJS='$(BASE_OBJS) $(GUI_OBJS)'
+    
+    # Wrap up the disgusting libBLT/strerror affair.
+    # This is a patch that we hope works.
+    if test $CHECK_BLT_INSTALLED_P != yes
+    then
+	LIBS_NO_BLT=$LIBS
+	LIBS="-lBLT $LIBS"
+    else
+	LIBS_NO_BLT=$LIBS
+	# LIBS does not change
+    fi
+else
+    CONFIGURATION_OBJS='$(BASE_OBJS)'
+fi
+
+
+# Final wrap up for the GC library
+
+if test $ENABLE_GC_SUPPORT_P != no
+then
+    LIBS="$GCLIBRARY $LIBS"
+    LIBS_NO_BLT="$GCLIBRARY $LIBS_NO_BLT"
+    GCINCLUDEFLAG="-I$GCINCLUDEPATH"
+fi
+
+
+AC_SUBST(CHECK_BLT_INSTALLED_P)
+AC_SUBST(SETUP_SHIFT_GUI_P)
+AC_SUBST(ENABLE_GC_SUPPORT_P)
+
+AC_SUBST(GCINCLUDEFLAG)
+AC_SUBST(GCINCLUDEPATH)
+AC_SUBST(GCLIBPATH)
+
+AC_SUBST(LIBS_NO_BLT)
+AC_SUBST(CONFIGURATION_TARGET)
+AC_SUBST(CONFIGURATION_OBJS)
+
+AC_SUBST(LIBOBJS)
+  
+  
+dnl Output the configured files
+
+AC_OUTPUT(include/Makefile socket/Makefile libTcl/Makefile
+    compiler/Makefile libDebug/Makefile reference/Makefile
+    run-time/Makefile Makefile shift.mk shiftDefaults
+    cshift extra/shiftdoc/Makefile extra/shifttree/Makefile)
+
+echo done configuring the SHIFT distribution.
+echo ''
+
+dnl end of file -- configure.in --

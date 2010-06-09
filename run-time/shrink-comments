@@ -1,0 +1,11 @@
+#! /bin/awk -f
+BEGIN		{ printf "/* This file was generated automatically with\n"; \
+		  printf " * the command: shrink-comments %s\n", FILENAME; \
+		  printf " */\n\n"; }
+/\/---/		{ skip = 2; }
+/./ || /^$/	{ if (skip == 0 && doprint) printf "%s\n", previous_line; \
+		  else if (skip == 1) skip = 0; \
+		  previous_line = $0; \
+		  doprint = 1; }
+/---\//		{ skip = 1; }
+END		{ printf "%s\n", previous_line; }

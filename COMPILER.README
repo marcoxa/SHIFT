@@ -1,0 +1,90 @@
+# Copyright (c)1996, 1997, 1998 The Regents of the University of
+# California (Regents). All Rights Reserved. 
+#
+# Permission to use, copy, modify, and distribute this software and its
+# documentation for educational, research, and not-for-profit purposes,
+# without fee and without a signed licensing agreement, is hereby
+# granted, provided that the above copyright notice, this paragraph and
+# the following two paragraphs appear in all copies, modifications, and
+# distributions. 
+#
+# Contact The Office of Technology Licensing, UC Berkeley, 2150 Shattuck
+# Avenue, Suite 510, Berkeley, CA 94720-1620, (510) 643-7201, for
+# commercial licensing opportunities. 
+#
+# IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+# SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
+# ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
+# REGENTS HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+#
+# REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE.  THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF
+# ANY, PROVIDED HEREUNDER IS PROVIDED "AS IS". REGENTS HAS NO OBLIGATION
+# TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+# MODIFICATIONS. 
+
+# README
+
+This is an early pre-release of the SHIFT compiler.  Only the
+front-end is included.  It checks the syntax and static semantics of a
+SHIFT program, producing error messages as needed.  Not all checks are
+implemented, and the existing checks have only been barely tested.
+So good luck.
+
+---------------------
+BUILDING THE COMPILER
+---------------------
+
+To compile the system the first time, do the following.
+
+	touch depend
+	make make-depend
+	make hasher
+	make
+
+After the initial bootstrap, it is sufficient to say `make'.
+
+Some versions of `make' will say that the Makefile is bad.
+The GNU make (gmake) is known to work.
+
+--------------------
+RUNNING THE COMPILER
+--------------------
+
+Type
+	shic <input-file>
+
+---------------------------------------------
+TIPS FOR UNDERSTANDING THE COMPILER INTERNALS
+---------------------------------------------
+
+The Internal Representation (IR) for a SHIFT program is built out of C
+data structures that look like Lisp objects (see lisp.h).  These
+are the standard Lisp types: cons, fixnum (integer), symbol (see
+below), string, plus one additional type, the NODE.
+
+A node has an operator (a symbol), a variable number of arguments
+(which must be nodes), and an attribute list.  Attributes are
+name-value pairs, where the name is a symbol, and the value an
+arbitrary Lisp value.
+
+Example: the expression x + y is represented by a node with operator
+CALL; an argument list constisting of three nodes with operator
+IDENTIFIER (the first for +, the second for x, and the third for y);
+and an attribute list consisting of the pair TYPE and a node with
+operator NUMBER.
+
+Because symbols are used heavily in the source, and because they are
+unique (that is, there may not be two different symbols with the same
+name), it is convenient to precompute all symbols known by the
+compiler.  This is done by the hasher program, which preprocesses all
+.c and .h source files looking for identifier which start with the `@'
+character, and preallocates symbols for each of them.
+
+------
+AUTHOR
+------
+
+Luigi Semenzato, Berkeley PATH
+luigi@fiat.its.berkeley.edu

@@ -1,0 +1,83 @@
+socket.o: socket.c ../include/shift_config.h socket.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdio.h \
+ /usr/include/sys/feature_tests.h /usr/include/sys/va_list.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/string.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdlib.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/errno.h \
+ /usr/include/sys/errno.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/signal.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/signal.h \
+ /usr/include/sys/unistd.h /usr/include/sys/siginfo.h \
+ /usr/include/sys/machsig.h /usr/include/sys/time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/types.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/isa_defs.h \
+ /usr/include/sys/machtypes.h /usr/include/sys/select.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/time.h \
+ /usr/include/sys/procset.h /usr/include/fcntl.h \
+ /usr/include/sys/fcntl.h /usr/include/netdb.h \
+ /usr/include/sys/socket.h /usr/include/sys/netconfig.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/unistd.h \
+ /usr/include/stropts.h /usr/include/sys/stropts.h \
+ /usr/include/sys/conf.h /usr/include/sys/t_lock.h \
+ /usr/include/sys/machlock.h /usr/include/sys/dki_lkinfo.h \
+ /usr/include/sys/dl.h /usr/include/sys/sleepq.h \
+ /usr/include/sys/turnstile.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/param.h \
+ /usr/include/sys/pirec.h /usr/include/sys/mutex.h \
+ /usr/include/sys/rwlock.h /usr/include/sys/semaphore.h \
+ /usr/include/sys/condvar.h /usr/include/sys/ioctl.h \
+ /usr/include/sys/un.h /usr/include/netinet/in.h \
+ /usr/include/sys/stream.h /usr/include/sys/vnode.h \
+ /usr/include/sys/cred.h /usr/include/sys/uio.h \
+ /usr/include/vm/seg_enum.h /usr/include/sys/poll.h \
+ /usr/include/sys/strmdep.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/byteorder.h \
+ /usr/include/sys/filio.h /usr/include/sys/ioccom.h \
+ shift_socket_wrappers.h
+init.o: init.c socket.h ../include/shift_config.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdio.h \
+ /usr/include/sys/feature_tests.h /usr/include/sys/va_list.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/string.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdlib.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/errno.h \
+ /usr/include/sys/errno.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/signal.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/signal.h \
+ /usr/include/sys/unistd.h /usr/include/sys/siginfo.h \
+ /usr/include/sys/machsig.h /usr/include/sys/time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/types.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/isa_defs.h \
+ /usr/include/sys/machtypes.h /usr/include/sys/select.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/time.h \
+ /usr/include/sys/procset.h /usr/include/fcntl.h \
+ /usr/include/sys/fcntl.h /usr/include/netdb.h \
+ /usr/include/sys/socket.h /usr/include/sys/netconfig.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/unistd.h \
+ /usr/include/stropts.h /usr/include/sys/stropts.h \
+ /usr/include/sys/conf.h /usr/include/sys/t_lock.h \
+ /usr/include/sys/machlock.h /usr/include/sys/dki_lkinfo.h \
+ /usr/include/sys/dl.h /usr/include/sys/sleepq.h \
+ /usr/include/sys/turnstile.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/param.h \
+ /usr/include/sys/pirec.h /usr/include/sys/mutex.h \
+ /usr/include/sys/rwlock.h /usr/include/sys/semaphore.h \
+ /usr/include/sys/condvar.h /usr/include/sys/ioctl.h \
+ /usr/include/sys/un.h /usr/include/netinet/in.h \
+ /usr/include/sys/stream.h /usr/include/sys/vnode.h \
+ /usr/include/sys/cred.h /usr/include/sys/uio.h \
+ /usr/include/vm/seg_enum.h /usr/include/sys/poll.h \
+ /usr/include/sys/strmdep.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/byteorder.h \
+ /usr/include/sys/filio.h /usr/include/sys/ioccom.h \
+ shift_socket_wrappers.h ../include/run-time.h
+shift_socket_wrappers.o: shift_socket_wrappers.c \
+ ../include/shift_config.h shift_socket_wrappers.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/unistd.h \
+ /usr/include/sys/feature_tests.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/types.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/isa_defs.h \
+ /usr/include/sys/machtypes.h /usr/include/sys/select.h \
+ /usr/include/sys/time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/time.h \
+ /usr/include/sys/siginfo.h /usr/include/sys/machsig.h \
+ /usr/include/sys/unistd.h

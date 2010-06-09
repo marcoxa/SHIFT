@@ -1,0 +1,189 @@
+shift.o: shift.c ../include/shift_config.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdio.h \
+ /usr/include/sys/feature_tests.h /usr/include/sys/va_list.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdarg.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/va-sparc.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdlib.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/types.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/isa_defs.h \
+ /usr/include/sys/machtypes.h /usr/include/sys/select.h \
+ /usr/include/sys/time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/time.h \
+ /usr/include/sys/siginfo.h /usr/include/sys/machsig.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/math.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/floatingpoint.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/ieeefp.h \
+ ../include/gc_support.h ../include/shifttypes.h ../include/run-time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/string.h \
+ ../include/shift_api_types.h ../include/collection.h \
+ ../include/inlining.h ../include/shift_debug.h ../include/names.h \
+ ../include/information.h
+integrate.o: integrate.c ../include/shift_config.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/math.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/floatingpoint.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdio.h \
+ /usr/include/sys/feature_tests.h /usr/include/sys/va_list.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/ieeefp.h \
+ ../include/shifttypes.h ../include/gc_support.h ../include/run-time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/string.h \
+ ../include/shift_api_types.h ../include/collection.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/types.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/isa_defs.h \
+ /usr/include/sys/machtypes.h /usr/include/sys/select.h \
+ /usr/include/sys/time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/time.h \
+ /usr/include/sys/siginfo.h /usr/include/sys/machsig.h \
+ ../include/inlining.h ../include/shiftlib.h
+before_advance.o: before_advance.c
+after_advance.o: after_advance.c
+before_transition.o: before_transition.c ../include/shifttypes.h \
+ ../include/shift_config.h ../include/gc_support.h \
+ ../include/run-time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/string.h \
+ /usr/include/sys/feature_tests.h ../include/shift_api_types.h \
+ ../include/shiftlib.h
+after_transition.o: after_transition.c ../include/shifttypes.h \
+ ../include/shift_config.h ../include/gc_support.h \
+ ../include/run-time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/string.h \
+ /usr/include/sys/feature_tests.h ../include/shift_api_types.h \
+ ../include/shiftlib.h
+discrete.o: discrete.c ../include/shift_config.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdio.h \
+ /usr/include/sys/feature_tests.h /usr/include/sys/va_list.h \
+ /usr/local/sparc-sun-solaris2.5.1/include/assert.h \
+ ../include/shifttypes.h ../include/gc_support.h ../include/run-time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/string.h \
+ ../include/shift_api_types.h ../include/collection.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/types.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/isa_defs.h \
+ /usr/include/sys/machtypes.h /usr/include/sys/select.h \
+ /usr/include/sys/time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/time.h \
+ /usr/include/sys/siginfo.h /usr/include/sys/machsig.h \
+ ../include/inlining.h ../include/shiftlib.h ../include/discrete.h
+collection.o: collection.c ../include/shift_config.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdio.h \
+ /usr/include/sys/feature_tests.h /usr/include/sys/va_list.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdarg.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/va-sparc.h \
+ /usr/local/sparc-sun-solaris2.5.1/include/assert.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/types.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/isa_defs.h \
+ /usr/include/sys/machtypes.h /usr/include/sys/select.h \
+ /usr/include/sys/time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/time.h \
+ /usr/include/sys/siginfo.h /usr/include/sys/machsig.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/limits.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/syslimits.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/string.h \
+ ../include/shifttypes.h ../include/gc_support.h ../include/run-time.h \
+ ../include/shift_api_types.h ../include/collection.h \
+ ../include/inlining.h
+watch.o: watch.c \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdio.h \
+ /usr/include/sys/feature_tests.h /usr/include/sys/va_list.h \
+ /usr/include/sys/time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/types.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/isa_defs.h \
+ /usr/include/sys/machtypes.h /usr/include/sys/select.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/time.h \
+ /usr/include/sys/siginfo.h /usr/include/sys/machsig.h \
+ ../include/watch.h ../include/shift_config.h
+built-ins.o: built-ins.c ../include/shift_config.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdio.h \
+ /usr/include/sys/feature_tests.h /usr/include/sys/va_list.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/limits.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/syslimits.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/isa_defs.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdlib.h \
+ /usr/local/sparc-sun-solaris2.5.1/include/assert.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdarg.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/va-sparc.h \
+ ../include/shifttypes.h ../include/gc_support.h ../include/run-time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/string.h \
+ ../include/shift_api_types.h ../include/collection.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/types.h \
+ /usr/include/sys/machtypes.h /usr/include/sys/select.h \
+ /usr/include/sys/time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/time.h \
+ /usr/include/sys/siginfo.h /usr/include/sys/machsig.h \
+ ../include/inlining.h
+information.o: information.c ../include/shift_config.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdio.h \
+ /usr/include/sys/feature_tests.h /usr/include/sys/va_list.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdarg.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/va-sparc.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdlib.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/types.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/isa_defs.h \
+ /usr/include/sys/machtypes.h /usr/include/sys/select.h \
+ /usr/include/sys/time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/time.h \
+ /usr/include/sys/siginfo.h /usr/include/sys/machsig.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/math.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/floatingpoint.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/ieeefp.h \
+ ../include/shifttypes.h ../include/gc_support.h ../include/run-time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/string.h \
+ ../include/shift_api_types.h ../include/collection.h \
+ ../include/inlining.h ../include/shift_debug.h \
+ ../include/shift_tools.h ../include/names.h ../include/information.h \
+ ../include/tkShift_data.h ../include/shift_api_info.h \
+ ../include/shift_api_internal.h ../include/shift_db_debug.h
+user_functions.o: user_functions.c ../include/shift_config.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/ctype.h \
+ /usr/include/sys/feature_tests.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdlib.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdio.h \
+ /usr/include/sys/va_list.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/math.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/floatingpoint.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/ieeefp.h \
+ ../include/shift_debug.h ../include/gc_support.h \
+ ../include/shifttypes.h ../include/run-time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/string.h \
+ ../include/shift_api_types.h ../include/collection.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/types.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/isa_defs.h \
+ /usr/include/sys/machtypes.h /usr/include/sys/select.h \
+ /usr/include/sys/time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/time.h \
+ /usr/include/sys/siginfo.h /usr/include/sys/machsig.h \
+ ../include/inlining.h ../include/sim_info.h \
+ ../include/shift_api_info.h ../include/shift_tools.h
+ffi-support.o: ffi-support.c ../include/shift_config.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/limits.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/syslimits.h \
+ /usr/include/sys/feature_tests.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/isa_defs.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/signal.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/signal.h \
+ /usr/include/sys/unistd.h /usr/include/sys/siginfo.h \
+ /usr/include/sys/machsig.h /usr/include/sys/time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/types.h \
+ /usr/include/sys/machtypes.h /usr/include/sys/select.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/time.h \
+ /usr/include/sys/procset.h ../include/shifttypes.h \
+ ../include/gc_support.h ../include/run-time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/string.h \
+ ../include/shift_api_types.h ../include/collection.h \
+ ../include/inlining.h
+shift_args.o: shift_args.c \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdio.h \
+ /usr/include/sys/feature_tests.h /usr/include/sys/va_list.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/stdlib.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/errno.h \
+ /usr/include/sys/errno.h ../include/run-time.h \
+ ../include/shift_config.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/string.h \
+ ../include/names.h ../include/shift_debug.h ../include/gc_support.h \
+ ../include/shifttypes.h ../include/shift_api_types.h \
+ ../include/collection.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/types.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/sys/isa_defs.h \
+ /usr/include/sys/machtypes.h /usr/include/sys/select.h \
+ /usr/include/sys/time.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.7.2.3/include/time.h \
+ /usr/include/sys/siginfo.h /usr/include/sys/machsig.h \
+ ../include/inlining.h

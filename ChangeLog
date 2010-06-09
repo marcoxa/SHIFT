@@ -1,0 +1,123 @@
+Copyright ©1996, 1997, 1998 The Regents of the University of
+California (Regents). All Rights Reserved. 
+
+Permission to use, copy, modify, and distribute this software and its
+documentation for educational, research, and not-for-profit purposes,
+without fee and without a signed licensing agreement, is hereby
+granted, provided that the above copyright notice, this paragraph and
+the following two paragraphs appear in all copies, modifications, and
+distributions. 
+
+Contact The Office of Technology Licensing, UC Berkeley, 2150 Shattuck
+Avenue, Suite 510, Berkeley, CA 94720-1620, (510) 643-7201, for
+commercial licensing opportunities. 
+
+IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
+ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
+REGENTS HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+  
+REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE.  THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF
+ANY, PROVIDED HEREUNDER IS PROVIDED "AS IS". REGENTS HAS NO OBLIGATION
+TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+MODIFICATIONS. 
+	
+
+Wed Apr 15 16:33:21 1998  Tunc Simsek  <simsek@maruti.PATH.berkeley.edu>
+
+	* include/shifttypes.h: Adding support for external data types.
+
+Tue Oct 28 11:18:29 1997  Daniel Wiesmann  <danielw@alfa.PATH.Berkeley.EDU>
+
+	* socket: Removed the config.c, config.h, and the init.h
+	files. Made the other functions portable for WIN32. 
+
+Mon Oct 27 16:09:45 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* socket: added framework to write a minimal portable layer over
+	the socket interface in order to take in to account MS Windows.
+
+	* socket/socket.c: changed a few things in the file in order to
+	make it compile on the SGI.  Cleaned up in the process.
+
+Tue Aug 26 11:26:39 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* configure.in: Added condition preprocessor variable
+	fo OS_MSWINDOWS.
+
+	* include/shift_config.h.in: Added condition preprocessor variable
+	fo OS_MSWINDOWS.
+
+Wed Aug 13 14:16:36 1997  Daniel Wiesmann  <danielw@alfa.PATH.Berkeley.EDU>
+
+	* libTcl/animation-update.c (C_UpdateItem): Changed the change of
+	the sign or the orientation. Added a <return> bind to the setenv 
+	window.
+
+Fri Aug  1 09:57:37 1997  Daniel Wiesmann  <danielw@alfa.PATH.Berkeley.EDU>
+
+	* Made some changes to the animation-update.c file which was not
+	returning TCL_OK. 
+	
+	* libTcl/graph-plots.tcl: Changed the labels of graphs from
+	TimeClick to Time.
+
+Mon Jul 28 14:33:32 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* libDebug/shift_api_info.c (shift_api_make_array_value): fixed
+	printing of arrays of instances.
+
+Wed Jul 16 12:28:13 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* libDebug/shift_api_info.c (shift_api_make_user_value): Added
+	zeroing of the heap allocated instance if no component is actually
+	passed in.  Some versions of malloc do not zero the memory and
+	this resulted in a bad reference down the line when printing an
+	instance.
+
+Thu Jul  3 11:18:54 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* Modified several calls to 'malloc' into 'safe_malloc'.  This
+	also required making the external definition of this function
+	available in the file 'include/run-time.h'.
+
+Thu Jun 12 09:59:41 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* run-time/collection.c (set_membership_X): added specialized
+ 	functions for testing membership in number, symbol, array, set,
+ 	and instance sets.
+	(set_equal): added proper definition for 'set_equal'.
+
+	* Fixed bug with set membership testing of constant elements.
+	Modifications in 'include/collection.h', 'run-time/collection.c',
+	and 'compiler/generate.c'.  Possible problems without new hash
+	code may lurk somewhere.
+
+Thu May 15 15:13:53 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* Changed all the .in files and the configuration scripts in order
+	to remove all the dependencies from Itcl/ and Itk.
+
+Wed May 14 08:31:07 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* Added preliminary Foreign Function interface.  A 'function' can
+	now have arrays as arguments and parameters declared as 'in' or
+	'out' (a la' Ada - with no combinations).  Most machinery is
+	"incremental": old programs work without modification.
+
+	Note however that the FFI may break the RHS first LHS next rule,
+	when 'out' parameters are present in a function call.
+
+	* Fixed bugs here and there.
+
+Mon Mar  3 11:12:32 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* Added construction of binary distribution.
+
+	* Changed the packaging scheme for SHIFT.  Now the tar file
+	unpacks in a directory called 'shift'.  The configuration process
+	must take place in there.
+	
+

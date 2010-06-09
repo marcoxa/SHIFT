@@ -1,0 +1,352 @@
+Copyright (c)1996, 1997, 1998 The Regents of the University of
+California (Regents). All Rights Reserved. 
+
+Permission to use, copy, modify, and distribute this software and its
+documentation for educational, research, and not-for-profit purposes,
+without fee and without a signed licensing agreement, is hereby
+granted, provided that the above copyright notice, this paragraph and
+the following two paragraphs appear in all copies, modifications, and
+distributions. 
+
+Contact The Office of Technology Licensing, UC Berkeley, 2150 Shattuck
+Avenue, Suite 510, Berkeley, CA 94720-1620, (510) 643-7201, for
+commercial licensing opportunities. 
+
+IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
+ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
+REGENTS HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+  
+REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF
+ANY, PROVIDED HEREUNDER IS PROVIDED "AS IS". REGENTS HAS NO OBLIGATION
+TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+MODIFICATIONS. 
+
+
+Matrix to Scalar Preprocessor
+
+Version 0.1
+
+Daniel Wiesmann
+
+Luigi Semenzato
+
+Akash Deshpande
+
+1.0  Overview
+
+
+
+The program "mat2scalar" is a program for translating  matrix equations to the scalar 
+format. 
+
+
+
+To run the program, simply supply as its only argument your matrix file.  The results will
+
+be put in the file "results.mx"
+
+
+
+2.0  Syntax and other constraints
+
+
+
+To use the program, one must understand a few details.  These details are: 
+
+2) The matrix language syntax
+
+3) How to enter these matrices in the file
+
+
+
+2.1  Syntax
+
+
+
+The preprocessor handles matrix addition, subtraction, and multiplication. It requires
+
+a full equation, with a left-hand side and a right-hand side.  The left-hand side must be
+
+a matrix or the prime of a matrix.  The right-hand-side can be arbitrarly complicated.
+
+The program checks to make sure all the matrix operations are allowed for matrices
+
+of that size, and signal an error if one is found.  At this point, the error messages are
+
+not informative, but this will hopefully change soon.
+
+The syntax is the following:
+
+
+
+                                   equation -> result  = expression ;
+
+
+
+result -> matrix
+
+                  | matrix '
+
+  
+
+                                            expression-> expression  *  expression
+
+                                                                |   expression  +  expression 
+
+                                                                |   expression  -  expression
+
+                                           |   expression ~
+
+                                              |   ( expression )
+
+                                |    matrix
+
+                                   |   - matrix
+
+
+
+Tokens are grabbed in the order shown by the arrows in table 1.  One can put more than
+
+one token in the same column (a `~' and a ` ;' , for example) as long as they abide by the 
+syntax. 
+
+
+
+
+
+
+
+2.2  Matrix input syntax
+
+
+
+This release requires that matrices are entered in a certain way.   
+
+
+
+1) matrix delimiters fit row by row
+
+If you have a matrix that is on more that one line, the corresponding bars that delimit this
+
+matrix must be aligned vertically on every line.
+
+
+
+2) newlines needed at the end
+
+There must be at least an extra newline at the end of the input
+
+
+
+3) No tabs allowed.
+
+All alignment must be done by using spaces.
+
+
+
+4) Allowed characters 
+
+The characters you can specify matrix entries with are
+
+a-z, A-Z, the underscore character
+
+3.0  More Examples
+
+3.1  Matrix Derivative Example
+
+
+
+ |a1 a2 a3|'  =  |b11 b12 b13|  + |c11 c12 c13|  ;
+
+
+
+becomes:
+
+
+
+a1' = (b11+c11);
+
+a2' = (b12+c12);
+
+a3' = (b13+c13);
+
+
+
+
+
+3.2  Matrix Transpose Operation Example
+
+
+
+ |a11 a12 a13 | = |b11 b12 b13|    |c11 c12|~ 
+
+ |a21 a22 a23 |   |b21 b22 b23|  - |c21 c22|
+
+                                   |c31 c32|;
+
+
+
+
+
+becomes
+
+
+
+a11 = (b11-c11);
+
+a12 = (b12-c21);
+
+a13 = (b13-c31);
+
+a21 = (b21-c12);
+
+a22 = (b22-c22);
+
+a23 = (b23-c32);
+
+3.3  Matrix multiplication
+
+
+
+
+
+|a11 a12 a13 |     |b11 b12 b13|~   *  |c11 c12 c13| 
+
+|a21 a22 a23 |     |b21 b22 b23|       |c21 c22 c23|       
+
+|a31 a32 a33 |  =  |b31 b32 b33|       |c31 c32 c33|  
+
+
+
+ |d11 d12 d13 d14|
+
+*|d21 d22 d33 d24|
+
+ |d31 d32 d33 d34|;
+
+
+
+becomes:
+
+
+
+a11 = 
+((((b11*c11)+(b21*c21)+(b31*c31))*d11)+(((b11*c12)+(b21*c22)
++(b31*c32))*d21)+(((b11*c13)+(b21*c23)+(b31*c33))*d31));
+
+a12 = 
+((((b11*c11)+(b21*c21)+(b31*c31))*d12)+(((b11*c12)+(b21*c22)
++(b31*c32))*d22)+(((b11*c13)+(b21*c23)+(b31*c33))*d32));
+
+a13 = 
+((((b11*c11)+(b21*c21)+(b31*c31))*d13)+(((b11*c12)+(b21*c22)
++(b31*c32))*d33)+(((b11*c13)+(b21*c23)+(b31*c33))*d33));
+
+a21 = 
+((((b12*c11)+(b22*c21)+(b32*c31))*d11)+(((b12*c12)+(b22*c22)
++(b32*c32))*d21)+(((b12*c13)+(b22*c23)+(b32*c33))*d31));
+
+a22 = 
+((((b12*c11)+(b22*c21)+(b32*c31))*d12)+(((b12*c12)+(b22*c22)
++(b32*c32))*d22)+(((b12*c13)+(b22*c23)+(b32*c33))*d32));
+
+a23 = 
+((((b12*c11)+(b22*c21)+(b32*c31))*d13)+(((b12*c12)+(b22*c22)
++(b32*c32))*d33)+(((b12*c13)+(b22*c23)+(b32*c33))*d33));
+
+a31 = 
+((((b13*c11)+(b23*c21)+(b33*c31))*d11)+(((b13*c12)+(b23*c22)
++(b33*c32))*d21)+(((b13*c13)+(b23*c23)+(b33*c33))*d31));
+
+a32 = 
+((((b13*c11)+(b23*c21)+(b33*c31))*d12)+(((b13*c12)+(b23*c22)
++(b33*c32))*d22)+(((b13*c13)+(b23*c23)+(b33*c33))*d32));
+
+a33 = 
+((((b13*c11)+(b23*c21)+(b33*c31))*d13)+(((b13*c12)+(b23*c22)
++(b33*c32))*d33)+(((b13*c13)+(b23*c23)+(b33*c33))*d33));
+
+
+
+3.4  Multiple Equations
+
+
+
+
+
+              | b11 |~
+
+ |a11 a12| =  | b21 |+ |c11 c12|;
+
+
+
+ | x1 | = |y11 y12 y13| * |z11|
+
+                          |z21|
+
+                          |z31|;
+
+
+
+
+
+becomes
+
+
+
+x1 = ((y11*z11)+(y12*z21)+(y13*z31));
+
+a11 = (b11+c11);
+
+a12 = (b21+c12);
+
+
+
+4.0  Error Examples and Explanations
+
+The errors I believe are most likely to happen are the following:
+
+1) Incorrect token order
+
+2) Lack of a newline between sets of matrices.
+
+3) Presence of tabs in the input.  
+
+
+
+ |a11 a12 a13 | = |b11 b12 b13|    |c11 c12| ~ 
+
+ |a21 a22 a23 |   |b21 b22 b23|  - |c21 c22|
+
+                                   |c31 c32|;
+
+
+
+
+
+The input is wrong because the `;' will be parsed before the `~', and that grammatically 
+incorrect.
+
+
+
+  |a1 a2 a3|'  =  |b11 b12 b13|  + |c11 c12 c13|  -
+
+|d11 d12 d13|;
+
+
+
+
+
+This is wrong because there is no newline between sets of matrices.  Two matrices
+
+cannot be on top of each other,there must at least be an extra line in between.
+
+5.0  Bugs
+
+When there is an error in the input file, and the program cannot generate a file of equa-
+tions, the scanner will plug in the previous generated file.
+
+Please send bug reports to danielw@alfa.its.berkeley.edu.

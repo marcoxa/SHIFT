@@ -1,0 +1,396 @@
+# -*- Mode: Makefile -*-
+
+# Copyright (c)1996, 1997, 1998 The Regents of the University of
+# California (Regents). All Rights Reserved. 
+#
+# Permission to use, copy, modify, and distribute this software and its
+# documentation for educational, research, and not-for-profit purposes,
+# without fee and without a signed licensing agreement, is hereby
+# granted, provided that the above copyright notice, this paragraph and
+# the following two paragraphs appear in all copies, modifications, and
+# distributions. 
+#
+# Contact The Office of Technology Licensing, UC Berkeley, 2150 Shattuck
+# Avenue, Suite 510, Berkeley, CA 94720-1620, (510) 643-7201, for
+# commercial licensing opportunities. 
+#
+# IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+# SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
+# ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
+# REGENTS HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+#
+# REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE.  THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF
+# ANY, PROVIDED HEREUNDER IS PROVIDED "AS IS". REGENTS HAS NO OBLIGATION
+# TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+# MODIFICATIONS. 
+
+
+# -*- Mode: Makefile -*-
+
+# Makefile.in -- Main Makefile (in 'configure' format) for SHIC
+# project.
+#
+# Autoconf/Configure tag.
+# @configure_input@
+
+
+#==============================================================================
+# Standard (GNU form) variable setup
+
+# General Variables
+
+SHELL = /bin/sh
+
+
+# Installation Variables
+
+prefix      = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir      = @bindir@
+includedir  = @includedir@
+libdir      = @libdir@
+libexecdir  = @libexecdir@
+
+mandir      = @mandir@
+
+
+# Build Variables
+
+top_srcdir  = @top_srcdir@
+srcdir      = @srcdir@
+
+
+# Special directives and variables
+
+# .PHONY works for GNU Make, but not for other Make's.  Therefore we
+# also use the dummy target FORCE (see "Application's Targets"section)
+# to enforce dependencies.
+
+# .PHONY: include compiler run-time debugger graphic.env ttyonly communications
+# .PHONY: include.i compiler.i run-time.i debugger.i
+# .PHONY: graphic.env.i ttyonly.i communications.i
+# .PHONY: FORCE
+
+# Extra Variables
+
+MAT2SCALARDIR = extra/mat2scalar
+SHIFTDOCDIR = extra/shiftdoc
+SHIFTTREEDIR = extra/shifttree
+
+# Variables for creating the source distribution
+
+SRC_DISTRIBUTION_FILES = Makefile.in \
+                         shift.mk.in \
+                         cshift.in \
+                         configure \
+                         configure.in \
+                         config.sub \
+                         config.guess \
+                         install-sh \
+                         shiftDefaults.in \
+                         README \
+                         INSTALL \
+                         RUNNING \
+                         COPYRIGHT \
+                         COMPILER.README \
+                         RELEASE-NOTES \
+			 NEWS \
+			 ChangeLog
+
+
+SRC_DISTRIBUTION_DIRS  = compiler \
+                         include \
+                         run-time \
+                         libDebug \
+                         libTcl \
+                         socket \
+                         applications \
+                         examples \
+                         doc \
+                         reference \
+			 $(MAT2SCALARDIR)
+#			 $(SHIFTDOCDIR) \
+#			 $(SHIFTTREEDIR)
+
+
+SHIFT_TARGETS =	include \
+		compiler \
+		run-time \
+		debugger \
+		@CONFIGURATION_TARGET@ \
+		mat2scalar
+#		shiftdoc \
+#		shifttree
+
+
+INSTALL_TARGETS	=	all \
+			include.i \
+			compiler.i \
+			run-time.i \
+			debugger.i \
+			@CONFIGURATION_TARGET@.i \
+			mat2scalar.i
+#			shiftdoc.i \
+#			shifttree.i
+
+
+#==============================================================================
+# Standard Targets
+
+all: $(SHIFT_TARGETS)
+	@echo "SHIFT Building: compiler and debugger(s) have been built."
+	@echo ''
+
+
+install: $(INSTALL_TARGETS)
+	chmod a+x cshift
+	cp cshift $(bindir)
+	@echo SHIFT Building: executables and libraries installed.
+
+
+uninstall:
+	cd compiler; $(MAKE) uninstall
+	cd run-time; $(MAKE) uninstall
+	cd libDebug; $(MAKE) uninstall
+	cd include; $(MAKE) uninstall
+	cd socket; $(MAKE) uninstall
+	cd libTcl; $(MAKE) uninstall
+	if test -d  $(MAT2SCALARDIR) && test -f $(MAT2SCALARDIR)/Makefile; \
+	then \
+	  cd $(MAT2SCALARDIR) ; $(MAKE) uninstall; \
+	fi
+	if test -d  $(SHIFTDOCDIR) && test -f $(SHIFTDOCDIR)/Makefile; \
+	then \
+	  cd $(SHIFTDOCDIR) ; $(MAKE) uninstall; \
+	fi
+	if test -d  $(SHIFTTREEDIR) && test -f $(SHIFTTREEDIR)/Makefile; \
+	then \
+	  cd $(SHIFTTREEDIR) ; $(MAKE) uninstall; \
+	fi
+	rm -f $(bindir)/cshift
+
+
+reinstall: clean install
+	@echo SHIFT Building: reinstallation complete
+	@echo ''
+
+
+clean:
+	cd compiler; $(MAKE) clean
+	cd run-time; $(MAKE) clean
+	cd libDebug; $(MAKE) clean
+	cd include; $(MAKE) clean
+	cd socket; $(MAKE) clean
+	cd libTcl; $(MAKE) clean
+	if test -d  $(MAT2SCALARDIR) && test -f $(MAT2SCALARDIR)/Makefile; \
+	then \
+	  cd $(MAT2SCALARDIR) ; $(MAKE) clean; \
+	fi
+	if test -d  $(SHIFTDOCDIR) && test -f $(SHIFTDOCDIR)/Makefile; \
+	then \
+	  cd $(SHIFTDOCDIR) ; $(MAKE) clean; \
+	fi
+	if test -d  $(SHIFTTREEDIR) && test -f $(SHIFTTREEDIR)/Makefile; \
+	then \
+	  cd $(SHIFTTREEDIR) ; $(MAKE) clean; \
+	fi
+	-rm shic
+
+
+distclean:
+	cd compiler; $(MAKE) distclean
+	cd run-time; $(MAKE) distclean
+	cd libDebug; $(MAKE) distclean
+	cd include; $(MAKE) distclean
+	cd socket; $(MAKE) distclean
+	cd libTcl; $(MAKE) distclean
+	cd reference; $(MAKE) distclean
+	if test -d  $(MAT2SCALARDIR) && test -f $(MAT2SCALARDIR)/Makefile; \
+	then \
+	  cd $(MAT2SCALARDIR); \
+	  $(MAKE) clean; \
+	fi
+	if test -d  $(SHIFTDOCDIR) && test -f $(SHIFTDOCDIR)/Makefile; \
+	then \
+	  cd $(SHIFTDOCDIR); \
+	  $(MAKE) clean; \
+	fi
+	if test -d  $(SHIFTTREEDIR) && test -f $(SHIFTTREEDIR)/Makefile; \
+	then \
+	  cd $(SHIFTTREEDIR); \
+	  $(MAKE) clean; \
+	fi
+	-rm shic *.tar.gz *.tar *~ \#*
+	if test -d obsolete;      then rm -rf obsolete; fi
+	if test -f config.cache;  then rm config.cache; fi
+	if test -f config.log;    then rm config.log; fi
+	if test -f config.status; then rm config.status; fi
+
+
+# mostlyclean: # UNUSED
+
+
+# maintainer-clean: # UNUSED
+
+
+# TAGS: # UNUSED
+
+
+# info: # UNUSED
+
+
+# dvi: # UNUSED
+
+
+# dist -- The 'dist' target assumes GMAKE.  It should not cause problems
+# since it should be really used only locally at PATH.
+
+CWD = $(shell pwd)
+CWDNAME = $(notdir $(CWD))
+
+# The SHIFT version.
+
+SV  = $(shell admin/get-shift-version)
+
+
+# dist -- Note that this is the only place where we actually make the
+# reference manual automatically.
+
+dist: distprologue reference.i distclean
+	@if test $(MAKE) != gmake; then \
+	   echo "'gmake' is needed for the dist target" ; \
+	   exit 1; \
+	fi
+	@echo "Preparing the tar file..."
+	if test $(CWDNAME) != shift; then \
+	  if test -d ../shift; then \
+	    echo "Directory shift already exists."; \
+	    echo "Please rename it.  Cannot make distribution without"; \
+	    echo "risking to cancel important data."; \
+	    exit 1; \
+	  fi; \
+	  cd ..; ln -s $(CWDNAME) shift; \
+	fi
+	cd ..; \
+	tar cvf SHIFTsrc-$(SV).tar \
+	    $(SRC_DISTRIBUTION_FILES:%=shift/%) \
+	    $(SRC_DISTRIBUTION_DIRS:%=shift/%)
+	gzip ../SHIFTsrc-$(SV).tar
+	@echo ''
+	@echo SHIFT Distribution: done.
+	@echo ''
+
+distprologue:
+	@echo
+	@echo ======================================================
+	@echo Preparing SHIFT Distribution
+	@echo Many '(ignore)' messages may be printed out by $(MAKE).
+	@echo
+
+
+# check: # UNUSED
+
+
+# installcheck: # UNUSED
+
+
+# installdirs: # UNUSED
+
+
+#==============================================================================
+# Special PATH targets
+# These are useless to anybody outside California PATH
+
+bindist: distclean
+	@if test -r admin/make-bin-dist ; then admin/make-bin-dist; fi
+
+
+#==============================================================================
+# Application Targets
+
+FORCE:
+
+compiler: FORCE
+	cd compiler; touch depend; $(MAKE) make-depend; $(MAKE) hasher; $(MAKE)
+compiler.i:
+	cd compiler; $(MAKE) install
+
+
+run-time: FORCE
+	cd run-time; touch depend; $(MAKE) make-depend; $(MAKE)
+run-time.i:
+	cd run-time; $(MAKE) install
+
+
+debugger: FORCE
+	cd libDebug; $(MAKE)
+debugger.i: FORCE
+	cd libDebug; $(MAKE) install
+
+
+include: FORCE
+	cd include; $(MAKE)
+include.i: FORCE
+	cd include; $(MAKE) install
+
+
+communications: FORCE
+	cd socket; touch depend; $(MAKE) make-depend; $(MAKE)
+communications.i: FORCE
+	cd socket; $(MAKE) install
+
+
+graphic.env: communications
+	@echo SHIFT Building: configuration with graphic debugger.
+	cd libTcl; $(MAKE)
+graphic.env.i: communications.i
+	cd libTcl; $(MAKE) install
+
+ttyonly: FORCE
+	@echo SHIFT Building: configuration with tty only debugger.
+ttyonly.i: FORCE
+
+
+reference: FORCE
+	cd reference; $(MAKE)
+reference.i: FORCE
+	cd reference; $(MAKE) install
+
+
+mat2scalar: FORCE
+	if test -d  $(MAT2SCALARDIR) && test -f $(MAT2SCALARDIR)/Makefile; \
+	then \
+	cd $(MAT2SCALARDIR) ; touch depend; $(MAKE) make-depend; $(MAKE); \
+	fi
+mat2scalar.i: FORCE
+	if test -d  $(MAT2SCALARDIR) && test -f $(MAT2SCALARDIR)/Makefile; \
+	then \
+	cd $(MAT2SCALARDIR) ; $(MAKE) install; \
+	fi
+
+shiftdoc: FORCE
+	if test -d  $(SHIFTDOCDIR) && test -f $(SHIFTDOCDIR)/Makefile; \
+	then \
+	cd $(SHIFTDOCDIR) ; touch depend; $(MAKE) make-depend; $(MAKE); \
+	fi
+shiftdoc.i: FORCE
+	if test -d  $(SHIFTDOCDIR) && test -f $(SHIFTDOCDIR)/Makefile; \
+	then \
+	cd $(SHIFTDOCDIR) ; $(MAKE) install; \
+	fi
+
+shifttree: FORCE
+	if test -d  $(SHIFTTREEDIR) && test -f $(SHIFTTREEDIR)/Makefile; \
+	then \
+	cd $(SHIFTTREEDIR) ; touch depend; $(MAKE) make-depend; $(MAKE); \
+	fi
+shifttree.i: FORCE
+	if test -d  $(SHIFTTREEDIR) && test -f $(SHIFTTREEDIR)/Makefile; \
+	then \
+	cd $(SHIFTTREEDIR) ; $(MAKE) install; \
+	fi
+
+# end of file -- Makefile --

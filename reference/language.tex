@@ -1,0 +1,1728 @@
+% -*- Mode: LaTeX -*-
+
+% language.tex --
+
+
+% Copyright (c)1996, 1997, 1998 The Regents of the University of
+% California (Regents). All Rights Reserved. 
+%
+% Permission to use, copy, modify, and distribute this software and its
+% documentation for educational, research, and not-for-profit purposes,
+% without fee and without a signed licensing agreement, is hereby
+% granted, provided that the above copyright notice, this paragraph and
+% the following two paragraphs appear in all copies, modifications, and
+% distributions. 
+%
+% Contact The Office of Technology Licensing, UC Berkeley, 2150 Shattuck
+% Avenue, Suite 510, Berkeley, CA 94720-1620, (510) 643-7201, for
+% commercial licensing opportunities. 
+%
+% IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+% SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
+% ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
+% REGENTS HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+%
+% REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT
+% LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+% A PARTICULAR PURPOSE.  THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF
+% ANY, PROVIDED HEREUNDER IS PROVIDED "AS IS". REGENTS HAS NO OBLIGATION
+% TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+% MODIFICATIONS. 
+
+
+\section{The Language\label{language}}
+
+\todaysname{} is a textual notation for the abstractions in
+section~\ref{model}.
+
+\subsection{Notation}
+
+\def\nont{\em}
+\def\tok{\tt}
+
+Non-terminals are in {\nont italics}.  Keywords and other literal
+tokens are in {\tok typewriter}.  Braces indicate repetition: $\{$
+{\nont X} $\}^*$ means zero or more repetitions of {\nont X}, $\{$
+{\nont X} $\}^+$ means one or more repetitions.  Brackets indicate
+optional parts, that is $[$ {\nont X} $]$ stands for zero or one
+instances of {\nont X}.  The vertical bar (`$|$') denotes
+alternation.
+
+\subsection{Lexical conventions\label{lexical}}
+
+A \todaysname{} specification is a sequence of printable ASCII
+characters, including space, tab, and newline.  The characters are
+separated into {\em tokens} according to the rules given below (the
+rules are similar, but not identical, to those of the C programming
+language).
+
+\begin{itemize}
+
+\item An {\nont identifier} is a sequence of characters from the set
+$\{$ `{\tt a}'$\ldots$`{\tt z}', `{\tt A}'$\ldots$`{\tt Z}', `{\tt
+0}'$\ldots$`{\tt 9}', `\verb|_|'~$\}$.  The sequence must start with
+an alphabetic character or `\verb|_|'.  Certain identifiers, called
+{\em keywords}, are reserved by \todaysname{}, meaning they are not
+available as user-defined names.  Table~\ref{keyword-table} lists all
+the keywords.
+
+\begin{table}[htb]
+\vspace{1ex}
+\begin{center}
+\begin{verse}
+\begin{multicols}{5}
+{\tt
+	all\\
+	array\\
+	ascending\\
+	by\\
+	choose\\
+	closed\\
+	components\\
+	connect\\
+	continuous\\
+	count\\
+	create\\
+	default\\
+	define\\
+	descending\\
+	discrete\\
+	do\\
+	else\\
+	exists\\
+	export\\
+	find\\
+	flow\\
+	function\\
+	global\\
+	if\\
+	in\\
+	input\\
+	invariant\\
+	logical\\
+	maxel\\
+	minel\\
+	number\\
+	one\\
+	open\\
+	out\\
+	output\\
+	set\\
+	setup\\
+	state\\
+	symbol\\
+	then\\
+	transition\\
+	type\\
+	when\\
+}
+\end{multicols}
+\end{verse}
+\end{center}
+\caption{List of \todaysname{} keywords.\label{keyword-table}}
+\end{table}
+
+\item  An {\nont operator} is a sequence of characters from the set $\{$
+`\verb|+|',
+`\verb|*|',
+`\verb|-|',
+`\verb|/|',
+`\verb|<|',
+`\verb|>|',
+`\verb|=|',
+`\verb|&|',
+`\verb,|,',
+`\verb|'|',
+`\verb|`|'~$\}$, possibly enclosed in a balanced pair of parentheses,
+`\verb|(|' and 
+`\verb|)|',
+`\verb|{|' and 
+`\verb|}|', or
+`\verb|[|' and 
+`\verb|]|'.  For example: \verb.(+)..
+%%
+
+Note that an operator in \Shift{} is  different from an operator in C. 
+In \Shift{} the character sequence
+`{\tt x+-3}' contains the tokens `{\tt x}', `{\tt +-}', and `{\tt 3}'.
+
+\item A {\nont logical-connective} is a predefined operator from the set $\{$
+`\verb|not|',
+`\verb|and|',
+`\verb|or|',
+`\verb|xor|'~$\}$.
+
+\item A {\nont numeric-constant} consists of a {\em mantissa} followed
+by an optional {\em exponent}.  The mantissa consists of one or more
+digits and optionally a single `\verb,.,' (period) in any position.
+The exponent is in the form `{\tt e$|$E}[{\tt +}$|${\tt -}]$\{${\nont
+digit}$\}^+$'.
+
+\item A {\nont symbolic-constant} is a sequence of characters
+starting with \verb.$. followed by an identifier (examples:
+\verb.$ONE., \verb.$_TWO.).
+
+%% $
+
+\item A sequence of characters starting with `{\tt /*}' and ending at
+the first occurrence of the pair `{\tt */}' (included) is a
+comment.
+
+\item A sequence of characters starting with `{\tt //}' and ending at
+the first occurrence of the end-of-line character is a comment.
+
+\item Tabs, spaces, newlines, and comments terminate tokens but
+otherwise have no meaning.
+
+\item The characters `\verb|"|', `\verb|!|', `\verb|\|', `\verb|~|', and
+`\verb|?|' are reserved and may be used internally by \todaysname{}.
+
+\item The characters `\verb|@|', `\verb|#|', `\verb|%|' are guaranteed
+never to be used by \todaysname{} (thus they may be given special
+meanings by a preprocessor).
+
+\item The remaining characters are used as specified by the grammar
+rules in the rest of this document.
+
+\end{itemize}
+
+\subsection{Scopes\label{scope}}
+
+Several \todaysname{} constructs establish a relationship between an
+identifier (for instance, `\verb.x.') and an entity (for instance, a
+variable, or a type).  The section of text for which the relationship
+is valid is called the {\em scope} of the identifier.  \todaysname{}
+has nested scopes; a scope always starts and ends within another
+scope.  When referring to two such scopes, the former is called the
+{\em inner scope}, the latter the {\em outer scope}.  The outermost
+scope is also called the {\em global scope}.
+
+This manual defines scoping rules along with each construct which
+defines a scope.  Some rules are valid for all scopes.
+
+\begin{itemize}
+\item It is illegal to define an identifier twice in the
+same scope. \item It is permitted to redefine an identifier in an inner
+scope.  \item Scopes are transparent: all meanings of identifiers from the
+outer scope are also valid in an inner scope, except those of
+identifiers which are redefined.
+\end{itemize}
+%
+Most constructs associating identifiers to entities are called {\em
+declarations}.  Unlike other languages, \todaysname{} has no
+`declaration-before-use' rule.  A declaration is valid for its entire
+scope, no matter where it appears.
+
+\subsection{Preprocessing}
+
+\todaysname{} uses the same preprocessing as the ANSI C language, for
+the purpose of macro substitution (\verb.#define.), file inclusion
+(\verb.#include.), and all other available facilities.
+
+\subsection{Overall structure}
+
+A \todaysname{} specification is a sequence of {\em definitions}.
+\begin{center}
+\begin{tabular}{rl}
+{\nont specification} $\quad\Rightarrow$ & $\{$ {\nont definition} $\}^+$\\
+{\nont definition} $\quad\Rightarrow$ & {\nont component-type-definition}\\
+	$|$ & {\nont external-type-definition}\\
+	$|$ & {\nont global-variable-decl}\\
+	$|$ & {\nont external-function-decl}\\
+	$|$ & {\nont global-setup-clause}\\
+\end{tabular}
+\end{center}
+%
+% A {\nont type-definition} describes a class of components.
+% A {\nont macro-definition} is a (yet to be defined) mechanism for
+% abstracting common constructs.
+
+\subsection{Component types\label{types}}
+
+A component type definition describes a set of components with common
+behavior.
+
+\begin{center}
+\begin{tabular}{rl}
+{\nont component-type-definition} $\quad\Rightarrow$ & {\tok type} {\nont type-name} [{\tok :} {\nont parent}] \verb.{. $\{$ {\nont type-clause} {\tok ;} $\}^+$ \verb.}. [{\tok ;}]\\
+{\nont type-name} $\quad\Rightarrow$ & {\nont identifier}\\
+{\nont parent} $\quad\Rightarrow$ & {\nont identifier}\\
+{\nont type-clause} $\quad\Rightarrow$ & {\tok state} {\nont state-declarations}\\
+	$|$ & {\tok input} {\nont input-declarations}\\
+	$|$ & {\tok output} {\nont output-declarations}\\
+	$|$ & {\tok export} {\nont export-declaration-list}\\
+	$|$ & {\tok setup} {\nont setup-clause}\\
+%	$|$ & {\tok setup} \verb.{. $\{$ {\nont reset-action} {\tok ;} $\}^*$ \verb.}.\\
+	$|$ & {\tok flow} {\nont flow-list}\\
+	$|$ & {\tok discrete} {\nont discrete-state-list}\\
+	$|$ & {\tok transition} {\nont transition-list}\\
+{\nont state-declarations} $\quad\Rightarrow$ & {\nont declaration-list}\\
+{\nont input-declarations} $\quad\Rightarrow$ & {\nont declaration-list}\\
+{\nont output-declarations} $\quad\Rightarrow$ & {\nont declaration-list}\\
+\end{tabular}
+\end{center}
+%
+The definition `{\tt type $X$ : $Y$ \verb.{. $\ldots$ \verb.}.}'
+defines a component type named $X$ in the global scope.  The body of
+definition (all text between \verb.{. and \verb.}.) is the local scope
+for $X$.
+
+$Y$, if present, must be the name of another component type
+called the {\em parent type} of $X$.  The function $P$
+maps a type to its parent: in this case, $Y = P(X)$.
+Type $A$ is a {\em supertype} of $B$ when $A = P(B)$ or $A$ is a
+supertype of $P(B)$.  In such a case, $B$ is a {\em subtype} of $A$.
+
+A type represents a set of components.  The statements `component $x$
+has type $X$' and `$x \in X$' are equivalent.
+
+% A \todaysname{} type $X$ is associated with two sets of components,
+% $E_X$ and $T_X$.
+% The set $E_X$ (where $E$ stands for {\em exactly}) contains the
+% components of type $X$ that are created as the system evolves.  The
+% set $T_X$ (where $T$ stands for {\em transitive}) is defined by
+% \[ T_X = E_X \cup \bigcup_{S \mbox{\scriptsize\ is a subtype of } X} E_S,
+% \] that is the set of all components of this type plus all the
+% descendant types.
+% 
+% Uses of the type name $X$ refer, depending on
+% context, to the type $X$, the set $E_X$, or the set $T_X$.
+
+The parent/child relationship implies certain constraints and
+inheritance rules between the state, input, output, and export lists of the
+involved types.  These are described in sections~\ref{inherit_export}
+and~\ref{inherit_local}.
+
+
+In a type definition there can be multiple clauses of each kind.  The
+items in all clauses of like kinds are concatenated in the order in
+which they appear, as if there were a single clause containing all of
+them.
+
+\subsection{External types\label{external-types}}
+
+\begin{center}
+\begin{tabular}{rl}
+{\nont external-type-definition} $\quad\Rightarrow$ & {\tok type} {\nont type-name} [{\tok ;}]\\
+\end{tabular}
+\end{center}
+%
+The definition `{\tt type $X$}'
+defines an external type named $X$ in the global scope. See
+Section~\ref{types} for a description of an external type.
+
+
+\subsection{Export lists}
+
+\begin{center}
+\begin{tabular}{rl}
+{\nont export-declaration-list} $\quad\Rightarrow$ & {\nont export-declaration} $\{$ {\tok ;} {\nont export-declaration} $\}^*$\\
+{\nont export-declaration} $\quad\Rightarrow$ & {\nont event-type} {\nont local-event} $\{$ {\tok ,} {\nont local-event} $\}^*$\\
+{\nont local-event} $\quad\Rightarrow$ & {\nont identifier}\\
+{\nont event-type} $\quad\Rightarrow$ & {\tok open}\\
+	$|$ & {\tok closed}\\
+\end{tabular}
+\end{center}
+
+Export declarations declare local events in the scope of a component
+type.  {\nont Local-event} identifies the event and {\nont event-type}
+is its type.  The {\nont event-type} may be one of $\{$ {\tok open},
+{\tok closed} $\}$.  If no event type is specified then the default is
+chosed as {\tok closed}.
+
+
+\subsection{Declaration lists\label{decl-lists}}
+
+\begin{center}
+\begin{tabular}{rl}
+{\nont declaration-list} $\quad\Rightarrow$ & {\nont declaration} $\{$ {\tok ;} {\nont declaration} $\}^*$\\
+{\nont declaration} $\quad\Rightarrow$ & {\nont type} {\nont variable-clause} $\{$ {\tok ,} {\nont variable-clause} $\}^*$\\
+{\nont variable-clause} $\quad\Rightarrow$ & {\nont variable-name} [ {\nont init} ]\\
+{\nont type} $\quad\Rightarrow$ & {\nont simple-type}\\
+	$|$ & {\tok set} {\tok (} {\nont type} {\tok )}\\
+	$|$ & {\tok array} {\tok (} {\nont type} {\tok )}\\
+	$|$ & {\nont external-type}\\
+{\nont variable-name} $\quad\Rightarrow$ & {\nont identifier}\\
+{\nont init} $\quad\Rightarrow$ & {\tok :=} {\nont expression}\\
+{\nont simple-type} $\quad\Rightarrow$ & {\tok number}\\
+	$|$ & {\tok continuous} {\tok number}\\
+	$|$ & {\tok symbol}\\
+	$|$ & {\nont type-name}\\
+{\nont external-type} $\quad\Rightarrow$ & {\nont type-name}\\
+\end{tabular}
+\end{center}
+%
+Input, output, and state declarations declare local variables
+in the scope of a component type.  {\nont Variable-name} identifies a
+variable, and {\nont type} is its type. The initializing expression is
+evaluated at component creation time, and must be of a compatible
+type.  If a variable is defined algebraically, its initialization is
+ignored. Variables are initialized to zero or {\tt nil} 
+ unless otherwise specified.
+
+\subsection{Global Variable Declarations}
+
+\begin{center}
+\begin{tabular}{rl}
+{\nont global-variable-decl} $\quad\Rightarrow$ & {\tok global} {\nont
+declaration-list} \\
+\end{tabular}
+\end{center}
+%
+Global variable declaration declare global variable in the global
+scope of a \Shift{} program.  The global variable declaration follow
+the rules of declarations given in Section~\ref{decl-lists}.
+
+
+\subsection{Types\label{types}}
+
+\paragraph{Numbers.}
+
+Variables of {\tok number} type hold real numbers, such as 1 or 2.72.
+Scalar variables whose type is {\tok continuous number} may be used in
+the definition of the continuous evolution of a component, as shown in
+section~\ref{flow}.
+
+\paragraph{Symbols.}
+
+Variables of type symbol hold symbolic constants
+(section~\ref{lexical}), such as \verb.$GO. or \verb.$STOP..  Every
+different symbolic constant represents a distinct value.  The only
+operations available for symbols are assignment and comparison.
+
+\paragraph{Component types.}
+
+A variable of type $X$, where $X$ is a component type, is a reference
+to an element in $T_X$, that is a component whose type is $X$ or any of
+its descendants.
+
+\paragraph{Sets.}
+
+A variable of type {\tok set($E$)} contains a set of elements of type
+$E$. The set might be empty.  The expression {\tok \{\}} evaluates to
+the empty set.
+
+\paragraph{Arrays.}
+
+A variable of type {\tok array($E$)} contains a one-dimensional array
+of elements of type $E$.  The same variable may hold arrays of
+different lengths at different times.  The elements of the array are
+numbered consecutively starting from 0. An array might be empty. The
+expression {\tok []} evaluates to the empty array.
+
+\paragraph{External types.}
+
+Variables of the external type $X$ can store values that are returned
+by the foreign functions of \Shift{}.  This is a pragmatic approach
+since a foreign function may return a values that is not of the {\nont
+simple-types} allowed in \Shift{}.  Foreign functions are described in
+Section~\ref{foreign-functions}).  
+
+\subsubsection{Links}
+
+When the type in a declaration is a component type, or a set or array
+whose element is a component type, the declared variable is a
+reference to another component (or a set of components).  Such
+variable, called link variable (or simply link), identifies edges in
+the link graph.
+
+Let type $X$ define a link variable $c$ with type $Y$.
+Then each $x \in X$ has an edge to some $y \in Y$, or to the
+special component {\tok nil}.  The edge is identified by the pair $(x,
+c)$.  In the local scope of $X$, $c$ is a valid
+expression, and it refers to $y$.  This is a {\em single-valued
+link}.  
+
+If $c$ has type {\tok set($Y$)} or {\tok array($Y$, \ldots)}, each $x
+\in X$ has a set of edges to distinct components in $Y$.  In the
+case of a set the edges cannot be individually named.  This is
+a {\em multi-valued link}.
+
+For simplicity, this manual often uses $c$ to refer to the element, or
+set of elements, currently linked by $(x, c)$.
+
+% The {\tok tight} qualifier, which is valid only for single-valued
+% connections, selects alternate synchronization rules between the state
+% machine of this component and the connected component.
+% Section~\ref{transitions} explain these rules.  Tight connection do
+% not add any descriptive power, but they simplify the composition of
+% finite-state machines at the expense of modularity.
+
+\subsection{Flows\label{flow}}
+
+\begin{center}
+\begin{tabular}{rl}
+{\nont flow-list} $\quad\Rightarrow$ & {\nont flow} $\{$ {\tok ,} {\nont flow} $\}^*$\\
+{\nont flow} $\quad\Rightarrow$ & {\nont flow-name} \verb.{. {\nont equation-list} \verb.}.\\
+{\nont flow-name} $\quad\Rightarrow$ & {\nont identifier}\\
+{\nont equation-list} $\quad\Rightarrow$ & {\nont flow-or-equation} $\{${\tok ,} {\nont flow-or-equation}$\}^*$\\
+{\nont flow-or-equation} $\quad\Rightarrow$ & {\nont differential-equation}\\
+	$|$ & {\nont algebraic-definition}\\
+	$|$ & {\nont flow-name}\\
+{\nont differential-equation} $\quad\Rightarrow$ & {\nont differential-equation-lhs} {\tok '} {\tok =} {\nont expression}\\
+{\nont algebraic-definition} $\quad\Rightarrow$ & {\nont algebraic-definition-lhs} {\tok =} {\nont expression}\\
+{\nont differential-equation-lhs} $\quad\Rightarrow$ & {\nont continuous-number-state}\\
+	$|$ & {\nont continuous-number-output}\\
+{\nont algebraic-definition-lhs} $\quad\Rightarrow$ & {\nont continuous-number-state}\\
+	$|$ & {\nont continuous-number-output}\\
+	$|$ & {\nont variable-name}\\
+{\nont continuous-number-state} $\quad\Rightarrow$ & {\nont variable-name}\\
+{\nont continuous-number-output} $\quad\Rightarrow$ & {\nont variable-name}\\
+\end{tabular}
+\end{center}
+%
+A {\nont flow} is a named set of differential equations and algebraic
+definitions, used to define the continuous evolution of one
+or more variables in the component.  {\nont Flow-name} refers to
+the set of equations in {\nont equation-list}.  Its scope is the
+body of the enclosing component type definition.
+
+Flows define the behavior of state or output variables of type {\tok
+number}.  The left-hand side of an algebraic definition, or a
+differential equation, is, respectively, one such variable or its
+derivative.  (For convenience, these rules are more relaxed than those
+of the standard input-output-state model.  The only difference between
+states and outputs is that outputs are visible on the outside, states
+are not.)
+
+The right-hand sides of both kinds of equations are expressions of all
+variables of this component (states, inputs, and outputs) and the
+outputs of linked components.
+
+There may be no circular dependencies in algebraic definitions.
+
+When a {\nont flow-name} appears in place of an equation, it stands
+for all equations in the corresponding {\nont equation-list}.  If a
+flow defines variable $x$ more than once, all definitions of $x$
+except the last one are ignored.
+
+Flows are used in the definition of discrete states, as shown in the
+next section.  Two flow names have special meanings.
+
+\begin{itemize}
+
+\item The flow named {\tok default} is the default flow for all states
+that do not explicitly specify one.
+
+
+\item The flow named {\tok stop} sets the derivative of all variables
+to zero.
+
+\end{itemize}
+
+Note that there is a subtle difference between {\nont
+differential-equation-lhs} and {\nont algebraic-definition-lhs}.  That
+is, differential equations require a continuous number on the left
+hand side of the equality where as algebraic definitions may equate
+any valid expression to a variable of compatible type to that
+expression.
+
+\subsection{Discrete states\label{discrete}}
+
+\begin{center}
+\begin{tabular}{rl}
+{\nont discrete-state-list} $\quad\Rightarrow$ & {\nont discrete-state-clause} $\{$ {\tok ,} {\nont discrete-state-clause} $\}^*$\\
+{\nont discrete-state-clause} $\quad\Rightarrow$ & {\nont state-name} [ \verb.{. {\nont equation-list} \verb.}. ] [ {\tok invariant} {\nont expression} ]\\
+{\nont state-name} $\quad\Rightarrow$ & {\nont identifier}\\
+\end{tabular}
+\end{center}
+%
+A {\nont state-name} is the name of the state.  There must be at least
+one state in each machine.  The first state in the list is the initial
+state for a newly-created component.
+
+{\nont Flow} specifies the continuous behavior at the corresponding
+discrete state, as given in section~\ref{flow}.  The optional {\tok
+invariant} expression is expected to be always true.
+
+\begin{comment}
+If {\nont flow} is not given for a state, and
+there is no {\tok default} flow, then it is an error if time starts
+flowing in that state.
+\end{comment}
+
+%   If $c$ is a single-valued connection,
+% the functional notation $v(c)$ refers to the variable $v$ in a
+% component connected by $c$ to this component.  If $c$ is a set-valued
+% connection in a component $x$, then $v(c)$ is the set ${v(y) : y \in
+% c(x)}$.
+%
+% It is an error to refer to $v(c)$ if no $c$-connection has been
+% established.
+
+\subsection{Transitions\label{transitions}}
+
+\begin{center}
+\begin{tabular}{rl}
+{\nont transition-list} $\quad\Rightarrow$ & {\nont transition} $\{$ {\tok ,} {\nont transition} $\}^*$\\
+{\nont transition} $\quad\Rightarrow$ & {\nont from-set} {\tok ->} {\nont to-state} {\nont event-list} {\nont transition-clauses}\\
+{\nont from-set} $\quad\Rightarrow$ & {\nont set-of-states}\\
+{\nont set-of-states} $\quad\Rightarrow$ & {\nont expression}\\
+{\nont to-state} $\quad\Rightarrow$ & {\nont state-name}\\
+{\nont event-list} $\quad\Rightarrow$ & \verb.{. [ {\nont event} $\{${\tok ,} {\nont event}$\}^*$ ] \verb.}.\\
+{\nont event} $\quad\Rightarrow$ & {\nont local-event}\\
+	$|$ & {\nont external-event}\\
+{\nont local-event} $\quad\Rightarrow$ & {\nont identifier}\\
+{\nont external-event} $\quad\Rightarrow$ & {\nont link-var} {\tok :} {\nont exported-event} [ {\tok (} {\nont set-sync-rule} {\tok )} ]\\
+{\nont exported-event} $\quad\Rightarrow$ & {\nont identifier}\\
+{\nont set-sync-rule} $\quad\Rightarrow$ & {\tok one} [{\tok :} {\nont temporary-link}]\\
+	$|$ & {\tok all}\\
+{\nont link-var} $\quad\Rightarrow$ & {\nont identifier}\\
+{\nont temporary-link} $\quad\Rightarrow$ & {\nont identifier}\\
+{\nont transition-clauses} $\quad\Rightarrow$ & [ {\nont when-clause} ] [ {\nont action-clause} ]\\
+{\nont when-clause} $\quad\Rightarrow$ & {\tok when} {\nont expression}\\
+\end{tabular}
+\end{center}
+%
+A {\nont transition} defines one or more edges in the finite state
+machine of a component type: one edge from each state in the
+{\nont from} set to the {\nont to-state} state.  {\nont Set-of-states}
+is a constant expression which evaluates to a set of states, or a single
+state.  In this context, the identifier {\tok all} is the set of all
+states for this
+machine.  See section~\ref{expressions} for a complete list of
+set functions and constructors.
+
+{\nont Event} is the event associated with this transition.  It must
+appear in the {\nont export-list} of the component.  {\nont
+Exported-event} is a local event in a linked component.  The link
+variable in an exported event may not be algebraically defined.  When
+a transition contains exported events, the state machine of this
+component potentially synchronizes with the state machines in other
+components.  The synchronization rules are given in
+section~\ref{sync-rules}.
+
+The optional {\nont guard-clause} contains a logical algebraic
+expression called the {\em guard}.  A transition
+may be taken only if the guard is true.
+
+If the guard contains an expression with the quantifiers {\tok
+exists}, {\tok minel}, or {\tok maxel}, the quantified variable
+defines a temporary link whose scope is the action list for the
+transition (see section~\ref{expressions}).
+
+The {\nont action-clause} specifies actions which are taken
+concurrently with the transition, as described in section~\ref{actions}.
+
+\subsection{Synchronization rules\label{sync-rules}}
+
+A component synchronizes its state machine with other state machines
+by labeling its own edges with {\nont local-event}s and {\nont
+external-event}s.  Local events are exported; they can be used as
+external events by other components, and they can appear in {\nont
+connection actions} (section~\ref{connection}).  Each label of an edge
+$E$ establishes conditions under which a transition may be taken along
+$E$.
+
+When all conditions are satisfied, and the guard, if present,
+evaluates to true, and the component is in a state that has $E$ as an
+outgoing edge, then the transition along $E$ is taken simultaneously
+with other transitions as required by the conditions.
+
+The conditions associated with each label are as follows.  Let $x$ and
+$y$ be components, and $Z$ a set of components.  Let {\tt c} be a
+single-valued link, and {\tt C} a set-valued link.  Let $e_y$ be a
+local event for $y$, and $e_z$ a local event for all components in
+$Z$.
+
+\begin{itemize}
+
+\def\ee#1#2{$#1\hbox{:}#2$}
+
+% \item Let $X$ be the set of components which have one or more edges
+% labeled \ee{c_y}{e_y}, with $c_y$ evaluating to $y$.  An edge labeled
+% $e_y$ in $y$ must be taken simultaneously with an edge labeled
+% \ee{c_y}{e_y} in all $x \in X$.  If $X$ is empty, $e_y$ imposes no
+% restrictions.
+
+\item If {\tt c} evaluates to {\tok nil}, an edge labeled
+\ee{c}{e_y} may not be taken.
+
+\item If {\tt c} evaluates to $y$, an edge $E$ labeled \ee{{\tt c}}{e_y}
+must be taken simultaneously with an edge $E'$ labeled $e_y$ in
+$y$.
+
+\item If $e_y$ is of type {\tok open} then an edge $E'$ labeled $e_y$
+in $y$ requires that there exists a component $x$ with an edge $E$
+labeled \ee{y}{e_y} and $E'$ must be taken simultaneously with $E$.
+However, if $e_y$ is of type {\tok closed} then:
+
+\begin{itemize}
+
+\item if there is no other component $x$ with an edge $E$ labeled
+\ee{c}{e_y}, where $c$ evaluates to $y$, then $E'$
+may be taken alone.
+
+\item if there is at least one other component $x$ with an edge $E$
+labeled \ee{c}{e_y}, where $c$ evaluates to $y$, then $E'$ must be
+taken simultanesouly with $E$.
+
+\end{itemize}
+
+\item If {\tt C} evaluates to the empty set, the edge labeled
+\ee{{\tt C}}{e_z} may not be taken if {\nont set-sync-rule} is {\tok one}.
+Otherwise it may be taken.
+
+\item If {\tt C} evaluates to $Z$ then
+an edge labeled $e_z$ in any $z \in Z$ may only be taken
+simultaneously with an edge labeled \ee{{\tok C}}{e_z}.  The following
+also applies.
+
+\begin{itemize}
+
+\item If the synchronization rule is {\tok one}, then an edge labeled
+\ee{{\tt C}}{e_z} may only be taken simultaneously with an edge
+labeled $e_z$ in a single component $z \in Z$.  If a temporary link is
+specified, it is assigned the component $z$.  The scope of the
+temporary link is the action list for the transition.
+
+\item Otherwise, if the rule is {\tok all}, an edge labeled \ee{{\tt
+C}}{e_z} must be taken simultaneously with an edge labeled $e_z$ in
+every $z \in Z$.
+
+\end{itemize}
+
+\end{itemize}
+
+%
+% If $c$ is a {\em tight} connection (section~\ref{connections}), then
+% local events with the same name in the two components must be taken
+% concurrently.  Local events which do not appear in any transition of
+% the tightly-connected components may still occur independently.
+% {\bf [Is this what we want?]}
+%
+
+\subsection{Evolution of a \todaysname{} system}
+
+A \todaysname{} system starts by executing all initializations of
+global variables, at time $t = 0$.  Then the system evolves by
+alternating discrete and continuous phases, starting with a discrete
+phase.
+
+In the discrete mode, all possible transitions are taken, in some
+serial order unless explicitly synchronized.  Time does not flow in
+the discrete mode.  The system switches to continuous mode when no
+more transitions are possible.
+
+The system evolves in continuous mode according to the flow associated
+to the discrete state of each component.  As soon as it becomes
+possible for one or more components to execute a transition, time
+stops again.
+
+% A {\em non-deterministic transition} occurs when it is possible to
+% follow two different edges out of the current discrete state.
+% Non-deterministic transitions are allowed in a specification,
+% but certain tools (such as the simulator) may signal an error
+% when they encounter them.
+
+
+\subsection{Actions\label{actions}}
+
+\begin{center}
+\begin{tabular}{rcl}
+{\nont action-clause} & $\Rightarrow$ & [ {\nont define-clause} ] {\nont do-clause}\\
+{\nont setup-clause}	& $\Rightarrow$
+	& [ {\nont define-clause} ] {\nont do-clause} [ {\nont connect-clause} ]\\
+{\nont define-clause} & $\Rightarrow$ & {\tok define} \verb.{. $\{$ {\nont local-definition} {\tok ;} $\}^*$ \verb.}.\\
+{\nont local-definition} & $\Rightarrow$ & {\nont temp-var-declaration} {\tok :=} {\nont expression}\\
+{\nont temp-var-declaration}
+	 & $\Rightarrow$
+	 & {\nont type} {\nont identifier} {\tok :=} {\nont expression}\\
+{\nont do-clause} & $\Rightarrow$ & {\tok do} \verb.{. $\{$ {\nont action} {\tok ;} $\}^*$ \verb.}.\\
+{\nont action} & $\Rightarrow$ & {\nont reset-action}\\
+{\nont connect-clause}
+	& $\Rightarrow$
+	& {\tok connect} \verb.{. $\{$ {\nont connect-action} {\tok ;} $\}^*$ \verb.}.\\
+\end{tabular}
+\end{center}
+
+\noindent
+Actions are used to change the continuous state, create type
+instances, and change the way in which components are linked.
+
+The {\tt setup} clause in a type definition contains several
+initializations and operations which are intended to make explicit the
+input-output connections of the components of a given type
+instance. This is explained in Section~\ref{setup-semantics}.
+
+A {\nont local-definition} declares and initializes a variable whose
+scope is the following local definitions, and the actions in the
+{\nont do-clause} (and in the {\nont connect-clause}.)
+
+\subsubsection{Resets\label{resets}}
+
+\begin{center}
+\begin{tabular}{rl}
+{\nont reset-action} $\quad\Rightarrow$ & {\nont selector} {\tok :=} {\nont expression}\\
+\end{tabular}
+\end{center}
+%
+{\nont Selector} refers to a state or output variable of this
+component, or an input variable of a linked component (it is defined in
+section~\ref{expressions}).  {\nont Expression} is an
+expression of the old values (that is, before they are reset) of
+all variables (input, state, and output) of this component, and output
+variables of linked components.  Resets have no effect on
+variables which are algebraically defined in the final state of
+the associated transition.
+
+\paragraph{Note on `{\tok :=}' vs. `{\tok =}'.}  The notation `{\nont
+l} {\tok :=} {\nont r}' represents a one-time assignment which occurs
+during the discrete phase.  The notation `{\nont l} {\tok =} {\nont
+r}' in certain contexts establishes equality of the left and
+right-hand sides as time flows.  In other contexts, `{\nont x} {\tok
+=} {\nont y}' is a logical expression which evaluates to {\tok true}
+when {\nont x} is equal to {\nont y}.
+
+
+\subsubsection{Connection actions\label{connection}}
+
+\begin{center}
+\begin{tabular}{rl}
+{\nont connection-action} $\quad\Rightarrow$ & {\nont external-event} {\tok <->} {\nont external-event} $\{$ {\tok <->} {\nont external-event} $\}^*$\\
+	$|$ & {\nont connection}\\
+{\nont connection} $\quad\Rightarrow$ & 
+	 {\nont input} {\tok (} {\nont link-var} {\tok )} {\tok <-} {\nont expression}\\
+{\nont input} $\quad\Rightarrow$ & {\nont identifier}\\
+{\nont link-var} $\quad\Rightarrow$ & {\nont identifier}\\
+\end{tabular}
+\end{center}
+%
+connection actions are only allowed in the {\tok setup} phase of a
+component's life.  They establish static event synchronization and I/O
+connections for components without their direct involvement.
+
+A {\em connection} makes the value of the left-hand side be that of
+the right-hand side at all times.  If the right-hand side of a
+connection is not a continuously-varying number, the left-hand side
+may not contain continuously-varying numbers.  In the {\em input
+definition} $u(a) = E$, $u$ must be an input of component $a$.
+The connection is static: if $a$ later changes, the input definition
+refers to the value of $a$ at setup time.
+{\bf [ What happens when a flow conflicts with a connection? ]}
+
+The event synchronization \[ a\hbox{:}e \hbox{\tt\ <-> } b\hbox{:}f \]
+specifies that event $e$ in $a$ and event $f$ in $b$ may only occur
+simultaneously.  Event synchronizations are also static, and the
+synchronized components forever remain those reached through $a$ and
+$b$ at setup time.
+
+Some useful forms of connections are I/O connections ($u(a) =
+y(b)$, where $y$ is an output of linked component $b$), I/I
+connections ($u(a) = v$, where $v$ is an input of this component),
+O/I and O/O connections.
+
+There may not be circular dependencies in discrete definitions.
+
+\subsubsection{Linking and unlinking}
+
+Links are established and removed by resets (section~\ref{resets}) of
+link variables.
+
+In a link statement of the form $X \hbox{\tt\ := } Y$, $X$ refers to a
+single or multi-valued link in this component.  The action modifies
+the edge, or edges, named by $X$.
+
+When $X$ is a single-valued link, the action removes the
+existing link and adds a new one, from this component to the
+component obtained by evaluating $Y$ (possibly to the {\tok nil}
+component).
+
+When $X$ is a multi-valued link, the action can add or remove
+edges from the set, or leave it unchanged.
+
+% The {\nont connection-expression} $c(d)$, where $d$ is a single-valued
+% connection, refers to connection $c$ in the component $d$.  Let $D$ is
+% a set of components.  If $c(D)$ appears in the right-hand side of a
+% connection assignment, then $c(D) = \cup_{d \in D} c(d)$.  The action
+% $c(D) {\tok :=} E$ is equivalent to $\forall d \in D : c(d) {\tok :=}
+% E$.
+
+\subsubsection{Execution of actions}
+
+The order in which actions are specified is inconsequential.  Actions
+are executed in phases as follows.
+
+\begin{enumerate}
+
+\item All components specified by {\nont create-expression}s are
+created.
+
+\item The right-hand sides and the destinations of resets are
+evaluated, and so are the component initializers.
+
+\item The previously computed values for resets and link actions
+and component initial values are assigned to their destinations.
+
+\item connection actions are executed.
+
+\end{enumerate}
+%
+Definitions in the {\nont define-clause} are evaluated in
+the order in which they are given.
+The execution sequence for the {\nont create-expression} is:
+initial values, passed in arguments, define/do actions.
+
+\subsection{Setup clause\label{setup-semantics}}
+
+If a {\tok setup} clause is present, its actions are executed before
+the finite-state machine enters the initial state.  If the initial
+state is $S_0$, this is equivalent to creating an additional state
+$S_{-1}$, making it the initial state, and placing an unguarded edge
+from $S_{-1}$ to $S_0$ with the {\tok setup} actions.
+Section~\ref{actions} lists all possible actions.  The {\em
+connect-clause} of section~\ref{connection}) may only appear in the
+{\tok setup} clause.
+
+\subsection{Global Setup Clause\label{global-setup}}
+
+
+\begin{center}
+\begin{tabular}{rl}
+{\nont global-setup-clause} $\quad\Rightarrow$ & {\nont setup-clause}
+\end{tabular}
+\end{center}
+
+A {\nont global-setup-clause} is analogous to the {\nont setup-clause}
+of a component.  Its actions are executed at the beginning of the
+execution of a \Shift{} program right after the {\nont
+global-variable-declarations} are evaluated.
+
+\subsection{Input, output, and export declarations\label{export}}
+
+Variables declared in an output list may be used outside a component.
+They may not be reset or defined outside the component.
+
+The input list declares local variables which can only be defined and
+reset from outside the component.
+
+The export declares local events of a type.  They are all visible to
+other components.
+
+
+\subsubsection{Inheritance/Subtyping of export variables\label{inherit_export}}
+
+If $X$ is the parent of $Y$, the export, input, and output lists of
+$Y$ must be supersets of, respectively, the export, input, and output
+lists of $X$.  The same name in two input or output lists must refer
+to the same kind of object.
+
+Inheritance is an implemenation technique whereby the user is spared
+the effort of duplicating code.  Inheritance and subtyping in \Shift\
+are implemented together and the inheritance features of \Shift\
+supports the subtyping restrictions specified above.  If $X$ is the
+the parent of $Y$, the export, input and output lists of $X$ are
+handled respectively in the export, input and output lists of $Y$
+according to:
+
+\begin{enumerate}
+
+\item A variable $a$ declared in $X$ and redeclared in $Y$ is processed
+according to the following rules:
+
+	\begin{itemize}
+	
+	\item If $a(X)$ is a variable declared in either one of the
+	export, input or output lists of $X$ then it must be a subtype
+	of $a(Y)$.
+	\item If $a(X)$ is a variable delared in either the input or
+	output list of $X$ then it must be of the same kind as $a(Y)$.
+
+	\end{itemize}
+
+\item A variable $a$ declared in $X$ and not declared in $Y$ is inherited
+according to the following rules:
+
+	\begin{itemize}
+
+	\item A new variable is instantiated in the scope of $Y$ and
+	given the same name, $a$.  The scoping rules for the newly
+	created variable obey the rules given above in section~\ref{export}
+	and in section~\ref{scope}.
+	\item The initialization expressions of $a(X)$, if any exists,
+	are also valid for the inherited variable.
+
+	\end{itemize}
+
+\item Wide subtyping where variable $a$ declared in $Y$ and not
+declared in $X$ is allowed, there are no restrictions.
+
+\end{enumerate}
+
+\subsection{State declarations\label{state}}
+
+Variables declared in a state list may not be used and are not visible
+outside a component.  They cannot be reset or defined outside a
+component with the exception of the creation expression,
+section~\ref{creation}.  
+
+\subsubsection{Inheritance/Subtyping of state variables\label{inherit_local}}
+
+%With the creation expression and only this expression the state variables of a
+%component become visible outside that component. Thus,  the subtyping
+%rules of state variables are required to honor the subtyping rules
+%given in section~\ref{inherit_export}:  If $X$ is an ancestor of $Y$,
+%the state lists of $Y$ must be supersets of the state lists of $X$.
+%The same name in two state lists must refer to the same kind of object.
+%
+%Inheritance of state variables obey the same rules as the inheritance
+%of input and output variables as enumerated above.  The only difference
+%is that state variables are essentially defined only in local scope,
+%so the inheritance rules given in section~\ref{inherit_export} must be
+%modified so that the newly created (i.e.~inherited) variables must be
+%defined according to the scoping rules given in section~\ref{state} and section~\ref{scope}. 
+State variables do not honor the inheritance mechanism.  If $X$ is an
+ancestor of $Y$ the state lists of $X$ are independent of the state
+lists of $Y$; the state lists of $X$ are not inherited to the state
+lists of $Y$ and any redeclaration of state variables in $Y$
+(overloading) is allowed. 
+
+
+\subsection{Expressions\label{expressions}}
+
+\begin{center}
+\begin{tabular}{rl}
+{\nont expression} $\quad\Rightarrow$ & {\nont selector}\\
+	$|$ & {\nont numeric-constant}\\
+	$|$ & {\nont symbolic-constant}\\
+	$|$ & {\tok true}\\
+	$|$ & {\tok false}\\
+	$|$ & {\tok nil}\\
+	$|$ & {\nont create-expression}\\
+	$|$ & {\nont components-of-type-expression}\\
+	$|$ & {\nont expression} {\nont binary-operator} {\nont expression}\\
+	$|$ & {\nont prefix-operator} {\nont expression}\\
+	$|$ & {\nont expression} {\nont postfix-operator}\\
+	$|$ & {\nont expression} {\tok (} [ {\nont expression-list} ] {\tok )}\\
+	$|$ & {\nont expression} {\tok [} {\nont expression} {\tok }]\\
+	$|$ & {\tok (} {\nont expression} {\tok )}\\
+	$|$ & {\nont type}\\
+	$|$ & \verb.{. [ {\nont expression-list} ] \verb.}.\\
+	$|$ & {\nont set-former-expression}\\
+	$|$ & {\tok [} [ {\nont expression-list} ] {\tok }]\\
+	$|$ & {\nont array-former-expression}\\
+	$|$ & {\tok all}\\
+	$|$ & {\tok self}\\
+	$|$ & {\nont state-name}\\
+	$|$ & {\tok if} {\nont expression} {\tok then} {\nont expression} {\tok else} {\nont expression}\\
+	$|$ & {\tok exists} {\nont identifier} {\tok in} {\nont expression} {\tok :} {\nont expression}\\
+	$|$ & {\tok minel} {\nont identifier} {\tok in} {\nont expression} {\tok :} {\nont expression}\\
+	$|$ & {\tok maxel} {\nont identifier} {\tok in} {\nont expression} {\tok :} {\nont expression}\\
+{\nont selector} $\quad\Rightarrow$ & {\nont continuous-selector}\\
+	$|$ & {\nont link-selector}\\
+{\nont continuous-selector} $\quad\Rightarrow$ & {\nont number-var}\\
+	$|$ & {\nont number-var} {\tok (} {\nont link-selector} {\tok )}\\
+{\nont link-selector} $\quad\Rightarrow$ & {\nont link-var}\\
+	$|$ & {\nont link-var} {\tok (} {\nont link-selector} {\tok )}\\
+{\nont expression-list} $\quad\Rightarrow$ & {\nont expression} [ {\tok ,} {\nont expression-list} ]\\
+{\nont prefix-operator} $\quad\Rightarrow$ & {\nont operator}\\
+	$|$ & {\nont logical-connective}\\
+{\nont postfix-operator} $\quad\Rightarrow$ & {\nont operator}\\
+	$|$ & {\nont logical-connective}\\
+\end{tabular}
+\end{center}
+%
+% In the context of an expression, the name $X$ of a component type
+% refers to the set $T_X$ (see section~\ref{types}).
+%
+The indexing expression {\tok $a$[$i$]} accesses the $(i+1)$-th
+element of array $a$.
+
+The expression \verb.{. $e_1$, $\ldots$, $e_n$ \verb.}. evaluates to a
+set containing the elements $e_1, \ldots, e_n$, which must all be of
+the same type.  Similarly, the expression \verb.[. $e_0$, $\ldots$,
+$e_{n-1}$ \verb.]. evaluates to an array of length $n$.
+
+The expression {\tok all} evaluates to the set of all states in the
+state machine of this type.
+
+The expression {\tt self} is a self-link, that is a reference to the
+component containing the expression.
+
+The expression {\tt nil} is a special component whose behavior is
+absolutely boring: it has no inputs, outputs, or exported events.  It
+may be assigned to links of any type.
+
+The logical expression {\tt if $x$ then $y$ else $z$} evaluates to
+$y$ if $x$ is true, else it evaluates to $z$.
+
+Grammar ambiguities are resolved by operator precedence. {\bf [need
+precedence table here]}
+
+
+\subsubsection{Creation\label{creation}}
+
+\begin{center}
+\begin{tabular}{rl}
+{\nont create-expression} $\quad\Rightarrow$ & {\tok create} {\tok (} {\nont type-name} $\{$ {\tok ,} {\nont initializer} $\}^*$ {\tok )}\\
+{\nont initializer} $\quad\Rightarrow$ & {\nont variable} {\tok :=} {\nont expression}\\
+{\nont variable} $\quad\Rightarrow$ & {\nont identifier}\\
+\end{tabular}
+\end{center}
+%
+The {\tok create ($C$, $\ldots$)} command creates a new component of
+type $C$.  The left-hand side of an
+{\nont initializer} is a variable (not just an input) in the new
+component.  The initializer sets this variable to the value of the
+right-hand side, overriding the initial value of the variable in the
+declaration of the new component.
+
+% The action {\tok let $x$ := create ($C$, $\ldots$)} also declares a
+% temporary link $x$ of type $C$, whose scope is the list of actions, and
+% initializes it with the new component.
+
+The scopes of the left and right-hand sides of an initializer differ.
+Thus the action {\tok create(C, $v$ := $v$)} sets variable $v$ in the
+new component to the value of variable $v$ in the creating component.
+
+The setup actions of the new component are executed after completion
+of the transition that created it.
+
+\subsubsection{Dynamic Type Evaluation}
+
+\begin{center}
+\begin{tabular}{rl}
+{\nont components-of-type-expression} $\quad\Rightarrow$ & {\tok components} {\tok (} {\nont type-name} {\tok )}\\
+\end{tabular}
+\end{center}
+
+The {\tok components ($C$)} command evaluates to a set containing all
+components compatible with type $C$ (i.e. those components that are of
+type $C$ or in the inheritance chain of type $C$) that exist at the
+time of its evaluation. Note that this feature can be used to
+dynamically check the type of a component:  the logical expression
+\[
+\begin{array}{rcl}
+	c & \mbox{{\tok in}} & \mbox{{\tok components( }} $T$
+	\mbox{{\tok )}}
+\end{array}
+\]
+evaluates to {\tok true} if and only if $c$ if compatible with type
+$T$.
+
+\subsubsection{Complex Set and Array Constructors}
+
+\Shift\ provides more complex ways to built arrays and sets than the
+simple enumeration constructs listed in the {\nont expression} rule.
+The set and array formers are modeled after the SETL language
+\cite{schwartz86:_progr_sets} constructs and, as such, provide a
+constrained, yet powerful form of ``loop'' within \Shift.
+
+\noindent
+The general form of a set former is the following:
+
+\vspace{2mm}
+
+\verb.{.
+$F(x_1, x_2,\ldots, x_n)$
+\verb.:.
+$x_1$ {\tok in} {\nont e}$_1${\tok ,}
+$x_2$ {\tok in} {\nont e}$_2${\tok ,} 
+\ldots
+$x_n$ {\tok in} {\nont e}$_n${\tok ,}
+[ \verb.|. $P(x_1, x_2,\ldots, x_n)$ ]
+\verb.}.
+
+\vspace{2mm}
+
+\noindent
+The general array former expression is exactly the same with the
+outermost \verb.{}. replaced by \verb.[]..
+
+The set (resp. array) former expression evaluates to a set containing
+all the elements resulting from the evaluation of $F(x_1, x_2, \ldots,
+x_n)$ with the ``free'' variables $x_1$, $x_2$, \ldots $x_n$ bound in
+sequence in a nested way to the elements of the expressions {\nont
+expression}$_i$.  The result of the evaluation of $F$ will appear in
+the final result if and only if the optional condition $P$ evaluates
+to true (the default in the case $P$ were missing).
+
+Obviously the {\nont expression}'s {\nont e}$_i$ are assumed to be
+either sets or arrays, or a new kind of expression called a {\nont
+range}.
+
+Here are a few examples of the use of these set and array former
+expression.  Their full grammar will be given afterward.
+
+\paragraph{Set/Array Former Example 1:} Given an array of numbers,
+{\tok [1, 2, 5, 12]} held in a global variable {\tok A} of type {\tok
+array(number)}, build a set containing their doubles and put it into a
+variable {\tok B} of the same type.
+
+\vspace{2mm}
+
+{\tok B := \{x * 2 : x in A\};}
+
+\vspace{2mm}
+
+\noindent
+The result is to assign to {\tok B} the value {\tok \{2, 4, 10, 24\}}.
+Note that if the optional condition $P$ is specified then we can
+obtain a different behavior.
+
+\vspace{2mm}
+
+{\tok B := \{x * 2 : x in A | x < 10\};}
+
+\vspace{2mm}
+
+\noindent
+The result stored in {\tok B} will now be {\tok \{2, 4, 10\}}.
+
+\paragraph{Set/Array Former Example 2:} Multiple indices.  We can also write
+something like:
+
+\vspace{2mm}
+
+{\tok C := \{x + y : x in A, y in B | y > 3\};}
+
+\vspace{2mm}
+
+\noindent
+To understand this example, consider the Cartesian product of the {\em
+abstract\/} sets $A \equiv \{1, 2, 5, 12\}$ and $B \equiv \{2, 4, 10\}$.
+\[
+	A \times B
+	\equiv \{\{1, 2\}, \{1, 4\}, \ldots, \{12, 2\}, \{12, 4\}, \{12, 10\}\}.
+\]
+The condition {\tok y > 3} will prevent all the couples with `2' as
+second element from appearing in the result {\tok C}\footnote{The
+implementation actually takes care of the generation of these
+intermediate Cartesian products, which should immediately make the
+reader wary of the potential for the construction of very complex
+algorithms which are also very costly in both time and space.}
+
+
+\paragraph{Loop Like Constructs} Feedback from users of early versions
+of \Shift, pointed out that in many cases it might be useful to
+scan an array in an orderly way.  Also it would be useful to construct
+sets and arrays without relying on the existence of previously
+constructed intermediate results.  Finally, there are efficiency
+considerations to be taken into account.
+
+To address these problems \Shift\ introduces the notion of {\nont
+range}: a special form expression which may appear only at the right
+of the {\tok in} keyword. As an example, let's build the set of all
+the numbers from 0 to 1000.
+
+\vspace{2mm}
+
+{\tok N\_1\_1000 := \{x : x in [0 .. 1000]\}}
+
+\vspace{2mm}
+
+\noindent
+Therefore the {\nont range} expression constrains a variable to vary
+between the bounds.  Moreover, the default is to step between the
+bounds in increments equal to 1 and in ascending order.  This may be
+unsatisfactory for some applications, so the concept of {\nont range}
+is extended in such a way to make it more ``usable'' from a
+programming language point of view.
+
+\noindent
+The general form of the {\nont range} descriptor is the following:
+
+\vspace{2mm}
+
+{\tok [} {\nont e}$_1$ \verb|..| {\nont e}$_2$
+	 [ {\tok :} {\nont range-options} ]
+{\tok ]}
+
+\vspace{2mm}
+
+\noindent
+where {\nont e}$_1$ and {\nont e}$_2$ must be numeric expressions and
+{\nont range-options} is either one of the following forms separated
+by commas ({\tok ,}).
+
+\begin{tabular}{clp{10cm}}
+$\bullet$ & {\tok by} {\nont step-expression}
+	& i.e. the numeric value of {\nont step-expression} will be
+	used as the ``increment''.\\
+
+$\bullet$ & {\tok ascending}
+	& the range will be swept in ``ascending'' order.\\
+
+$\bullet$ & {\tok descending}
+	& the range will be swept in ``descending'' order\footnote{It
+	is obviously possible to write inconsistent specifications by
+	using both the {\tok by} clause and {\tok ascending} or {\tok
+	descending}.}.\\
+\end{tabular}
+
+
+\paragraph{Set/Array Former Example 3:} generating an array of numbers
+spaced 2.6 units form each other in the range $[2.0,\; 36.7]$.
+
+\vspace{2mm}
+
+{\tok [i : i in [2.0 .. 36.7 : by 2.6]]}
+
+\vspace{2mm}
+
+\noindent
+the result is
+
+\vspace{2mm}
+
+{\tt [2.0 4.6 7.2 9.8 12.4 15.0 17.6 20.2 22.8 25.4 28.0 30.6 33.2 35.8]}
+
+\vspace{2mm}
+
+
+\paragraph{Range Example 1:} {\tok exists} operator.  Of course it is
+also possible to use the range operator in conjunction with the {\tok
+exists} operator and friends.  In the following we will find the
+element of the array of instances ({\tok IA}) which has a certain output
+({\tok out\_value}) above a given threshold.
+
+\vspace{2mm}
+
+{\tt exists i in [0 .. size(IA)] : out\_value(IA[i]) > threshold;}
+
+\vspace{2mm}
+
+\noindent
+if such an item exists in the array, the {\tok exists} form will
+evaluate to {\em true} and {\tok i} will be bound to the index of the
+first element of {\tok IA} satisfying the condition.
+
+
+\paragraph{Grammar}
+
+The grammar of set and array formers is the following.
+
+\begin{center}
+\begin{tabular}{rl}
+{\nont set-former-expression} $\quad\Rightarrow$
+	& \verb|{|
+		{\nont expression}
+		{\tok :} {\nont in-exprs}
+		[ \verb.|. {\nont expression} ]
+	  \verb|}|\\[2mm]
+
+{\nont array-former-expression} $\quad\Rightarrow$
+	& \verb|[|
+		{\nont expression}
+		{\tok :} {\nont in-exprs}
+		[ \verb.|. {\nont expression} ]
+	  \verb|]|\\[2mm]
+
+{\nont in-exprs} $\quad\Rightarrow$
+	& {\nont in-expr} [ {\tok ,} {\nont in-exprs} ]\\[2mm]
+
+{\nont in-expr} $\quad\Rightarrow$
+	& {\nont identifier} {\tok in} {\nont aggregate-expression}\\[2mm]
+
+{\nont aggregate-expression} $\quad\Rightarrow$
+	& {\nont expression}\\
+	$|$ & {\nont range}\\[2mm]
+
+{\nont range} $\quad\Rightarrow$
+	& \verb.[.
+		{\nont expression} \verb|..| {\nont expression}
+		[ {\tok :} {\nont step-options} ]
+	  \verb.].\\[2mm]
+
+{\nont step-options} $\quad\Rightarrow$
+	& {\nont step-option} [ {\tok ,} {\nont step-options} ]\\[2mm]
+
+{\nont step-option} $\quad\Rightarrow$
+	& {\tok ascending}\\
+	$|$ & {\tok descending}\\
+	$|$ & {\tok by} {\nont expression}\\
+	$|$ & {\tok discrete}\\
+	$|$ & {\tok continuous}\\
+\end{tabular}
+\end{center}
+
+
+
+\paragraph{Rationale} These constructs were chosen because they do not
+interfere with the basic \Shift\ `RHS-first' rule of evaluation of
+actions.  More traditional ``loop'' constructs were considered, but
+they all would have required much more implementation work without the
+semantics guarantees that the chosen constructs offer instead.  Also,
+a ``higher'' order approach could have been chosen by introducing a
+{\tok map} function \'{a} l\`{a} {\sc Lisp}.  However, this would have
+meant to introduce a notation to denote anonymous function which would
+have complicated the language in an unwanted way.
+
+Lastly, there is also the argument that the adopted constructs have a
+very high level {\em mathematical\/} ``look-n-feel'', which should
+make many of \Shift\ targeted users quite comfortable.
+
+
+\subsubsection{Other Set Related Operations}
+
+In order to use sets and arrays in a more convenient way, \Shift\
+provides some more operators to essentially perform the following
+operations.
+\begin{itemize}
+\item	{\em finding\/} an element in a set or array.
+\item	{\em counting\/} how many elements in a set or array satisfy a
+	certain property.
+\item	{\em choosing} an arbitrary element from a set\footnote{This
+	is really a very high level operation. But it turned out to be
+	very easy to add.}
+\end{itemize}
+These three operations are built syntactically in a similar way and
+are very expressive.  They rely on the set constructor syntax in
+order to achieve their aim.  Moreover, care has been taken to provide
+the user with a way to return a {\em default\/} value should the main
+operation fail.
+
+Here are e few examples given the set
+
+\vspace{2mm}
+
+{\tok set(number) S := \{1, 2, 3, 4, 5, 6, 7, 8, 9, 10\};}
+
+\vspace{2mm}
+
+\paragraph{Example:} finding an element in a set.
+
+\vspace{2mm}
+
+{\tok number five := find \{x : x in S | x = 5\};}
+
+\vspace{2mm}
+
+
+\paragraph{Example:} finding an element in a set whose square is
+greater than 75.
+
+\vspace{2mm}
+
+{\tok number squared := find \{x : x in S | pow(x, 2) > 75\};}
+
+\vspace{2mm}
+
+\paragraph{Example:} finding an element in a set whose square is
+greater than 100, and if none is found return the default value 350.
+
+\vspace{2mm}
+
+{\tok number squared := find \{x : x in S | pow(x, 2) > 100\}
+      default \{ 350 \} ;}
+
+\vspace{2mm}
+
+\noindent
+The result will be 350.
+
+\paragraph{Example:} counting how many elements in a set have a square
+greater than 75.
+
+\vspace{2mm}
+
+{\tok number n\_squared := count \{x : x in S | pow(x, 2) > 75\};}
+
+\vspace{2mm}
+
+\noindent
+The result will be 2.
+
+\paragraph{Example:} choosing an arbitrary element from a set.
+
+\vspace{2mm}
+
+{\tok number any\_number := choose \{ x : x in S \};}
+
+\paragraph{Example:} choosing an arbitrary element from a set and
+squaring it.
+
+\vspace{2mm}
+
+{\tok number any\_number := choose \{ pow(x, 2) : x in S \};}
+
+
+\paragraph{Example:} choosing an arbitrary element from a set of
+numbers greater than 3.4 and squaring it.
+
+\vspace{2mm}
+
+{\tok number any\_number := choose \{ pow(x, 2) : x in S | x > 3.4 \};}
+
+
+\paragraph{Grammar} the grammar for these three {\em special forms\/}
+is the following.
+
+\begin{center}
+\begin{tabular}{rl}
+{\nont special-form} $\quad\Rightarrow$
+	& {\tok find} {\nont set-former-expression} {\nont default-option}\\
+	$|$ & {\tok count} {\nont set-former-expression}\\
+	$|$ & {\tok choose} {\nont set-former-expression}
+	      {\nont default-option}\\[2mm]
+
+{\nont default-option} $\quad\Rightarrow$
+	& {\nont empty}\\
+	$|$ & {\tok default} \verb.{. {\nont expression} \verb.}.\\
+\end{tabular}
+\end{center}
+
+
+\paragraph{Implementation and Efficiency Notes.} The three special
+forms are provided in order to facilitate the writing of \Shift
+programs.  However, their resemblance to the standard set formers
+is only apparent in the case of {\tok find} and {\tok count}.  These
+two forms do not allocate any intermediate data structure, and are
+therefore very efficient.  On the other hand, {\tok choose} does allocate
+an intermediate set of those element satisfying the filtering
+condition.  As such it is more memory intensive than the other two
+special forms.
+
+\subsection{Predefined functions and operators}
+
+The predefined functions and operators
+are listed and explained in tables~\ref{set}---\ref{misc}.
+Table~\ref{set} gives the standard functions on sets
+and logical values.
+Table~\ref{arithmetic} gives the arithmetic and mathematical
+operators.  Table~\ref{misc} lists miscellaneous operators.
+
+\begin{table}[htb]
+\begin{center}
+\begin{tabular}{ l | p{3.8in} }
+\hline
+\multicolumn{1}{c | }{\bf Expression} & \multicolumn{1}{c}{\bf Meaning} \\
+\hline
+\hline
+{\tok exists} $x$ {\tok in} $S$ {\tok :} $E$ &
+A logical expression which evaluates to {\tok true} if and only if the
+set $S$ contains at least one element which, when bound to $x$, causes
+the expression $E$ to be true.  If an {\tok exists} expression appears
+in a guard, the scope of $x$ includes the actions for that transition,
+where it is bound to one of the components which satisfy the
+guard.\\\hline
+\begin{minipage}[t]{1.4in}
+\begin{tabbing}
+{\tok maxel} $x$ {\tok in} $S$ {\tok :} $E$\\
+{\tok minel} $x$ {\tok in} $S$ {\tok :} $E$
+\end{tabbing}
+\end{minipage}&
+The element of $S$ which, when bound to $x$, respectively maximizes
+or minimizes expression $E$.\\\hline
+$S_1$ {\tok +} $S_2$, 
+$S_1$ {\tok *} $S_2$, 
+$S_1$ {\tok -} $S_2$ & Respectively the union, intersection, and
+difference of sets $S_1$ and $S_2$.\\\hline
+$x$ {\tok in} $S$ & A logical expression which is {\tok true} if
+$x$ is a member of $S$.\\\hline
+\begin{minipage}[t]{1.4in}
+\begin{tabbing}
+{\tok reduce}$(S, f)$\\
+{\tok reduce}$(S, f, e_0)$
+\end{tabbing}
+\end{minipage}&
+\begin{minipage}[t]{3.8in}
+\raggedright
+If $S = \{e_1, \ldots, e_n\}$, {\tok reduce}$(S, f)$ returns
+$f(e_n, f(\ldots, f(e_2, e_1)\ldots))$, and {\tok reduce}$(S, f, e_0)$
+returns $f(e_n, f(\ldots, f(e_1, e_0)\ldots))$.  $f$ is a binary
+function or a binary operator enclosed in double quotes (e.g., {\tok
+"*"}).
+\end{minipage}
+\\\hline
+${\tok size}(S)$ & The number of elements in set $S$.\\\hline
+{\tok and}, {\tok or}, {\tok xor}, {\tok not} & The standard logical
+connectives.\\\hline
+\end{tabular}
+\end{center}
+\caption{Set and logical operators.\label{set}}
+\end{table}
+
+\begin{table}[htb]
+\begin{center}
+\begin{tabular}{ l | p{3.8in} }
+\hline
+\multicolumn{1}{c | }{\bf Expression} & \multicolumn{1}{c}{\bf Meaning} \\
+\hline
+\hline
+\begin{minipage}[t]{1.4in}
+\begin{tabbing}
+{\tok +}, {\tok -}, {\tok *}, {\tok /}, {\tok **} \\
+{\tok <}, {\tok >}, {\tok <=}, {\tok >=}, {\tok =}, {\tok /=}
+\end{tabbing}
+\index{+} \index{--} \index{*@{\tok *}} \index{/} \index{**@{\tok **}}
+\index{<@\T{<}} \index{>@\T{>}} \index{<=@\T{<=}} \index{>=@\T{>=}}
+\index{=@\T {=}}\index{/=@\T{/=}}
+\end{minipage} & The standard arithmetic and relational operators
+({\tok /=} is ``not equal.'')\\\hline
+
+{\nont lhs} {\tok +:=} {\nont rhs}, \hspace{1mm}
+{\nont lhs} {\tok -:=} {\nont rhs}
+	& Increment and decrement assignment operators.
+	  Currently implemented only for set insertion and removal:
+	  i.e. {\nont lhs} must be a set valued location and {\nont
+	  rhs} must be either
+	  \begin{itemize}
+	  \item a value of the base type of the set, in which case
+		the object is added or removed from the set.
+	  \item a set of values of the base type of the set, in which
+		case all its elements are added from the {\nont lhs}
+		set valued side.
+	  \end{itemize}\\\hline
+
+\begin{minipage}[t]{1.4in}
+\begin{tabbing}
+{\tok exp($x$)}, {\tok ln($x$)}, {\tok log10($x$)} \\
+{\tok sin($x$)}, {\tok cos($x$)}, {\tok tan($x$)} \\
+{\tok sqrt($x$)} \\
+{\tok atan($x$)}, {\tok atan2($x,y$)}
+\end{tabbing}
+\index{exp}\index{ln}\index{log10}\index{sin}\index{cos}\index{tan}\index{sqrt}
+\index{atan}
+\end{minipage} &
+The standard elementary mathematical functions.\\\hline
+
+{\tok abs}($x$) & Absolute value.\index{abs} \\\hline
+\begin{minipage}[t]{1.4in}
+\begin{tabbing}
+{\tok floor($x$)}, {\tok trunc($x$)}, \\
+{\tok round($x$)}, \\
+\end{tabbing}
+\index{floor}\index{trunc}\index{round}\index{toSingle}\index{toLong}
+\index{toInt}
+\end{minipage} & Coercion to integers.  Floor, trunc, and round
+produce results rounded toward $-\infty$, toward 0, and toward
+nearest.\\\hline
+
+\begin{minipage}[t]{1.4in}
+\begin{tabbing}
+{\tok max($x_1,\dots,x_n$)} \\
+{\tok min($x_1,\dots,x_n$)}
+\end{tabbing}\index{max}\index{min}
+\end{minipage}
+& Maximum and minimum.\\\hline
+
+{\tok signum($x$)} & Returns -1, 0, or 1, depending on whether
+$x$ is negative, zero, or positive.\index{signum}\\\hline
+
+\begin{minipage}[t]{1.4in}
+\begin{tabbing}
+{\tok random()} 
+\end{tabbing}\index{random}
+\end{minipage}
+& {\tok random} requires no arguments and returns a random
+number uniformly distributed in [0, 1]. \\\hline
+
+\end{tabular}
+\end{center}
+\caption{Arithmetic Operators and Elementary Functions\label{arithmetic}}
+\end{table}
+
+\begin{table}[htb]
+\begin{center}
+\begin{tabular}{ l | p{3.8in} }
+\hline
+\multicolumn{1}{c | }{\bf Expression} & \multicolumn{1}{c}{\bf Meaning} \\
+\hline
+\hline
+{\tok narrow($X$, $y$)}
+& The compile-time type of {\tok narrow($X$, $y$)} is $X$.
+Let $Y$ be the compile-time type of $y$.  If $Y$ is $X$ or a
+supertype of $X$, and the run-time value of $y$ has type $X$
+or a subtype of $X$, then {\tok narrow($X$, $y$)} returns $y$,
+otherwise it is an error.\\\hline
+
+\end{tabular}
+\end{center}
+\caption{Miscellaneous Operators\label{misc}}
+\end{table}
+
+\subsection{Foreign functions\label{foreign-functions}}
+
+\begin{center}
+\begin{tabular}{rl}
+{\nont external-function-decl} $\quad\Rightarrow$
+	 & {\tok function} {\nont function-name}
+	   {\tok (} [ {\nont arg-list} ] {\tok )}
+           {\tok ->} {\nont return-type}\\
+{\nont arg-list} $\quad\Rightarrow$ & {\nont function-declaration-list}\\
+{\nont return-type} $\quad\Rightarrow$ & {\nont type}\\
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{rl}
+{\nont function-declaration-list} $\quad\Rightarrow$
+	& {\nont empty}\\
+$|$	& {\nont function-declaration-clause}\\
+$|$	& {\nont function-declaration-list} {\tok ;}
+	  {\nont function-declaration-clause}\\[2mm]
+
+{\nont function-declaration-clause} $\quad\Rightarrow$
+	& {\nont type} [({\tok in} | {\tok out})] {\nont identifier}\\
+\end{tabular}
+\end{center}
+
+\todaysname{} does not have functions, but a \todaysname{} program can
+refer to external functions, whose implementation must be provided for
+the purpose of simulation.  External functions are written in C.  The
+parameter passing scheme is modeled after Ada with {\tok in} and {\tok
+out} parameters which imply a ``copy in'', ``copy out'' semantics.
+
+The implementation of the simulator imposes further restrictions on
+the kind of \todaysname{} types that can be passed in and out a
+function.
+\begin{description}
+\item[function arguments]
+	arguments can be of type {\tok number}, {\tok array} or
+	{\nont external-type}.
+
+\item[return value]
+	the return value is also limited to {\tok number}, {\tok array} or
+	{\nont external-type}.
+
+\end{description}
+
+The C function which actually implements the \todaysname{} function
+must have the same name and use the following conversions:\\
+\begin{center}
+\begin{tabular}{ll}
+\hline
+\todaysname{}	& C\\
+\hline\hline
+{\tok number}			& {\tok double}\\\hline
+{\tok array(number)}		& {\tok double*}\\\hline
+{\tok array(array(number))}	& {\tok double**}\\\hline
+\end{tabular}
+\end{center}
+
+\noindent
+There is no general conversion machinery for higher rank arrays.
+Moreover, a formal {\tok array} argument declared {\tok out} is
+modified {\em only in its contents\/}.  Ranks and dimensions are not
+affected.  Therefore, the array must have been allocated on the
+\todaysname{} side before it can be effectively used in a foreign
+function call.
+
+\subsubsection{Implementation}
+
+The implementation is straightforward.  Each {\tok function}
+declaration is translate into a {\em wrapper} C function which takes
+care of copying in and out the actual arguments.
+
+\subsubsection{Rationale}
+
+The rationale of the foreign function interface is to provide a way to
+use C functions in \todaysname{} simulations with as little
+overhead as possible on the C programmer.  The functionality is far
+from complete and comprehensive, but it provides a minimum of
+functionality that extends the usefulness of \todaysname{} by allowing
+the reuse of standard C library functions.
+
+
+
+\subsection{Global variables}
+
+\begin{center}
+\begin{tabular}{rl}
+{\nont global-variable-decl} $\quad\Rightarrow$ & {\tok global} {\nont declaration-list}\\
+\end{tabular}
+\end{center}
+%
+Global variables have global scope, can be used in expressions, and
+can be set by any component.

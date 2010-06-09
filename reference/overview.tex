@@ -1,0 +1,66 @@
+% -*- Mode: LaTeX -*-
+
+% overview.tex --
+
+
+% Copyright (c) 1996, 1997 Regents of the University of California.
+% All rights reserved.
+% 
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions
+% are met:
+% 1. Redistributions of source code must retain the above copyright
+%    notice, this list of conditions and the following disclaimer.
+% 2. Redistributions in binary form must reproduce the above copyright
+%    notice, this list of conditions and the following disclaimer in the
+%    documentation and/or other materials provided with the distribution.
+% 3. All advertising materials mentioning features or use of this software
+%    must display the following acknowledgement:
+%      This product includes software developed by the University of
+%      California, Berkeley and the California PATH Program.
+% 4. Neither the name of the University nor of the California PATH
+%    Program may be used to endorse or promote products derived from
+%    this software without specific prior written permission.
+% 
+% THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+% ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+% IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+% ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+% FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+% DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+% OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+% HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+% LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+% OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+% SUCH DAMAGE.
+
+\section{Overview\label{overview}} \todaysname{} is a description
+language for dynamic
+networks of hybrid systems.  Such systems consist of components which
+can be created, interconnected and destroyed as the system evolves in
+time.  Components exhibit hybrid behavior, consisting of
+continuous-time phases separated by discrete-event transitions.  They
+may evolve independently or jointly with each other.  They interact
+through input-output connections and synchronization of events.  The
+interaction network may evolve in time.
+
+We believe this model offers the proper level of abstraction for
+describing complex applications such as highway and air traffic
+control systems, robotic shopfloors, and other systems whose operation
+cannot be captured by conventional models, which typically support
+only static interconnections.
+
+\todaysname{} is extensible.  We plan to use \todaysname{} as a
+mechanism for defining the Automated Highway System Tool Interchange
+Format (AHSTIF).  An automated highway system is a hybrid system with
+specific characteristics and restrictions. \todaysname{} supports the
+definition and enforcement of AHSTIF-specific semantics.
+
+This is a reference manual for \todaysname.  It presents its material
+in a logical order, but it aims to be concise and has no pretense to
+be a \todaysname{} tutorial.  Section~\ref{model} describes the model,
+and section~\ref{language} the language.
+
+The name \todaysname{} is a permutation of HSTIF (Hybrid System Tool
+Interchange Format).
+

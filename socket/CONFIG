@@ -1,0 +1,11 @@
+// Configuration file
+// 	This file specifies the hostname of the server (the machine that
+// sends messages to the debugger), and portnumbers for communication.
+//
+//  The format should be as follows: 
+//	server [hostname] [portnumber]
+//
+// Note: The debugger can run on any machine and does not need to be
+// specified at all
+ 
+server alfa 528 529

@@ -1,0 +1,47 @@
+Thu Apr 16 13:20:48 1998  Tunc Simsek  <simsek@maruti.PATH.berkeley.edu>
+
+	* collection.c: Modified (in several places) the switch statements
+	that create, destroy and update sets and pointes so that foreign
+	data types are taken into account as VOID *'s.
+
+Wed Apr 15 10:13:11 1998  Tunc Simsek  <simsek@maruti.PATH.berkeley.edu>
+
+	* ffi-support.c (shift_ffi_cvt_D_array_2D_C): The acceccsor to
+	arrays of arrays was missing a *.  That is, an array(array(.)) is
+	an array of **void's.
+
+Tue Dec 23 15:25:48 1997  Tunc Simsek  <simsek@maruti.PATH.berkeley.edu>
+
+	* discrete.c (open_events_matched_p): This function is basically
+	called after a possible world transition is computed.  It loops
+	on the events of those transtions to check if there are any
+	events that are open.
+
+Tue Nov  4 14:41:28 1997  Tunc Simsek  <simsek@maruti.PATH.berkeley.edu>
+
+	* discrete.c (check_live_components): Added a new variable to keep
+	track of the live_components list that is being traversed.  If the
+	list changes while it is being traversed, then the function 'restarts'.
+
+Wed Oct  8 11:39:42 1997  Tunc Simsek  <simsek@ferrari.PATH.Berkeley.EDU>
+
+	* discrete.c (backward_compatible_transition): Corrected the
+	access to the component C in C:E (i.e. the link reference).  There
+	are two instance of the DATA_ITEM macro where I changed 'c' to
+	'cc'.  That is, the container class is currently being used to
+	access C in C:E.
+
+Thu Jul 24 14:41:17 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* collection.c (insert_element): fixed pointer mangling in order
+	to pass the correct value to the unions involved when preparing to
+	'add_to_set'.  I hate C.
+	(remove_element): as per 'insert_element'.
+
+Thu Jul  3 11:16:40 1997  Marco Antoniotti  <marcoxa@infiniti.PATH.Berkeley.EDU>
+
+	* collection.c (remove_from_set): the removal of an element from
+	the set did not change the set size, therefore the API was getting
+	the wrong piece of information.
+	
+

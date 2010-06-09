@@ -1,0 +1,157 @@
+# Generated automatically from Makefile.in by configure.
+# -*- Mode: Makefile -*-
+
+# Copyright (c)1996, 1997, 1998 The Regents of the University of
+# California (Regents). All Rights Reserved. 
+# 
+# Permission to use, copy, modify, and distribute this software and
+# its documentation for educational, research, and not-for-profit
+# purposes, without fee and without a signed licensing agreement, is
+# hereby granted, provided that the above copyright notice, this
+# paragraph and the following two paragraphs appear in all copies,
+# modifications, and distributions.
+# 
+# Contact The Office of Technology Licensing, UC Berkeley, 2150
+# Shattuck Avenue, Suite 510, Berkeley, CA 94720-1620, (510)
+# 643-7201, for commercial licensing opportunities. 
+# 
+# IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT,
+# INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING
+# LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS
+# DOCUMENTATION, EVEN IF REGENTS HAS BEEN ADVISED OF THE POSSIBILITY
+# OF SUCH DAMAGE. 
+#   
+# REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE. THE SOFTWARE AND ACCOMPANYING
+# DOCUMENTATION, IF ANY, PROVIDED HEREUNDER IS PROVIDED "AS IS".
+# REGENTS HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
+# ENHANCEMENTS, OR MODIFICATIONS. 
+
+# -*- Mode: Makefile -*-
+
+# Makefile.in -- Compiler Makefile (in 'configure' format) for SHIC
+# project.
+#
+# Autoconf/Configure tag.
+# Generated automatically from Makefile.in by configure.
+
+#==============================================================================
+# Standard (GNU form) variable setup
+
+# General Variables
+
+SHELL = /bin/sh
+
+CC    = gcc
+
+
+# Installation Variables
+
+prefix      = /home/porsche2/varaiya/marcoz
+exec_prefix = ${prefix}
+
+bindir      = ${exec_prefix}/bin
+includedir  = ${prefix}/include
+libdir      = ${exec_prefix}/lib
+libexecdir  = ${exec_prefix}/libexec
+
+mandir      = ${prefix}/man
+
+
+# Build Variables
+
+top_srcdir  = ..
+srcdir      = .
+
+VPATH       = .:../include
+
+LIBS        = -lBLT -ltk -ltcl -lX11 -lsocket -lnsl -lm -ldl 
+
+
+# Other variables
+
+GCINCLUDEFLAG = 
+
+
+# C flags
+
+CFLAGS      = -g -I. -I../include $(GCINCLUDEFLAG)
+
+
+# Object files lists
+
+BASE_OBJS = after_click.o \
+            after_tran.o \
+            before_click.o \
+            before_tran.o \
+            control.o \
+            dispatch.o \
+            dump_data.o \
+            shift_api_info.o \
+            shift_api_control.o \
+            shift_tools.o \
+            sim_info.o \
+            shift_db_debug.o \
+            DB_btf.o \
+	    Tk_string_data.o
+
+GUI_OBJS =  Tk_communications.o \
+	    Tk_server.o \
+	    Tk_btf.o
+
+OBJECTS  = $(BASE_OBJS) $(GUI_OBJS)
+
+
+TARGET_OBJ = libDebug.a
+
+# Special directives
+
+# .PHONY works fine with GNU Make, but it breaks down with other
+# versions (notably FreeBSD.)
+
+# .PHONY: graphic.env ttyonly
+
+# Default rules 
+
+.SUFFIXES:
+.SUFFIXES: .c .o
+
+
+.c.o:
+	$(CC)  $(CFLAGS) -c $*.c
+
+# Standard Targets
+
+# all -- This is the rule as it appears in Makefile.in
+
+all: $(OBJECTS) $(TARGET_OBJ)
+
+
+clean:
+	rm -f _* *._* *.o *.sch core *.a
+
+distclean: clean
+	if test -d obsolete; then rm -fr obsolete; fi
+	-rm *~ \#*
+
+
+install: $(TARGET_OBJ)
+	cp -p $(TARGET_OBJ) $(libdir)
+
+
+uninstall:
+	rm $(libdir)/$(TARGET_OBJ)
+
+
+# Specific Targets
+
+# $(TARGET_OBJ) -- the main target of the Makefile
+
+$(TARGET_OBJ): $(OBJECTS)
+	rm -f $(TARGET_OBJ)
+	$(AR) cr $(TARGET_OBJ) $(OBJECTS)
+	-ranlib $(TARGET_OBJ)
+
+
+# end of file -- Makefile -- Generated automatically from Makefile.in by configure.

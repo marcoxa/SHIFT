@@ -1,0 +1,267 @@
+<html>
+
+<head>
+<title>
+Matrix to Scalar Processor
+</title>
+
+<map name="mainMap">
+<area shape="rect" coords="14,11,68,46" href="http://www.path.berkeley.edu/shift/">
+<area shape="rect" coords="69,11,184,47" href="http://www.path.berkeley.edu/shift/publications.html">
+<area shape="rect" coords="181,9,253,48" href="http://www.path.berkeley.edu/shift/tutorials.html">
+<area shape="rect" coords="251,8,334,47" href="http://www.path.berkeley.edu/shift/examples.html">
+<area shape="rect" coords="330,9,392,50" href="http://www.path.berkeley.edu/shift/people.html">
+<area shape="rect" coords="388,8,481,47" href="http://www.path.berkeley.edu/shift/download_form.html">
+<area shape="default" nohref>
+</map>
+
+</head>
+
+<body bgcolor="#FFFFFF" TEXT="#00000" LINK="#0000A0" VLINK="#C00000" ALINK="#FF8000">
+<center>
+<img src="../gifs/mainMap.gif" border="0" usemap="#mainMap"><br>
+</center>
+<p>
+<center>
+<h2>Matrix to Scalar Processor Documentation</h2>
+
+<h3>Version 1.0</h3>
+Daniel Wiesmann<br>
+Luigi Semenzato<br>
+Akash Deshpande<br>
+</center>
+
+
+<h3>1.0  Overview</h3>
+
+<p>
+The program "mat2scalar" is a program for translating matrix
+equations to the scalar format. The program takes a file containing
+matrix equations as an argument, converts the matrix equations to
+scalar format, and places the result in the "results.mx" file.
+<p>
+Format:<br>
+<b>mat2scalar <i>matrix_file</i></b>
+<br>
+The <i>matrix_file</i> must be a file of properly formatted matrix equations.
+
+<h3>2.0  Syntax and other constraints</h3>
+
+The preprocessor handles matrix addition, subtraction, and
+multiplication. It requires a full equation, with a left-hand side and
+a right-hand side.  The left-hand side must be a matrix or the prime
+of a matrix.  The right-hand-side can be arbitrarly complicated. 
+The program checks to make sure all the matrix operations are allowed
+for matrices of that size, and signal an error if one is found.  At
+this point, the error messages are not informative, but this will
+hopefully change soon.  
+
+The syntax is the following:
+
+<pre>
+                 equation -> result  = expression ;
+
+                 result -> matrix
+                         | matrix '
+
+                 expression-> expression  *  expression
+                          |   expression  +  expression 
+                          |   expression  -  expression
+                          |   expression ~
+                          |   ( expression )
+                          |   matrix
+                          |   - matrix
+
+</pre>
+<p>
+Tokens are grabbed in the order shown by the arrows in table 1.  One
+can put more than one token in the same column (a `~' and a ` ;' , for
+example) as long as they abide by the syntax. 
+
+
+<h3>2.2  Matrix input syntax</h3>
+<p>
+This release requires that matrices are entered in a certain way.   
+<dl>
+<dt>Matrix delimiters fit row by row</dt>
+<dd>If you have a matrix that is on more that one line, the 
+corresponding bars that delimit this matrix must be aligned vertically
+on every line. 
+</dd>
+
+
+<dt>newlines needed at the end</dt>
+<dd>There must be at least an extra newline at the end of the input</dd>
+<dt>No tabs allowed.</dt>
+<dd>All alignment must be done by using spaces.</dd>
+
+
+<dt> Allowed characters </dt>
+<dd>The characters you can specify matrix entries with are
+a-z, A-Z, the underscore character.
+</dd>
+
+</dl>
+<h3>3.0  Examples</h3>
+
+<b>Matrix Derivative Example</b>
+<pre>
+
+ |a1 a2 a3|'  =  |b11 b12 b13|  + |c11 c12 c13|  ;
+
+</pre>
+becomes:
+<pre>
+
+a1' = (b11+c11);
+
+a2' = (b12+c12);
+
+a3' = (b13+c13);
+
+</pre>
+<p>
+<b>Matrix Transpose Operation Example</b>
+
+<pre>
+ |a11 a12 a13 | = |b11 b12 b13|    |c11 c12|~ 
+ |a21 a22 a23 |   |b21 b22 b23|  - |c21 c22|
+                                   |c31 c32|;
+
+</pre>
+
+becomes
+
+<pre>
+a11 = (b11-c11);
+
+a12 = (b12-c21);
+
+a13 = (b13-c31);
+
+a21 = (b21-c12);
+
+a22 = (b22-c22);
+
+a23 = (b23-c32);
+
+</pre>
+<p>
+
+<b>Matrix multiplication</b>
+
+<pre>
+
+|a11 a12 a13 |     |b11 b12 b13|~   *  |c11 c12 c13| 
+|a21 a22 a23 |     |b21 b22 b23|       |c21 c22 c23|       
+|a31 a32 a33 |  =  |b31 b32 b33|       |c31 c32 c33|  
+
+
+ |d11 d12 d13 d14|
+*|d21 d22 d33 d24|
+ |d31 d32 d33 d34|;
+
+</pre>
+
+becomes:
+
+<pre>
+a11 = 
+((((b11*c11)+(b21*c21)+(b31*c31))*d11)+(((b11*c12)+(b21*c22)
++(b31*c32))*d21)+(((b11*c13)+(b21*c23)+(b31*c33))*d31));
+
+a12 = 
+((((b11*c11)+(b21*c21)+(b31*c31))*d12)+(((b11*c12)+(b21*c22)
++(b31*c32))*d22)+(((b11*c13)+(b21*c23)+(b31*c33))*d32));
+
+a13 = 
+((((b11*c11)+(b21*c21)+(b31*c31))*d13)+(((b11*c12)+(b21*c22)
++(b31*c32))*d33)+(((b11*c13)+(b21*c23)+(b31*c33))*d33));
+
+a21 = 
+((((b12*c11)+(b22*c21)+(b32*c31))*d11)+(((b12*c12)+(b22*c22)
++(b32*c32))*d21)+(((b12*c13)+(b22*c23)+(b32*c33))*d31));
+
+a22 = 
+((((b12*c11)+(b22*c21)+(b32*c31))*d12)+(((b12*c12)+(b22*c22)
++(b32*c32))*d22)+(((b12*c13)+(b22*c23)+(b32*c33))*d32));
+
+a23 = 
+((((b12*c11)+(b22*c21)+(b32*c31))*d13)+(((b12*c12)+(b22*c22)
++(b32*c32))*d33)+(((b12*c13)+(b22*c23)+(b32*c33))*d33));
+
+a31 = 
+((((b13*c11)+(b23*c21)+(b33*c31))*d11)+(((b13*c12)+(b23*c22)
++(b33*c32))*d21)+(((b13*c13)+(b23*c23)+(b33*c33))*d31));
+
+a32 = 
+((((b13*c11)+(b23*c21)+(b33*c31))*d12)+(((b13*c12)+(b23*c22)
++(b33*c32))*d22)+(((b13*c13)+(b23*c23)+(b33*c33))*d32));
+
+a33 = 
+((((b13*c11)+(b23*c21)+(b33*c31))*d13)+(((b13*c12)+(b23*c22)
++(b33*c32))*d33)+(((b13*c13)+(b23*c23)+(b33*c33))*d33));
+
+</pre>
+<p>
+<b>Multiple Equations</b>
+
+<pre>
+
+              | b11 |~
+ |a11 a12| =  | b21 |+ |c11 c12|;
+
+ | x1 | = |y11 y12 y13| * |z11|
+                          |z21|
+                          |z31|;
+
+
+</pre>
+<p>
+
+becomes
+
+<pre>
+
+x1 = ((y11*z11)+(y12*z21)+(y13*z31));
+a11 = (b11+c11);
+a12 = (b21+c12);
+
+
+</pre>
+<p>
+<h3>4.0  Error Examples and Explanations</h3>
+
+The errors that are most likely to happen are the following:
+
+1) Incorrect token order
+
+2) Lack of a newline between sets of matrices.
+
+3) Presence of tabs in the input.  
+
+<pre>
+
+ |a11 a12 a13 | = |b11 b12 b13|    |c11 c12| ~ 
+ |a21 a22 a23 |   |b21 b22 b23|  - |c21 c22|
+                                   |c31 c32|;
+
+</pre>
+<p>
+The input is wrong because the `;' will be parsed before the `~', and that grammatically 
+incorrect.
+
+<pre>
+
+  |a1 a2 a3|'  =  |b11 b12 b13|  + |c11 c12 c13|  -
+|d11 d12 d13|;
+
+</pre>
+<p>
+
+This is wrong because there is no newline between sets of matrices.
+Two matrices cannot be on top of each other,there must at least be an
+extra line in between. 
+
+
+Please send bug reports to <a href="mailto:danielw@path.berkeley.edu">danielw@path.berkeley.edu</a>.
