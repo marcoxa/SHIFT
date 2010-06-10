@@ -1,4 +1,3 @@
-# Generated automatically from Makefile.in by configure.
 # -*- Mode: Makefile -*-
 
 # Copyright (c)1996, 1997, 1998 The Regents of the University of
@@ -35,7 +34,7 @@
 # project.
 #
 # Autoconf/Configure tag.
-# Generated automatically from Makefile.in by configure.
+# socket/Makefile.  Generated from Makefile.in by configure.
 
 
 #==============================================================================
@@ -51,7 +50,7 @@ CXX   = @CXX@
 
 # Installation Variables
 
-prefix      = /home/porsche2/varaiya/marcoz
+prefix      = /usr/local
 exec_prefix = ${prefix}
 
 bindir      = ${exec_prefix}/bin
@@ -59,7 +58,7 @@ includedir  = ${prefix}/include
 libdir      = ${exec_prefix}/lib
 libexecdir  = ${exec_prefix}/libexec
 
-mandir      = ${prefix}/man
+mandir      = ${prefix}/share/man
 
 
 # Build Variables
@@ -67,7 +66,7 @@ mandir      = ${prefix}/man
 top_srcdir  = ..
 srcdir      = .
 
-VPATH       = .:../include
+VPATH       = ../include
 
 
 # Clear this for dynamic linkage on sun platform
@@ -76,7 +75,7 @@ STATIC      =
 
 # Which libraries to use
 
-LIBS        = -lBLT -ltk -ltcl -lX11 -lsocket -lnsl -lm -ldl 
+LIBS        = 
 
 
 # collect lots of flags together
@@ -84,7 +83,7 @@ LIBS        = -lBLT -ltk -ltcl -lX11 -lsocket -lnsl -lm -ldl
 GCINCLUDEFLAG = 
 
 CCFLAGS     = $(HDIR) $(O) $(CHECK) $(EXTRA) 
-LDFLAGS     = -L/usr/path/tclext/lib -L/usr/path/tclext/lib -L/usr/path/tclext/lib -I/usr/path/tclext/include -I/usr/path/tclext/include -I/usr/path/tclext/include -I/usr/openwin/include -I. -I../include $(GCINCLUDEFLAG) $(STATIC)
+LDFLAGS     = -I -I. -I../include $(GCINCLUDEFLAG) $(STATIC)
 
 
 # Default rules 
@@ -149,4 +148,4 @@ $(TARGET_OBJ): $(APPOBJECTS)
 include depend
 
 # end of file -- Makefile
-# Generated automatically from Makefile.in by configure.
+# socket/Makefile.  Generated from Makefile.in by configure.

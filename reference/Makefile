@@ -1,4 +1,3 @@
-# Generated automatically from Makefile.in by configure.
 # -*- Mode: Makefile -*-
 
 # Copyright (c)1996, 1997, 1998 The Regents of the University of
@@ -33,7 +32,7 @@
 # project.
 #
 # Autoconf/Configure tag.
-# Generated automatically from Makefile.in by configure.
+# reference/Makefile.  Generated from Makefile.in by configure.
 
 
 #==============================================================================
@@ -52,9 +51,9 @@ LATEX	= latex
 
 # Installation Variables
 
-prefix      = /home/porsche2/varaiya/marcoz
+prefix      = /usr/local
 
-mandir      = ${prefix}/man
+mandir      = ${prefix}/share/man
 
 
 # Build Variables
@@ -108,4 +107,4 @@ syn: syn.lex
 
 
 # end of file -- Makefile --
-# Generated automatically from Makefile.in by configure.
+# reference/Makefile.  Generated from Makefile.in by configure.

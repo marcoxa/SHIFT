@@ -1,4 +1,3 @@
-# Generated automatically from Makefile.in by configure.
 # -*- Mode: Makefile -*-
 
 # Copyright (c)1996, 1997, 1998 The Regents of the University of
@@ -33,7 +32,7 @@
 # Makefile for SHIFT run time subsystem
 #
 # Autoconf/Configure tag.
-# Generated automatically from Makefile.in by configure.
+# run-time/Makefile.  Generated from Makefile.in by configure.
 
 
 #==============================================================================
@@ -48,7 +47,7 @@ CC    = gcc
 
 # Installation Variables
 
-prefix      = /home/porsche2/varaiya/marcoz
+prefix      = /usr/local
 exec_prefix = ${prefix}
 
 bindir      = ${exec_prefix}/bin
@@ -56,7 +55,7 @@ includedir  = ${prefix}/include
 libdir      = ${exec_prefix}/lib
 libexecdir  = ${exec_prefix}/libexec
 
-mandir      = ${prefix}/man
+mandir      = ${prefix}/share/man
 
 
 # Build Variables
@@ -64,9 +63,9 @@ mandir      = ${prefix}/man
 top_srcdir  = ..
 srcdir      = .
 
-VPATH       = .:../include
+VPATH       = ../include
 
-LIBS        = -lBLT -ltk -ltcl -lX11 -lsocket -lnsl -lm -ldl 
+LIBS        = 
 
 
 # Other Variables

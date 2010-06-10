@@ -528,7 +528,7 @@ write_sexpr1_(lv* s, FILE* fp, int level)
       fprintf(fp, "()");
       return;
     }
-  if (print_addresses) fprintf(fp, "0x%x: ", s);
+  if (print_addresses) fprintf(fp, "0x%x: ", ((unsigned int) s));
   if (level >= print_level)
     {
       switch (s->type)
@@ -630,7 +630,7 @@ write_sexpr1_(lv* s, FILE* fp, int level)
       break;
 
     case L_OTHER:
-      fprintf(fp, "#<other 0x%x>", oth(s));
+      fprintf(fp, "#<other 0x%x>", ((unsigned int) oth(s)));
       break;
     }
 }

@@ -44,10 +44,12 @@
 #ifndef SHIFT_COMP_TYPE_I
 #define SHIFT_COMP_TYPE_I
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <assert.h>
 #include <limits.h>
+#include <string.h>
 
 #include "lisp.h"
 #include "shic.h"
@@ -70,7 +72,7 @@ internal_error(char *message)
 lv*
 decl_type(lv* decl)
 {
-  if (op(decl) != @declare)
+  if (op(decl) != intern("declare"))
     internal_error("'decl_type' called on a non declaration.");
   else
     return arg1(decl);
@@ -90,15 +92,15 @@ equal_type(lv *x, lv *y)
   if (x == error_type || y == error_type) return 1;
 
   /* numbers */
-  if (ox == @number_type && oy == @number_type) return 1;
+  if (ox == intern("number_type") && oy == intern("number_type")) return 1;
 
   /* sets */
-  if (ox == @set && oy == @set && equal_type(arg1(x), arg1(y))) return 1;
+  if (ox == intern("set") && oy == intern("set") && equal_type(arg1(x), arg1(y))) return 1;
 
   /* arrays */
-  if (ox == @array && oy == @array && equal_type(arg1(x), arg1(y))) return 1;
+  if (ox == intern("array") && oy == intern("array") && equal_type(arg1(x), arg1(y))) return 1;
 
-  if ((ox == @array && oy == @empty_array) || (ox == @set && oy == @null_set))
+  if ((ox == intern("array") && oy == intern("empty_array")) || (ox == intern("set") && oy == intern("null_set")))
     {
       /* This is an interesting case.  It might be that the node
        * representing the empty set or array is not "typed" yet.  We
@@ -108,7 +110,7 @@ equal_type(lv *x, lv *y)
       return 1;
     }
 
-  if ((oy == @array && ox == @empty_array) || (oy == @set && ox == @null_set))
+  if ((oy == intern("array") && ox == intern("empty_array")) || (oy == intern("set") && ox == intern("null_set")))
     {
       /* Same as above, but with 'ox' and 'oy' switched. */
       if (args(x) == nil) args(x) = args(y);
@@ -116,14 +118,14 @@ equal_type(lv *x, lv *y)
     }
 
 
-  if ((ox == @array || ox == @set) && oy == @"nil"
-      || (oy == @array || oy == @set) && ox == @"nil")
+  if ((ox == intern("array") || ox == intern("set")) && oy == intern("nil")
+      || (oy == intern("array") || oy == intern("set")) && ox == intern("nil"))
     return 1;
 
   /* component types */
-  if (ox == @id && oy == @id)
+  if (ox == intern("id") && oy == intern("id"))
     {
-      return attr(@entity, x) == attr(@entity, y);
+      return attr(intern("entity"), x) == attr(intern("entity"), y);
     }
 
   return 0;
@@ -132,115 +134,115 @@ equal_type(lv *x, lv *y)
 int
 set_type_p(lv *type)
 {
-  return type == error_type || op(type) == @set || op(type) == @null_set;
+  return type == error_type || op(type) == intern("set") || op(type) == intern("null_set");
 }
 
 
 int
 null_set_type_p(lv* type)
 {
-  return type == error_type || op(type) == @null_set;
+  return type == error_type || op(type) == intern("null_set");
 }
 
 
 int
 array_type_p(lv *type)
 {
-  return type == error_type || op(type) == @array || op(type) == @empty_array;
+  return type == error_type || op(type) == intern("array") || op(type) == intern("empty_array");
 }
 
 
 int
 empty_array_type_p(lv *type)
 {
-  return type == error_type || op(type) == @empty_array;
+  return type == error_type || op(type) == intern("empty_array");
 }
 
 
 int
 range_type_p(lv* type)
 {
-  return type == error_type || op(type) == @range;
+  return type == error_type || op(type) == intern("range");
 }
 
 int
 type_type_p(lv *type)
 {
-    return type == error_type || op(type) == @type_or_set;
+    return type == error_type || op(type) == intern("type_or_set");
 }
 
 int
 number_type_p(lv *type)
 {
-  return type == error_type || op(type) == @number_type;
+  return type == error_type || op(type) == intern("number_type");
 }
 
 int
 discrete_number_type_p(lv *type)
 {
-  return type == error_type || (op(type) == @number_type &&
-				attr(@continuous, type) == nil);
+  return type == error_type || (op(type) == intern("number_type") &&
+				attr(intern("continuous"), type) == nil);
 }
 
 int 
 continuous_number_type_p(lv *type)
 {
-  return type == error_type || (op(type) == @number_type &&
-				attr(@continuous, type) == @true);
+  return type == error_type || (op(type) == intern("number_type") &&
+				attr(intern("continuous"), type) == intern("true"));
 }
 
 int
 symbol_type_p(lv* type)
 {
-  return type == error_type || op(type) == @symbol_type;
+  return type == error_type || op(type) == intern("symbol_type");
 }
 
 
 int
 logical_type_p(lv* type)
 {
-  return type == error_type || op(type) == @logical_type;
+  return type == error_type || op(type) == intern("logical_type");
 }
 
 
 int
 nil_type_p(lv* type) 
 {
-  return type == error_type || op(type) == @"nil";
+  return type == error_type || op(type) == intern("nil");
 }
 
 
 int
 function_type_p(lv *type)
 {
-  return type == error_type || op(type) == @function;
+  return type == error_type || op(type) == intern("function");
 }
 
 
 int
 out_formal_p(lv* formal_par)
 {
-  lv* io_qual = attr(@io_qual, formal_par);
+  lv* io_qual = attr(intern("io_qual"), formal_par);
 
-  return io_qual == @out || io_qual == @i_o;
+  return io_qual == intern("out") || io_qual == intern("i_o");
 }
 
 
 int
 in_formal_p(lv* formal_par)
 {
-  lv* io_qual = attr(@io_qual, formal_par);
+  lv* io_qual = attr(intern("io_qual"), formal_par);
 
-  return io_qual == @in || io_qual == @i_o;
+  return io_qual == intern("in") || io_qual == intern("i_o");
 }
 
 
 int
 in_out_formal_p(lv* formal_par)
 {
-  lv* io_qual = attr(@io_qual, formal_par);
+  lv* io_qual = attr(intern("io_qual"), formal_par);
 
-  return io_qual == @i_o;
+  return io_qual == intern("i_o");
 }
 
 
@@ -250,7 +252,7 @@ L_value_p(lv* expr)
 {
   lv* expr_op = op(expr);
 
-  if (expr_op == @index || expr_op == @id || expr_op == @access)
+  if (expr_op == intern("index") || expr_op == intern("id") || expr_op == intern("access"))
     return 1;
   else
     return 0;
@@ -278,18 +280,18 @@ descendant(lv *x, lv *y)
       /* Check if it is a user type - Note that
        * user types are id nodes.
        */
-      if (op(x) == @id && op(y) == @id)
+      if (op(x) == intern("id") && op(y) == intern("id"))
 	{
           mymean = meaning(x);
           if (mymean)
-	    p = attr(@parent, meaning(x));
+	    p = attr(intern("parent"), meaning(x));
           else
 	    p = nil;
 	  if (p) 
 	    return descendant(p, y);
 	}
-      else if (op(x) == @"nil" && op(y) == @id
-	       || op(x) == @"nil" && op(y) == @"nil")
+      else if (op(x) == intern("nil") && op(y) == intern("id")
+	       || op(x) == intern("nil") && op(y) == intern("nil"))
 	{
 	  return 1;
 	}
@@ -316,7 +318,7 @@ int
 type_compatible_with_p(lv* t1, lv* t2)
 {
   if (nil_type_p(t1))
-    return (op(t2) == @id	/* Assuming a SHIFT 'type' */
+    return (op(t2) == intern("id")	/* Assuming a SHIFT 'type' */
 	    || symbol_type_p(t2)
 	    || set_type_p(t2)
 	    || array_type_p(t2));
@@ -334,7 +336,7 @@ type_compatible_with_p(lv* t1, lv* t2)
     return (array_type_p(t2)
 	    && (equal_type(t1, t2)
 		|| type_compatible_with_p(arg1(t1), arg1(t2))));
-  else if (op(t2) == @id && op(t1) == @id)
+  else if (op(t2) == intern("id") && op(t1) == intern("id"))
     return descendant(t1, t2);
   else
     return 0;
@@ -353,7 +355,7 @@ super_type_p(lv *t1, /* The supertype that is being tested */
 	     lv *t2) /* The subtype */
 {
   if (nil_type_p(t1))
-    return (op(t2) == @id	
+    return (op(t2) == intern("id")	
 	    || symbol_type_p(t2)
 	    || set_type_p(t2)
 	    || array_type_p(t2));
@@ -374,7 +376,7 @@ super_type_p(lv *t1, /* The supertype that is being tested */
     return (array_type_p(t2)
 	    && (equal_type(t1, t2)
 		|| type_compatible_with_p(arg1(t1), arg1(t2))));
-  else if (op(t2) == @id && op(t1) == @id)
+  else if (op(t2) == intern("id") && op(t1) == intern("id"))
     return descendant(t2, t1);
   else
     return 0;
@@ -392,7 +394,7 @@ find_types_ancestor(lv* t1, lv* t2)
   lv* parent;
   lv* mark;
 
-  if (op(t1) != @id || op(t2) != @id)
+  if (op(t1) != intern("id") || op(t2) != intern("id"))
     return nil;
   else if (equal_type(t1, t2))
     return t1;
@@ -400,12 +402,12 @@ find_types_ancestor(lv* t1, lv* t2)
     {
       new_node_marker();
       mark_node(meaning(t1));
-      for (parent = attr(@parent, meaning(t1));
+      for (parent = attr(intern("parent"), meaning(t1));
 	   parent != nil;
-	   parent = attr(@parent, meaning(parent)))
+	   parent = attr(intern("parent"), meaning(parent)))
 	mark_node(meaning(parent));
 
-      for (parent = t2; parent != nil; parent = attr(@parent, meaning(parent)))
+      for (parent = t2; parent != nil; parent = attr(intern("parent"), meaning(parent)))
 	{
 	 
 	  if (node_marked_p(meaning(parent)))
@@ -428,26 +430,26 @@ compute_type(lv *expr)
 {
   lv *x = op(expr);
 
-  if (x == @call)
+  if (x == intern("call"))
     return arg1(type_of(arg1(expr)));
-  else if (x == @exists)
+  else if (x == intern("exists"))
     return logical_type;
-  else if (x == @int || x == @float)
+  else if (x == intern("int") || x == intern("float"))
     return number_type;
-  else if (x == @symbolic)
+  else if (x == intern("symbolic"))
     return symbol_type;
-  else if (x == @assign
-	   || x == @opassign
-	   || x == @sync
-	   || x == @donothing
-	   || x == @dnth)
+  else if (x == intern("assign")
+	   || x == intern("opassign")
+	   || x == intern("sync")
+	   || x == intern("donothing")
+	   || x == intern("dnth"))
     return void_type;
-  else if (x == @create)
+  else if (x == intern("create"))
     return arg1(expr);
-  else if (x == @access)
-    return attr(@type, attr(@accessor, expr));
-  else if (x == @minel || x == @maxel)
-    return attr(@type, attr(@id, expr));
+  else if (x == intern("access"))
+    return attr(intern("type"), attr(intern("accessor"), expr));
+  else if (x == intern("minel") || x == intern("maxel"))
+    return attr(intern("type"), attr(intern("id"), expr));
   else
     internal_error("requesting type of unrewritten expression");
 }
@@ -458,12 +460,12 @@ compute_type(lv *expr)
 lv *
 type_of(lv *expr)
 {
-  lv *type = attr(@type, expr);
+  lv *type = attr(intern("type"), expr);
   lv* aggregate_type;
 
   if (type)
     {
-      if (op(type) == @type_of)
+      if (op(type) == intern("type_of"))
 	{
 	  if (node_marked_p(expr))
 	    {
@@ -477,9 +479,9 @@ type_of(lv *expr)
 	      type = type_of(rewrite_expression(arg1(type), arg2(type)));
 	    }
 	}
-      else if (op(type) == @element_type_of)
+      else if (op(type) == intern("element_type_of"))
 	{
-	  aggregate_type = type_of(node(@x, nil, alist1(@type, arg1(type))));
+	  aggregate_type = type_of(node(intern("x"), nil, alist1(intern("type"), arg1(type))));
 	  if (aggregate_type == error_type)
 	    {
 	      type = error_type;
@@ -499,10 +501,10 @@ type_of(lv *expr)
     {
       type = compute_type(expr);
     }
-  set_attr(@type, expr, type);
-  if (op(expr) == @id)
+  set_attr(intern("type"), expr, type);
+  if (op(expr) == intern("id"))
     {
-      set_attr(@type, attr(@entity, expr), type);
+      set_attr(intern("type"), attr(intern("entity"), expr), type);
     }
   return type;
 }
@@ -510,8 +512,8 @@ type_of(lv *expr)
 lv *
 find_leaf(lv *n)
 {
-    if (op(n) == @id || op(n) == @numliteral) return n;
-    if (op(n) == @error) return nil;
+    if (op(n) == intern("id") || op(n) == intern("numliteral")) return n;
+    if (op(n) == intern("error")) return nil;
     dolist (x, args(n)) {
 	lv *y = find_leaf(x);
 	if (y) return y;
@@ -534,8 +536,8 @@ user_error(lv *id, char *format, ...)
   n_errors++;
   if (id != nil)
     {
-      lv* file = attr(@file, id);
-      lv* line = attr(@line, id);
+      lv* file = attr(intern("file"), id);
+      lv* line = attr(intern("line"), id);
 
       fprintf(stderr, "%s:",
 	      file == nil ? "unknown location" : str(file));
@@ -609,8 +611,8 @@ user_warning(lv *id, char *format, ...)
   n_warnings++;
   if (id)
     {
-      char *file = str(attr(@file, id));
-      int line = num(attr(@line, id));
+      char *file = str(attr(intern("file"), id));
+      int line = num(attr(intern("line"), id));
       fprintf(stderr, "%s:%d: ", file, line);
     }
   else
@@ -678,7 +680,7 @@ summarize(lv *n)
     {
       fputs("node ", stdout);
       print(op(n));
-      if (op(n) == @id) printf(" [%s]", pname(attr(@name, n)));
+      if (op(n) == intern("id")) printf(" [%s]", pname(attr(intern("name"), n)));
       if (args(n))
 	{
 	  int l = length(args(n));

@@ -78,12 +78,12 @@ cons_generator(lv *e)
 
   if (args(e))
     {
-      lv *et = arg1(attr(@type, e));
-      lv *ht = attr(@hashed_type, et);
-      int tn = num(attr(@unique, ht));
+      lv *et = arg1(attr(intern("type"), e));
+      lv *ht = attr(intern("hashed_type"), et);
+      int tn = num(attr(intern("unique"), ht));
 
       fprintf(cfile, "%s_cons(&typed%d, %d",
-	      op(e) == @arraycons ? "array" : "set", tn, length(args(e)));
+	      op(e) == intern("arraycons") ? "array" : "set", tn, length(args(e)));
       dolist (a, args(e))
 	{
 	  fprintf(cfile, ", ");
@@ -99,12 +99,12 @@ cons_generator(lv *e)
        *
        * Tunc Simsek 19980528
        */
-      lv *intrinsic = attr(@components, e);
+      lv *intrinsic = attr(intern("components"), e);
       lv *t = type_of(e);
       /*******MAK***** implementation for null sets - create an overhead */
 
-#define _get_unique_hash_id_(_t_)  num(attr(@unique, \
-				       attr(@hashed_type, \
+#define _get_unique_hash_id_(_t_)  num(attr(intern("unique"), \
+				       attr(intern("hashed_type"), \
 				            arg1((_t_)))))
 
       if (intrinsic)
@@ -114,13 +114,13 @@ cons_generator(lv *e)
 		  _get_unique_hash_id_(t));
 
 	}
-      else if (op(t) == @null_set)
+      else if (op(t) == intern("null_set"))
 	{
 	  fprintf(cfile, 
 		  "set_cons(&typed%d, 0)",
 		  _get_unique_hash_id_(t));
 	}
-      else if (op(t) == @empty_array)
+      else if (op(t) == intern("empty_array"))
 	{
 	  fprintf(cfile, 
 		  "array_cons(&typed%d, 0)",
@@ -140,32 +140,32 @@ cons_generator(lv *e)
 void
 set_former_generator(lv* e)
 {
-  fprintf(cfile, "set_former_F%d(_self)", num(attr(@unique, e)));
+  fprintf(cfile, "set_former_F%d(_self)", num(attr(intern("unique"), e)));
 }
 
 
 void
 array_former_generator(lv* e)
 {
-  fprintf(cfile, "array_former_F%d(_self)", num(attr(@unique, e)));
+  fprintf(cfile, "array_former_F%d(_self)", num(attr(intern("unique"), e)));
 }
 
 
 void
 index_generator(lv *e)
 {
-  lv *t = attr(@type, e);
+  lv *t = attr(intern("type"), e);
 
-  /* The 'op(t) == @id' is a brutish hack.
+  /* The 'op(t) == intern("id")' is a brutish hack.
    * We really need to figure out a better way to decide whether we
    * have an instance here and not a subarray or set.
    *
    * Marco Antoniotti 19970207
    */
-  call_generator2(op(t) == @number_type ? "*double_index" :
-		  op(t) == @symbol_type
-		  || op(t) == @logical_type ? "*int_index" :
-		  op(t) == @id ? "(Component*) *voidstar_index" :
+  call_generator2(op(t) == intern("number_type") ? "*double_index" :
+		  op(t) == intern("symbol_type")
+		  || op(t) == intern("logical_type") ? "*int_index" :
+		  op(t) == intern("id") ? "(Component*) *voidstar_index" :
 		  "*voidstar_index",
 		  args(e),
 		  0);
@@ -193,7 +193,7 @@ compute_full_indent_level(lv *iterator_exprs)
 {
   if (iterator_exprs == 0)
     return 0;
-  else if (op(arg2(first(iterator_exprs))) == @arrayrange)
+  else if (op(arg2(first(iterator_exprs))) == intern("arrayrange"))
     return 2 + compute_full_indent_level(rest(iterator_exprs));
   else				/* should be a set range */
     return 1 + compute_full_indent_level(rest(iterator_exprs));
@@ -255,13 +255,13 @@ generate_set_former_function(lv* set_former_expr)
   char new_el_var_name[80];
   int indent_level = 1;
 
-  int u = num(attr(@unique, set_former_expr));
+  int u = num(attr(intern("unique"), set_former_expr));
   lv* element_expr   = arg1(set_former_expr);
   lv* iterator_exprs = arg2(set_former_expr);
   lv* filter_expr    = arg3(set_former_expr);
-  lv* element_type   = arg1(attr(@type, set_former_expr));
-  lv* hashed_element_type = attr(@hashed_type, element_type);
-  int element_type_u = num(attr(@unique, hashed_element_type));
+  lv* element_type   = arg1(attr(intern("type"), set_former_expr));
+  lv* hashed_element_type = attr(intern("hashed_type"), element_type);
+  int element_type_u = num(attr(intern("unique"), hashed_element_type));
   int n_iterator_exprs = length(iterator_exprs);
   int el_expr_indent_level = compute_full_indent_level(iterator_exprs);
 
@@ -349,13 +349,13 @@ generate_array_former_function(lv* array_former_expr)
   char count_var_name[80];
   int indent_level = 1;
 
-  int u = num(attr(@unique, array_former_expr));
+  int u = num(attr(intern("unique"), array_former_expr));
   lv* element_expr   = arg1(array_former_expr);
   lv* iterator_exprs = arg2(array_former_expr);
   lv* filter_expr    = arg3(array_former_expr);
-  lv* element_type   = arg1(attr(@type, array_former_expr));
-  lv* hashed_element_type = attr(@hashed_type, element_type);
-  int element_type_u = num(attr(@unique, hashed_element_type));
+  lv* element_type   = arg1(attr(intern("type"), array_former_expr));
+  lv* hashed_element_type = attr(intern("hashed_type"), element_type);
+  int element_type_u = num(attr(intern("unique"), hashed_element_type));
   int n_iterator_exprs = length(iterator_exprs);
 
   /* Forward declarations */
@@ -454,10 +454,10 @@ generate_new_set_element_code(char new_el_var_name[],
   lv* element_type_class = op(element_type);
 
   fprintf(cfile, "%s.", new_el_var_name);
-  if (element_type_class == @number_type)
+  if (element_type_class == intern("number_type"))
     fprintf(cfile, "d = ");
-  else if (element_type_class == @symbol_type
-	   || element_type_class == @logical_type)
+  else if (element_type_class == intern("symbol_type")
+	   || element_type_class == intern("logical_type"))
     fprintf(cfile, "i = ");
   else /* everything else */
     fprintf(cfile, "v = ");
@@ -502,10 +502,10 @@ generate_new_array_element_memo_code(char new_temp_list_el_name[],
   indent_to(indent_level, indent, cfile);
   fprintf(cfile, "__new_list_el->entry.");
 
-  if (element_type_class == @number_type)
+  if (element_type_class == intern("number_type"))
     fprintf(cfile, "d = ");
-  else if (element_type_class == @symbol_type
-	   || element_type_class == @logical_type)
+  else if (element_type_class == intern("symbol_type")
+	   || element_type_class == intern("logical_type"))
     fprintf(cfile, "i = ");
   else /* everything else */
     fprintf(cfile, "v = ");
@@ -529,10 +529,10 @@ generate_array_filling_loop(char new_array_var_name[],
   /* Most of the code generation hereafter depends on the selection of
    * the approriate field in the union 'entry'.
    */
-  if (element_type_class == @number_type)
+  if (element_type_class == intern("number_type"))
     union_field = 'd';
-  else if (element_type_class == @symbol_type
-	   || element_type_class == @logical_type)
+  else if (element_type_class == intern("symbol_type")
+	   || element_type_class == intern("logical_type"))
     union_field = 'i';
   else /* everything else */
     union_field = 'v';
@@ -617,7 +617,7 @@ generate_set_loop_header(lv* iterator_expr, int indent_level)
 
   indent_to(indent_level, indent, cfile);
   fprintf(cfile, "FOR_ALL_ELEMENTS(");
-  fprintf(cfile, "%s, ", pname(attr(@name, arg1(iterator_expr))));
+  fprintf(cfile, "%s, ", pname(attr(intern("name"), arg1(iterator_expr))));
   generate_expression(arg2(iterator_expr));
   fprintf(cfile, ") {\n");
 }
@@ -634,7 +634,7 @@ generate_range_loop_header(lv* iterator_expr, int indent_level)
    */
   char indent[3] = "  ";
   char iter_var_name[80];
-  lv* step_expr_info = attr(@step_expr, arg2(iterator_expr)); /* a 'by_expr' */
+  lv* step_expr_info = attr(intern("step_expr"), arg2(iterator_expr)); /* a 'by_expr' */
   lv* step_expr = arg1(step_expr_info);
 
   gen_var_name("_array_N%d_cursor", iter_var_name);
@@ -649,7 +649,7 @@ generate_range_loop_header(lv* iterator_expr, int indent_level)
 
   indent_to(indent_level + 1, indent, cfile);
   fprintf(cfile, "%s %s;\n",
-	  attr(@discrete, attr(@step_expr, arg2(iterator_expr))) == @true ?
+	  attr(intern("discrete"), attr(intern("step_expr"), arg2(iterator_expr))) == intern("true") ?
 	  "int" : "double",
 	  iter_var_name);
 	  
@@ -657,32 +657,32 @@ generate_range_loop_header(lv* iterator_expr, int indent_level)
 
   /* Generate init step from first bound */
   fprintf(cfile, "for (%s = ", iter_var_name);
-  generate_expression(attr(@bound1, arg2(iterator_expr)));
+  generate_expression(attr(intern("bound1"), arg2(iterator_expr)));
   fputs("; ", cfile);
 
   /* Generate loop condition stating both bounds */
   fprintf(cfile, "%s >= ", iter_var_name);
-  generate_expression(attr(@bound1, arg2(iterator_expr)));
+  generate_expression(attr(intern("bound1"), arg2(iterator_expr)));
   fputs(" && ", cfile);
 
   fprintf(cfile, "%s <= ", iter_var_name);
-  generate_expression(attr(@bound2, arg2(iterator_expr)));
+  generate_expression(attr(intern("bound2"), arg2(iterator_expr)));
   fputs("; ", cfile);
 
-  if (attr(@discrete, step_expr_info)
-      && attr(@type, step_expr) == discrete_number_type
-      && attr(@value, step_expr) != nil
-      && fixnump(attr(@value, step_expr))
-      && num(attr(@value, step_expr)) == 1)
+  if (attr(intern("discrete"), step_expr_info)
+      && attr(intern("type"), step_expr) == discrete_number_type
+      && attr(intern("value"), step_expr) != nil
+      && fixnump(attr(intern("value"), step_expr))
+      && num(attr(intern("value"), step_expr)) == 1)
     fprintf(cfile, "%s%s) {\n",
 	    iter_var_name,
-	    attr(@direction, step_expr_info) == @ascending ? "++" : "--"
+	    attr(intern("direction"), step_expr_info) == intern("ascending") ? "++" : "--"
 	    );
   else
     {
       fprintf(cfile, "%s %s= ",
 	      iter_var_name,
-	      attr(@direction, step_expr_info) == @ascending ? "+" : "-"
+	      attr(intern("direction"), step_expr_info) == intern("ascending") ? "+" : "-"
 	      );
       generate_expression(step_expr);
       fprintf(cfile, ") {\n");
@@ -706,14 +706,14 @@ generate_range_loop_header(lv* iterator_expr, int indent_level)
    * the C compiler chokes
    **** /
   char indent[3] = "  ";
-  char* iter_var_name = pname(attr(@name, arg1(iterator_expr)));
-  lv* step_expr_info = attr(@step_expr, arg2(iterator_expr)); / * a 'by_expr' * /
+  char* iter_var_name = pname(attr(intern("name"), arg1(iterator_expr)));
+  lv* step_expr_info = attr(intern("step_expr"), arg2(iterator_expr)); / * a 'by_expr' * /
   lv* step_expr = arg1(step_expr_info);
 
   indent_to(indent_level, indent, cfile);
 
   fprintf(cfile, "%s %s;\n",
-	  attr(@discrete, attr(@step_expr, arg2(iterator_expr))) == @true ?
+	  attr(intern("discrete"), attr(intern("step_expr"), arg2(iterator_expr))) == intern("true") ?
 	  "int" : "double",
 	  iter_var_name);
 	  
@@ -721,32 +721,32 @@ generate_range_loop_header(lv* iterator_expr, int indent_level)
 
   / * Generate init step from first bound * /
   fprintf(cfile, "for (%s = ", iter_var_name);
-  generate_expression(attr(@bound1, arg2(iterator_expr)));
+  generate_expression(attr(intern("bound1"), arg2(iterator_expr)));
   fputs("; ", cfile);
 
   / * Generate loop condition stating both bounds * /
   fprintf(cfile, "%s >= ", iter_var_name);
-  generate_expression(attr(@bound1, arg2(iterator_expr)));
+  generate_expression(attr(intern("bound1"), arg2(iterator_expr)));
   fputs(" && ", cfile);
 
   fprintf(cfile, "%s <= ", iter_var_name);
-  generate_expression(attr(@bound2, arg2(iterator_expr)));
+  generate_expression(attr(intern("bound2"), arg2(iterator_expr)));
   fputs("; ", cfile);
 
-  if (attr(@discrete, step_expr_info)
-      && attr(@type, step_expr) == discrete_number_type
-      && attr(@value, step_expr) != nil
-      && fixnump(attr(@value, step_expr))
-      && num(attr(@value, step_expr)) == 1)
+  if (attr(intern("discrete"), step_expr_info)
+      && attr(intern("type"), step_expr) == discrete_number_type
+      && attr(intern("value"), step_expr) != nil
+      && fixnump(attr(intern("value"), step_expr))
+      && num(attr(intern("value"), step_expr)) == 1)
     fprintf(cfile, "%s%s) {\n",
 	    iter_var_name,
-	    attr(@direction, step_expr_info) == @ascending ? "++" : "--"
+	    attr(intern("direction"), step_expr_info) == intern("ascending") ? "++" : "--"
 	    );
   else
     {
       fprintf(cfile, "%s %s= ",
 	      iter_var_name,
-	      attr(@direction, step_expr_info) == @ascending ? "+" : "-"
+	      attr(intern("direction"), step_expr_info) == intern("ascending") ? "+" : "-"
 	      );
       generate_expression(step_expr);
       fprintf(cfile, ") {\n");
@@ -760,7 +760,7 @@ generate_loop_headers(lv* iterator_exprs, int indent_level)
 {
   if (iterator_exprs != nil)
     {
-      if (op(arg2(first(iterator_exprs))) == @arrayrange)
+      if (op(arg2(first(iterator_exprs))) == intern("arrayrange"))
 	generate_range_loop_header(first(iterator_exprs), indent_level);
       else			/* set expression */
 	generate_set_loop_header(first(iterator_exprs), indent_level);
@@ -780,7 +780,7 @@ generate_loop_closing(lv* iterator_exprs, int indent_level)
 
   if (iterator_exprs)
     {
-      if (op(arg2(first(iterator_exprs))) == @arrayrange)
+      if (op(arg2(first(iterator_exprs))) == intern("arrayrange"))
 	{
 	  indent_to(indent_level, indent, cfile);
 	  fprintf(cfile, "} /* for loop block */\n");
@@ -802,14 +802,14 @@ generate_loop_closing(lv* iterator_exprs, int indent_level)
 void
 generate_exists_function_range(lv* exists_expr)
 {
-  lv *id = attr(@id, exists_expr);
-  lv *id_type = attr(@type, id);
+  lv *id = attr(intern("id"), exists_expr);
+  lv *id_type = attr(intern("type"), id);
   lv* range_expr = arg1(exists_expr);
-  int u = num(attr(@unique, exists_expr));
+  int u = num(attr(intern("unique"), exists_expr));
   int indent_level = 1;
   char indent[3] = "  ";
   char* iter_var_name = "__array_range_i";
-  lv* step_expr_info = attr(@step_expr, range_expr); /* a 'by_expr' */
+  lv* step_expr_info = attr(intern("step_expr"), range_expr); /* a 'by_expr' */
   lv* step_expr = arg1(step_expr_info);
 
   fprintf(hfile,
@@ -819,7 +819,7 @@ generate_exists_function_range(lv* exists_expr)
 	  "int\nexists_expr_range_F%d(Component *_self)\n{\n", u);
 
   indent_to(indent_level, indent, cfile);
-  if (attr(@discrete, step_expr_info))
+  if (attr(intern("discrete"), step_expr_info))
     fputs("int", cfile);
   else
     generate_type(id_type, cfile);
@@ -828,33 +828,33 @@ generate_exists_function_range(lv* exists_expr)
   /* Generate init step from first bound */
   indent_to(indent_level, indent, cfile);
   fprintf(cfile, "for (%s = ", iter_var_name);
-  generate_expression(attr(@bound1, range_expr));
+  generate_expression(attr(intern("bound1"), range_expr));
   fputs("; ", cfile);
 
   /* Generate loop condition stating both bounds */
   fprintf(cfile, "%s >= ", iter_var_name);
-  generate_expression(attr(@bound1, range_expr));
+  generate_expression(attr(intern("bound1"), range_expr));
   fputs(" && ", cfile);
 
   fprintf(cfile, "%s <= ", iter_var_name);
-  generate_expression(attr(@bound2, range_expr));
+  generate_expression(attr(intern("bound2"), range_expr));
   fputs("; ", cfile);
 
   /* Generate step expression */
-  if (attr(@discrete, step_expr_info)
-      && attr(@type, step_expr) == discrete_number_type
-      && attr(@value, step_expr) != nil
-      && fixnump(attr(@value, step_expr))
-      && num(attr(@value, step_expr)) == 1)
+  if (attr(intern("discrete"), step_expr_info)
+      && attr(intern("type"), step_expr) == discrete_number_type
+      && attr(intern("value"), step_expr) != nil
+      && fixnump(attr(intern("value"), step_expr))
+      && num(attr(intern("value"), step_expr)) == 1)
     fprintf(cfile, "%s%s) {\n",
 	    iter_var_name,
-	    attr(@direction, step_expr_info) == @ascending ? "++" : "--"
+	    attr(intern("direction"), step_expr_info) == intern("ascending") ? "++" : "--"
 	    );
   else
     {
       fprintf(cfile, "%s %s= ",
 	      iter_var_name,
-	      attr(@direction, step_expr_info) == @ascending ? "+" : "-"
+	      attr(intern("direction"), step_expr_info) == intern("ascending") ? "+" : "-"
 	      );
       generate_expression(step_expr);
       fprintf(cfile, ") {\n");
@@ -883,9 +883,9 @@ generate_exists_function_range(lv* exists_expr)
 void
 generate_exists_function_set(lv* exists_expr)
 {
-  lv *id = attr(@id, exists_expr);
-  lv *id_type = attr(@type, id);
-  int u = num(attr(@unique, exists_expr));
+  lv *id = attr(intern("id"), exists_expr);
+  lv *id_type = attr(intern("type"), id);
+  int u = num(attr(intern("unique"), exists_expr));
   int indent_level = 1;
   char indent[3] = "  ";
 
@@ -929,7 +929,7 @@ generate_exists_function_set(lv* exists_expr)
 void
 generate_exists_function(lv *exists_expr)
 {
-  if (op(arg1(exists_expr)) == @arrayrange)
+  if (op(arg1(exists_expr)) == intern("arrayrange"))
     {
       generate_exists_function_range(exists_expr);
     }
@@ -948,24 +948,24 @@ generate_exists_function(lv *exists_expr)
 void
 generate_minmax_function(lv *q, int max)
 {
-  lv *id = attr(@id, q);
-  int u = num(attr(@unique, q));
-  lv *t = attr(@type, q);
+  lv *id = attr(intern("id"), q);
+  int u = num(attr(intern("unique"), q));
+  lv *t = attr(intern("type"), q);
 
   char indent[3] = "  ";
   int indent_level = 1;
 
   char *prefix =
-    (op(t) == @number_type) ? "double" :
-    (op(t) == @logical_type || op(t) == @symbol_type) ? "int" :
+    (op(t) == intern("number_type")) ? "double" :
+    (op(t) == intern("logical_type") || op(t) == intern("symbol_type")) ? "int" :
     "voidstar";
 
   char set_field =
-    (op(t) == @number_type) ? 'd' :
-    (op(t) == @logical_type || op(t) == @symbol_type) ? 'i' :
+    (op(t) == intern("number_type")) ? 'd' :
+    (op(t) == intern("logical_type") || op(t) == intern("symbol_type")) ? 'i' :
     'v';
 
-  if (op(arg1(q)) == @arrayrange)
+  if (op(arg1(q)) == intern("arrayrange"))
     {
       internal_error("'minel' and 'maxel' operators\
 over ranges have not yet been implemented");

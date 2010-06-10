@@ -50,11 +50,11 @@ static void generate_shift_type_from_formal_decl(lv*, FILE*);
 void
 generate_foreign_function_code(lv* fd)
 {
-  lv *formals = attr(@formals, fd);
+  lv *formals = attr(intern("formals"), fd);
 
   /* Header file */
-  generate_type(attr(@return_type, fd), hfile);
-  fprintf(hfile, " %s(", pname(attr(@ffi_wrapper_name, fd)));
+  generate_type(attr(intern("return_type"), fd), hfile);
+  fprintf(hfile, " %s(", pname(attr(intern("ffi_wrapper_name"), fd)));
   if (formals)
     {
       generate_shift_type_from_formal_decl(hd(formals), hfile);
@@ -68,9 +68,9 @@ generate_foreign_function_code(lv* fd)
   fprintf(hfile, ");\n");
 
   /* C file */
-  generate_ffi_wrapper_code(attr(@ffi_wrapper_name, fd),
+  generate_ffi_wrapper_code(attr(intern("ffi_wrapper_name"), fd),
 			    formals,
-			    attr(@return_type, fd),
+			    attr(intern("return_type"), fd),
 			    fd);
 }
 
@@ -141,19 +141,19 @@ generate_ffi_wrapper_code(lv* ffi_wrapper_name,
 {
   /* Function Header */
   fprintf(cfile, "/* Foreign Function Wrapper for '%s' */\n\n",
-	  pname(attr2(@name, @id, function_desc)));
+	  pname(attr2(intern("name"), intern("id"), function_desc)));
 
-  generate_ffi_type(attr(@return_type, function_desc), cfile);
+  generate_ffi_type(attr(intern("return_type"), function_desc), cfile);
   fprintf(cfile, "\n%s(", pname(ffi_wrapper_name));
   if (formals)
     {
       generate_shift_type_from_formal_decl(hd(formals), cfile);
-      fprintf(cfile, " %s", pname(attr2(@name, @id, hd(formals))));
+      fprintf(cfile, " %s", pname(attr2(intern("name"), intern("id"), hd(formals))));
       dolist (f, tl(formals))
 	{
 	  fprintf(cfile, ", ");
 	  generate_shift_type_from_formal_decl(f, cfile);
-	  fprintf(cfile, " %s", pname(attr2(@name, @id, f)));
+	  fprintf(cfile, " %s", pname(attr2(intern("name"), intern("id"), f)));
 	}
       tsilod;
     }
@@ -191,7 +191,7 @@ generate_ffi_pre_glue_code(lv* formals, lv* return_type, lv* function_desc)
 	{
 	  indent_to(1, indent_string, cfile);
 	  generate_ffi_type(arg1(f), cfile);
-	  fprintf(cfile, " _ffi_%s;\n", pname(attr2(@name, @id, f)));
+	  fprintf(cfile, " _ffi_%s;\n", pname(attr2(intern("name"), intern("id"), f)));
 	}
     }
   tsilod;
@@ -208,7 +208,7 @@ generate_ffi_pre_glue_code(lv* formals, lv* return_type, lv* function_desc)
   indent_to(1, indent_string, cfile);
   fputs("extern ", cfile);
   generate_ffi_type(return_type, cfile);
-  fprintf(cfile, " %s(", pname(attr2(@name, @id, function_desc)));
+  fprintf(cfile, " %s(", pname(attr2(intern("name"), intern("id"), function_desc)));
   if (formals != 0)
     {
       generate_ffi_type_from_formal_decl(hd(formals), cfile);
@@ -242,7 +242,7 @@ generate_ffi_pre_glue_code(lv* formals, lv* return_type, lv* function_desc)
 	  %d);");
 	  */
 	  indent_to(1, indent_string, cfile);
-	  fprintf(cfile, "_ffi_%s = ", pname(attr2(@name, @id, f)));
+	  fprintf(cfile, "_ffi_%s = ", pname(attr2(intern("name"), intern("id"), f)));
 	  generate_ffi_pre_glue_expr(f, cfile);
 	  fputs(";\n", cfile);
 	}
@@ -291,8 +291,8 @@ generate_ffi_type(lv* type_decl, FILE* file)
     fputs("int", file);
   else if (array_type_p(type_decl))
     generate_ffi_array_type(type_decl, file);
-  else if (op(type_decl) == @id)
-    generate_ffi_type(attr(@type, type_decl), file);
+  else if (op(type_decl) == intern("id"))
+    generate_ffi_type(attr(intern("type"), type_decl), file);
   else if (type_type_p(type_decl))
     generate_ffi_type_type(type_decl, file);
   else
@@ -307,13 +307,13 @@ generate_ffi_type(lv* type_decl, FILE* file)
 static void
 generate_ffi_type_type(lv* type_decl, FILE* file)
 {
-  lv *exttypedef = attr(@exttypedef, type_decl);
+  lv *exttypedef = attr(intern("exttypedef"), type_decl);
   
   /* Adding support for external data types.
    *
    * Tunc Simsek 15th April, 1998
    */
-  if ( exttypedef && exttypedef == @true )
+  if ( exttypedef && exttypedef == intern("true") )
     {
       fputs("FOREIGN_TYPE *", file);
     }
@@ -370,14 +370,14 @@ generate_ffi_pre_glue_expr(lv* formal_arg, FILE* file)
   lv* type_decl = arg1(formal_arg);
 
   if (number_type_p(type_decl))
-    fprintf(file, "%s", pname(attr2(@name, @id, formal_arg)));
+    fprintf(file, "%s", pname(attr2(intern("name"), intern("id"), formal_arg)));
   else if (array_type_p(type_decl))
     generate_ffi_pre_glue_array_expr(formal_arg, file);
   else
     {
-      user_error(attr(@id, formal_arg),
+      user_error(attr(intern("id"), formal_arg),
 		 "FFI: cannot generate a foreign expression for argument ~s\n",
-		 attr(@id, formal_arg));
+		 attr(intern("id"), formal_arg));
     }
 }
 
@@ -469,7 +469,7 @@ generate_ffi_pre_glue_array_expr(lv* array_formal_arg, FILE* file)
 				      array_indirections,
 				      C),
 	  out_formal_p(array_formal_arg) ? "*" : "",
-	  pname(attr2(@name, @id, array_formal_arg)));
+	  pname(attr2(intern("name"), intern("id"), array_formal_arg)));
 }
 
 
@@ -481,20 +481,20 @@ generate_ffi_call(lv* formals, lv* function_desc)
 
   indent_to(1, indent_string, cfile);
   fputs("_ffi__return_value = ", cfile);
-  fprintf(cfile, "%s(", pname(attr2(@name, @id, function_desc)));
+  fprintf(cfile, "%s(", pname(attr2(intern("name"), intern("id"), function_desc)));
 
   if (formals != 0)
     {
       if (array_type_p(arg1(hd(formals))))
 	fputs("_ffi_", cfile);
-      fprintf(cfile, "%s", pname(attr2(@name, @id, hd(formals))));
+      fprintf(cfile, "%s", pname(attr2(intern("name"), intern("id"), hd(formals))));
       dolist (f, tl(formals))
 	{
 	  fputs(", ", cfile);
 	  if (array_type_p(arg1(f)))
 	    fputs("_ffi_", cfile);
 
-	  fprintf(cfile, "%s", pname(attr2(@name, @id, f)));
+	  fprintf(cfile, "%s", pname(attr2(intern("name"), intern("id"), f)));
 	}
       tsilod;
     }
@@ -519,7 +519,7 @@ generate_ffi_post_glue_code(lv* formals, lv* function_desc)
       generate_ffi_copyback_code(f, function_desc, cfile);
     }
   tsilod;
-  generate_ffi_return_value_expr(attr(@return_type, function_desc), cfile);
+  generate_ffi_return_value_expr(attr(intern("return_type"), function_desc), cfile);
   generate_signal_restore();
 
   indent_to(1, indent_string, cfile);
@@ -558,7 +558,7 @@ generate_ffi_copyback_code(lv* formal_arg, lv* function_desc, FILE* file)
       
       /* Old version
 	 indent_to(1, indent_string, file);
-	 fprintf(file, "%s = ", pname(attr2(@name, @id, formal_arg)));
+	 fprintf(file, "%s = ", pname(attr2(intern("name"), intern("id"), formal_arg)));
 	 generate_ffi_post_glue_expr(formal_arg, cfile);
 	 fputs(";\n", file);
 	 */
@@ -577,11 +577,11 @@ generate_ffi_copyback_code(lv* formal_arg, lv* function_desc, FILE* file)
 					  array_indirections,
 					  SHIFT),
 	      /* ffi_C_D_array_copiers[array_indirections], */
-	      pname(attr2(@name, @id, formal_arg)),
-	      pname(attr2(@name, @id, formal_arg)));
+	      pname(attr2(intern("name"), intern("id"), formal_arg)),
+	      pname(attr2(intern("name"), intern("id"), formal_arg)));
 
       /* generate_ffi_C_D_array_dimensions(arg1(formal_arg),
-					attr(@id, formal_arg),
+					attr(intern("id"), formal_arg),
 					file);
 					*/
       fputs(");\n", file);
@@ -598,14 +598,14 @@ generate_ffi_post_glue_expr(lv* formal_arg, FILE* file)
   lv* type_decl = arg1(formal_arg);
 
   if (number_type_p(type_decl))
-    fprintf(file, "_ffi_%s", pname(attr2(@name, @id, formal_arg)));
+    fprintf(file, "_ffi_%s", pname(attr2(intern("name"), intern("id"), formal_arg)));
   else if (array_type_p(type_decl))
     generate_ffi_post_glue_array_expr(formal_arg, file);
   else
     {
-      user_error(attr(@id, formal_arg),
+      user_error(attr(intern("id"), formal_arg),
 		 "FFI: cannot generate a foreign expression for argument ~s\n",
-		 attr(@id, formal_arg));
+		 attr(intern("id"), formal_arg));
     }
 }
 
@@ -625,9 +625,9 @@ generate_ffi_post_glue_array_expr(lv* array_formal_arg, FILE* file)
 				      array_indirections,
 				      C),
 	  /* ffi_C_D_array_copiers[array_indirections], */
-	  pname(attr2(@name, @id, array_formal_arg)));
+	  pname(attr2(intern("name"), intern("id"), array_formal_arg)));
   generate_ffi_C_D_array_dimensions(arg1(array_formal_arg),
-				    attr(@id, array_formal_arg),
+				    attr(intern("id"), array_formal_arg),
 				    file);
   fputs(")", file);
 }
@@ -643,13 +643,13 @@ generate_ffi_C_D_array_dimensions(lv* array_formal_type,
 
   if (array_type_p(array_formal_type))
     {
-      dimension_form = attr(@dimensions, array_formal_type);
+      dimension_form = attr(intern("dimensions"), array_formal_type);
       if (dimension_form == 0)
 	user_error(find_leaf(array_formal_id),
 		   "FFI: cannot generate C array copy back code (no dimensions in array type).");
       else
 	{
-	  dimension = num(attr(@value, dimension_form));
+	  dimension = num(attr(intern("value"), dimension_form));
 	  fprintf(file, ", %d", dimension);
 	  generate_ffi_C_D_array_dimensions(arg1(array_formal_type),
 					    array_formal_id,
@@ -694,7 +694,7 @@ generate_ffi_return_value_expr(lv* return_type, FILE* file)
 					file);
       fputs(");\n", file);
     }
-  else if (op(return_type) == @id)
+  else if (op(return_type) == intern("id"))
     {
       fputs("_ffi__return_value;\n", file);
     }

@@ -114,38 +114,38 @@ verbose_list_data_fields(lv *p)
    */
   dolist(t, p)
     {
-      if(op(t) == @typedef)
+      if(op(t) == intern("typedef"))
 	{
 	  if(verbose_list_states 
 	     || verbose_list_outputs
 	     || verbose_list_inputs)
 	    {
 	      fprintf(stdout, "#");
-	      write_sexpr1(@typedef, stdout);
-	      fprintf(stdout,"\n");
-	      write_type(attr(@id,t), stdout);
+	      write_sexpr1(intern("typedef"), stdout);
+	      fprintf(stdout, "\n");
+	      write_type(attr(intern("id"), t), stdout);
 	      fprintf(stdout, "\n");
 	      
 	      if(verbose_list_states)
 		{
-		  lv *states = attr(@state, t);
+		  lv *states = attr(intern("state"), t);
 		  
 		  if(states)
 		    {
 		      fprintf(stdout, "#");
-		      write_sexpr1(@state, stdout);
+		      write_sexpr1(intern("state"), stdout);
 		      fprintf(stdout, "\n");
 		      write_declare_list(states, stdout);
 		    }
 		}
 	      if(verbose_list_outputs)
 		{
-		  lv *outputs = attr(@output, t);
+		  lv *outputs = attr(intern("output"), t);
 		  
 		  if(outputs)
 		    {
 		      fprintf(stdout, "#");
-		      write_sexpr1(@output, stdout);
+		      write_sexpr1(intern("output"), stdout);
 		      fprintf(stdout, "\n");
 		      write_declare_list(outputs, stdout);
 		    }
@@ -153,22 +153,22 @@ verbose_list_data_fields(lv *p)
 	      
 	      if(verbose_list_inputs)
 		{
-		  lv *inputs = attr(@input, t);
+		  lv *inputs = attr(intern("input"), t);
 
 		  if(inputs)
 		    {
 		      fprintf(stdout, "#");
-		      write_sexpr1(@input, stdout);
+		      write_sexpr1(intern("input"), stdout);
 		      fprintf(stdout, "\n");
 		      write_declare_list(inputs, stdout);
 		    }
 		}
 	    }
 	}
-      else if(op(t) == @glob_var_decl && ! g)
+      else if(op(t) == intern("glob_var_decl") && ! g)
 	{
 	  /* The flag g is used so that only the first
-	   * node @glob_var_decl is visited.
+	   * node intern("glob_var_decl") is visited.
 	   * The rest is redundant because the typechecker
 	   * collects these lists under the first one.
 	   */
@@ -176,7 +176,7 @@ verbose_list_data_fields(lv *p)
 	  if(verbose_list_globals)
 	    {
 	      fprintf(stdout, "#");
-	      write_sexpr1(@glob_var_decl, stdout);
+	      write_sexpr1(intern("glob_var_decl"), stdout);
 	      fprintf(stdout,"\n");
 	      write_declare_list(args(t), stdout);
 	    }
@@ -192,11 +192,11 @@ write_declare_list(lv *l, FILE *fp)
 
   dolist(d, l)
     {
-      if(op(d) == @declare)
+      if(op(d) == intern("declare"))
 	{
-	  lv *id = attr(@id, d);
-	  lv *type = id ? attr(@type, id) : nil;
-	  /* The @id attribute provides the name of the
+	  lv *id = attr(intern("id"), d);
+	  lv *type = id ? attr(intern("type"), id) : nil;
+	  /* The intern("id") attribute provides the name of the
 	   * global variable that is declared.
 	   */
 	  if(id)
@@ -221,9 +221,9 @@ write_declare_list(lv *l, FILE *fp)
 void
 write_type(lv *type, FILE *fp)
 {
-  if(op(type) == @id)
+  if(op(type) == intern("id"))
     {
-      lv *name = attr(@name, type);
+      lv *name = attr(intern("name"), type);
       
       if(name)
 	{

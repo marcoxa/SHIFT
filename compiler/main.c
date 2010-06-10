@@ -214,7 +214,8 @@ parse_cmd_line_args(int argc, char *argv[])
     }
 }
 
-void
+
+int
 main(int argc, char **argv)
 {
 

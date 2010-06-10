@@ -62,6 +62,7 @@ bindir      = @bindir@
 includedir  = @includedir@
 libdir      = @libdir@
 libexecdir  = @libexecdir@
+datarootdir	    = @datarootdir@
 
 mandir      = @mandir@
 
@@ -105,10 +106,13 @@ SOURCES = README Makefile $(CSRC) $(HSRC) parser.y scanner.l \
 
 # Generic target for preprocessing by 'hasher'.
 
+# .c.o:
+# 	$(CC) $(CFLAGS) -E $< | ./hasher SYMBOLS > X.c
+# 	$(CC) $(CFLAGS) -c X.c
+# 	mv -f X.o $*.o; rm -f X.c SYMBOLS.h
+
 .c.o:
-	$(CC) $(CFLAGS) -E $< | ./hasher SYMBOLS > X.c
-	$(CC) $(CFLAGS) -c X.c
-	mv -f X.o $*.o; rm -f X.c SYMBOLS.h
+	$(CC) $(CFLAGS) -c $<
 
 
 # The dependency on parser.h forces (hopefully) making parser.h first.

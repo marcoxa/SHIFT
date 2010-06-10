@@ -55,7 +55,7 @@ literalp(lv *e)
 {
   lv *o = op(e);
 
-  if (o == @setcons || o == @arraycons)
+  if (o == intern("setcons") || o == intern("arraycons"))
     {
       dolist (a, args(e))
 	{
@@ -67,12 +67,12 @@ literalp(lv *e)
       return 1;
     }
   else
-    return o == @semis
-           || o == @id && op(attr(@type, e)) == @state_type
-           || o == @int
-           || o == @float
-           || o == @string
-           || o == @symbol;
+    return o == intern("semis")
+           || o == intern("id") && op(attr(intern("type"), e)) == intern("state_type")
+           || o == intern("int")
+           || o == intern("float")
+           || o == intern("string")
+           || o == intern("symbol");
 }
 
 
@@ -81,19 +81,19 @@ compute_state_set_op(lv *o, lv *l, lv *r)
 {
   lv *result_list;
 
-  assert(op(l) == @setcons);
-  assert(op(r) == @setcons);
-  if (o == @set_union)
+  assert(op(l) == intern("setcons"));
+  assert(op(r) == intern("setcons"));
+  if (o == intern("set_union"))
     {
       result_list = args(l);
       dolist (re, args(r))
 	{
-	  lv *rentity = attr(@entity, re);
+	  lv *rentity = attr(intern("entity"), re);
 	  int found = 0;
 
 	  dolist (le, args(l))
 	    {
-	      lv *lentity = attr(@entity, le);
+	      lv *lentity = attr(intern("entity"), le);
 
 	      if (rentity == lentity)
 		{
@@ -106,17 +106,17 @@ compute_state_set_op(lv *o, lv *l, lv *r)
 	}
       tsilod;
     }
-  else if (o == @intersection)
+  else if (o == intern("intersection"))
     {
       result_list = nil;
       dolist (re, args(r))
 	{
-	  lv *rentity = attr(@entity, re);
+	  lv *rentity = attr(intern("entity"), re);
 	  int found = 0;
 
 	  dolist (le, args(l))
 	    {
-	      lv *lentity = attr(@entity, le);
+	      lv *lentity = attr(intern("entity"), le);
 
 	      if (rentity == lentity)
 		{
@@ -129,17 +129,17 @@ compute_state_set_op(lv *o, lv *l, lv *r)
 	}
       tsilod;
     }
-  else if (o == @difference)
+  else if (o == intern("difference"))
     {
       result_list = nil;
       dolist (le, args(l))
 	{
-	  lv *lentity = attr(@entity, le);
+	  lv *lentity = attr(intern("entity"), le);
 	  int found = 0;
 
 	  dolist (re, args(r))
 	    {
-	      lv *rentity = attr(@entity, re);
+	      lv *rentity = attr(intern("entity"), re);
 
 	      if (rentity == lentity)
 		{
@@ -152,7 +152,7 @@ compute_state_set_op(lv *o, lv *l, lv *r)
 	}
       tsilod;
     }
-  return node(@setcons, result_list, alist1(@type, stateset_type));
+  return node(intern("setcons"), result_list, alist1(intern("type"), stateset_type));
 }
 
 
@@ -161,18 +161,18 @@ fold(lv *e)
 {
   if (literalp(e))
     return e;
-  else if (op(e) == @id)
+  else if (op(e) == intern("id"))
     {
       return meaning(e);
     }
   else
     {
       lv *o = op(e);
-      lv *t = attr(@type, e);
+      lv *t = attr(intern("type"), e);
 
-      if ((o == @set_union || o == @set_difference || o == @set_intersection)
-	  && op(t) == @set
-	  && op(arg1(t)) == @state_type)
+      if ((o == intern("set_union") || o == intern("set_difference") || o == intern("set_intersection"))
+	  && op(t) == intern("set")
+	  && op(arg1(t)) == intern("state_type"))
 	{
 	  lv *l = fold(arg1(e));
 	  lv *r = fold(arg2(e));
@@ -196,47 +196,47 @@ fold(lv *e)
 void
 transform_typedef(lv *td)
 {
-  /* Move all initializations into the @initialize attribute of the
-   * @setup node.  Initialize all variables to some default.
+  /* Move all initializations into the intern("initialize") attribute of the
+   * intern("setup") node.  Initialize all variables to some default.
    */
-  lv *setup = attr(@setup, td);
+  lv *setup = attr(intern("setup"), td);
   lv *init = nil;
 
   if (! setup)
     {
-      setup = node(@setup, nil, nil);
-      set_attr(@setup, td, setup);
+      setup = node(intern("setup"), nil, nil);
+      set_attr(intern("setup"), td, setup);
     }
 
-  dolist (d, attr(@input, td))
+  dolist (d, attr(intern("input"), td))
     {
       if (tl(args(d)))
-	push(node(@assign, list2(attr(@id, d), arg2(d)), nil), init);
+	push(node(intern("assign"), list2(attr(intern("id"), d), arg2(d)), nil), init);
     }
   tsilod;
 
-  dolist (d, attr(@output, td))
+  dolist (d, attr(intern("output"), td))
     {
       if (tl(args(d)))
-	push(node(@assign, list2(attr(@id, d), arg2(d)), nil), init);
+	push(node(intern("assign"), list2(attr(intern("id"), d), arg2(d)), nil), init);
     }
   tsilod;
 
-  dolist (d, attr(@state, td))
+  dolist (d, attr(intern("state"), td))
     {
       if (tl(args(d)))
-	push(node(@assign, list2(attr(@id, d), arg2(d)), nil), init);
+	push(node(intern("assign"), list2(attr(intern("id"), d), arg2(d)), nil), init);
     }
   tsilod;
 
-  dolist (d, attr(@global, td))
+  dolist (d, attr(intern("global"), td))
     {
       if (tl(args(d)))
-	push(node(@assign, list2(attr(@id, d), arg2(d)), nil), init);
+	push(node(intern("assign"), list2(attr(intern("id"), d), arg2(d)), nil), init);
     }
   tsilod;
 
-  set_attr(@initialize, setup, nreverse(init));
+  set_attr(intern("initialize"), setup, nreverse(init));
 
   /* Original (Marco Antoniotti 19960528)
    * This does not quite work.  It might be the case that the
@@ -256,22 +256,22 @@ transform_typedef(lv *td)
    * have a sync variable.
    */
 
-  dolist (tr, attr(@transition, td))
+  dolist (tr, attr(intern("transition"), td))
     {
-      dolist (e, attr(@events, tr))
+      dolist (e, attr(intern("events"), tr))
 	{
-	  if (op(e) == @external_event)
+	  if (op(e) == intern("external_event"))
 	    {
-	      lv *sync_type = attr(@sync_type, e);
+	      lv *sync_type = attr(intern("sync_type"), e);
 
-	      if (sync_type && sync_type == @one)
+	      if (sync_type && sync_type == intern("one"))
 		{
-		  lv *etype = arg1(attr(@type, arg1(e)));
-		  lv *y = node(@entity, nil, alist1(@type, etype));
-		  lv *a = alist3(@type, etype, @name, @SY, @entity, y);
-		  lv *id = node(@id, nil, a);
+		  lv *etype = arg1(attr(intern("type"), arg1(e)));
+		  lv *y = node(intern("entity"), nil, alist1(intern("type"), etype));
+		  lv *a = alist3(intern("type"), etype, intern("name"), intern("SY"), intern("entity"), y);
+		  lv *id = node(intern("id"), nil, a);
 
-		  set_attr(@sync_type, e, id);
+		  set_attr(intern("sync_type"), e, id);
 		}
 	    }
 	} tsilod;
@@ -284,11 +284,11 @@ void
 initialize_transform()
 {
 
-  /* zero = node(@int, nil, alist2(@value, intern("0"), @type, number_type));
+  /* zero = node(intern("int"), nil, alist2(intern("value"), intern("0"), intern("type"), number_type));
    * Useless
    * Marco Antoniotti 19971023
    */
-  null_symbol = node(@null_symbol, nil, alist1(@type, symbol_type));
+  null_symbol = node(intern("null_symbol"), nil, alist1(intern("type"), symbol_type));
 }
 	
 
@@ -297,7 +297,7 @@ transform(lv *program)
 {
   dolist (n, program)
     {
-      if (op(n) == @typedef)
+      if (op(n) == intern("typedef"))
 	transform_typedef(n);
     }
   tsilod;

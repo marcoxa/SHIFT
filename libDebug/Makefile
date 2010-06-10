@@ -1,4 +1,3 @@
-# Generated automatically from Makefile.in by configure.
 # -*- Mode: Makefile -*-
 
 # Copyright (c)1996, 1997, 1998 The Regents of the University of
@@ -34,7 +33,7 @@
 # project.
 #
 # Autoconf/Configure tag.
-# Generated automatically from Makefile.in by configure.
+# libDebug/Makefile.  Generated from Makefile.in by configure.
 
 #==============================================================================
 # Standard (GNU form) variable setup
@@ -48,7 +47,7 @@ CC    = gcc
 
 # Installation Variables
 
-prefix      = /home/porsche2/varaiya/marcoz
+prefix      = /usr/local
 exec_prefix = ${prefix}
 
 bindir      = ${exec_prefix}/bin
@@ -56,7 +55,7 @@ includedir  = ${prefix}/include
 libdir      = ${exec_prefix}/lib
 libexecdir  = ${exec_prefix}/libexec
 
-mandir      = ${prefix}/man
+mandir      = ${prefix}/share/man
 
 
 # Build Variables
@@ -64,9 +63,9 @@ mandir      = ${prefix}/man
 top_srcdir  = ..
 srcdir      = .
 
-VPATH       = .:../include
+VPATH       = ../include
 
-LIBS        = -lBLT -ltk -ltcl -lX11 -lsocket -lnsl -lm -ldl 
+LIBS        = 
 
 
 # Other variables
@@ -100,7 +99,7 @@ GUI_OBJS =  Tk_communications.o \
 	    Tk_server.o \
 	    Tk_btf.o
 
-OBJECTS  = $(BASE_OBJS) $(GUI_OBJS)
+OBJECTS  = $(BASE_OBJS)
 
 
 TARGET_OBJ = libDebug.a
@@ -154,4 +153,4 @@ $(TARGET_OBJ): $(OBJECTS)
 	-ranlib $(TARGET_OBJ)
 
 
-# end of file -- Makefile -- Generated automatically from Makefile.in by configure.
+# end of file -- Makefile -- libDebug/Makefile.  Generated from Makefile.in by configure.

@@ -1,4 +1,3 @@
-# Generated automatically from Makefile.in by configure.
 # -*- Mode: Makefile -*-
 
 # Copyright (c) 1996, 1997 Regents of the University of California.
@@ -38,7 +37,7 @@
 # project.
 #
 # Autoconf/Configure tag.
-# Generated automatically from Makefile.in by configure.
+# extra/shifttree/Makefile.  Generated from Makefile.in by configure.
 
 
 #==============================================================================
@@ -51,7 +50,7 @@ SHELL = /bin/sh
 
 # Installation Variables
 
-prefix      = /users/marcoxa
+prefix      = /usr/local
 exec_prefix = ${prefix}
 
 bindir      = ${exec_prefix}/bin
@@ -59,7 +58,7 @@ includedir  = ${prefix}/include
 libdir      = ${exec_prefix}/lib
 libexecdir  = ${exec_prefix}/libexec
 
-mandir      = ${prefix}/man
+mandir      = ${prefix}/share/man
 
 
 # Build Variables

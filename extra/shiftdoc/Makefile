@@ -1,4 +1,3 @@
-# Generated automatically from Makefile.in by configure.
 # -*- Mode: Makefile -*-
 
 # Copyright (c) 1996, 1997 Regents of the University of California.
@@ -38,7 +37,7 @@
 # project.
 #
 # Autoconf/Configure tag.
-# Generated automatically from Makefile.in by configure.
+# extra/shiftdoc/Makefile.  Generated from Makefile.in by configure.
 
 
 #==============================================================================
@@ -52,15 +51,15 @@ CC     = gcc
 LEX    = flex
 YACC   = yacc
 
-LEXLIB = 
+LEXLIB = -lfl
 
 # LIBYACC is needed because of the way LINUX systems run yacc (or bison).
-YACCLIB = -ly
+YACCLIB = 
 
 
 # Installation Variables
 
-prefix      = /users/marcoxa
+prefix      = /usr/local
 exec_prefix = ${prefix}
 
 bindir      = ${exec_prefix}/bin
@@ -68,7 +67,7 @@ includedir  = ${prefix}/include
 libdir      = ${exec_prefix}/lib
 libexecdir  = ${exec_prefix}/libexec
 
-mandir      = ${prefix}/man
+mandir      = ${prefix}/share/man
 
 
 # Build Variables
@@ -76,13 +75,13 @@ mandir      = ${prefix}/man
 top_srcdir  = ../..
 srcdir      = .
 
-VPATH       = .:../../include
+VPATH       = ../../include
 
 
 # Other Variables
 
 # Unused for the time being
-GCINCLUDEFLAG = -I/software/public/gc/include
+GCINCLUDEFLAG = 
 
 CSRC = main.c \
        scanaux.c \

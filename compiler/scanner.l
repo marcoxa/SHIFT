@@ -107,9 +107,15 @@ ID	[a-zA-Z_][a-zA-Z_0-9]*
 <I>"["				{ return yytext[0]; }
 <I>"]"				{ return yytext[0]; }
 <I>{OP}+|\({OP}+\)|\[{OP}+\]|\{{OP}+\}	{ return predefinedOrOther(yytext, PREC1); }
+.					{ shift_lex_error("Illegal character: %c (0x%x)",
+					                  yytext[0],
+							  yytext[0]); }
+
+%%
+/*
 .				{ LEXERROR "Illegal character: %c (0x%x)", 
 				    yytext[0], yytext[0] ENDERROR; }
-%%
+*/
 
 /*
 \"[^"]*\"			{ return string(yytext); }

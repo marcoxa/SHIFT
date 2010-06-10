@@ -1,4 +1,4 @@
-/* include/shift_config.h.  Generated automatically by configure.  */
+/* include/shift_config.h.  Generated from shift_config.h.in by configure.  */
 /* -*- Mode: C -*- */
 
 /* shift_config.h.in -- */
@@ -45,8 +45,8 @@
 
 /* Various Sun */
 
-#define OS_SOLARIS 1
-#define OS_SUNOS5 1
+/* #undef OS_SOLARIS */
+/* #undef OS_SUNOS5 */
 /* #undef OS_SUNOS4 */
 
 
@@ -93,7 +93,7 @@
 /* #undef inline */
 
 /* Define if you have the ANSI C header files.  */
-#define STDC_HEADERS 1
+/* #undef STDC_HEADERS */
 
 /* Define if you can safely include both <sys/time.h> and <time.h>.  */
 #define TIME_WITH_SYS_TIME 1
@@ -102,19 +102,19 @@
 /* #undef TM_IN_SYS_TIME */
 
 /* Define if you have the gettimeofday function.  */
-#define HAVE_GETTIMEOFDAY 1
+/* #undef HAVE_GETTIMEOFDAY */
 
 /* Define if you have the socket function.  */
-#define HAVE_SOCKET 1
+/* #undef HAVE_SOCKET */
 
 /* Define if you have the strdup function.  */
-#define HAVE_STRDUP 1
+/* #undef HAVE_STRDUP */
 
 /* Define if you have the strerror function.  */
-#define HAVE_STRERROR 1
+/* #undef HAVE_STRERROR */
 
 /* Define if you have the drand48 function.  */
-#define HAVE_DRAND48 1
+/* #undef HAVE_DRAND48 */
 
 /* Define if you have the <fcntl.h> header file.  */
 #define HAVE_FCNTL_H 1
@@ -126,42 +126,42 @@
 #define HAVE_SYS_TIME_H 1
 
 /* Define if you have the vprintf function.  */
-#define HAVE_VPRINTF 1
+/* #undef HAVE_VPRINTF */
 
 /* Define if you have the <unistd.h> header file.  */
 #define HAVE_UNISTD_H 1
 
 /* Define if you have the dl library (-ldl).  */
-#define HAVE_LIBDL 1
+/* #undef HAVE_LIBDL */
 
 /* Define if you have the m library (-lm).  */
-#define HAVE_LIBM 1
+/* #undef HAVE_LIBM */
 
 /* Define if you have the nsl library (-lnsl).  */
-#define HAVE_LIBNSL 1
+/* #undef HAVE_LIBNSL */
 
 /* Define if you have the socket library (-lsocket).  */
-#define HAVE_LIBSOCKET 1
+/* #undef HAVE_LIBSOCKET */
 
 /* Define if you have the tcl library (-ltcl).  */
-#define HAVE_LIBTCL 1
+/* #undef HAVE_LIBTCL */
 
 /* Define if you have the tk library (-ltk).  */
-#define HAVE_LIBTK 1
+/* #undef HAVE_LIBTK */
 
 /* Define if you have the BLT library (-lBLT).  */
-#define HAVE_LIBBLT 1
+/* #undef HAVE_LIBBLT */
 
 /* Define if Graphic Environment was built */
-#define HAVE_SHIFT_GUI_P 1
+/* #undef HAVE_SHIFT_GUI_P */
 
 /* Define if support for the Boehm C Garbage Collector is provided/ */
-/* #undef USE_GC_SUPPORT_P */ 
+/* #undef USE_GC_SUPPORT_P  */
 
 /* Define if new hash table code is desired. (It should be a good idea
  * to use this with the new GC).
  */
-#define HAVE_NEW_HASH_P 1
+/* #undef HAVE_NEW_HASH_P */
 
 #endif  /* shift_config_h */
 

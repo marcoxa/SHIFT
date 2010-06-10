@@ -1,4 +1,3 @@
-# Generated automatically from Makefile.in by configure.
 # -*- Mode: Makefile -*-
 
 # Copyright (c)1996, 1997, 1998 The Regents of the University of
@@ -34,7 +33,7 @@
 # project.
 #
 # Autoconf/Configure tag.
-# Generated automatically from Makefile.in by configure.
+# compiler/Makefile.  Generated from Makefile.in by configure.
 
 
 #==============================================================================
@@ -51,20 +50,21 @@ YACC   = yacc
 LEXLIB = -lfl
 
 # LIBYACC is needed because of the way LINUX systems run yacc (or bison).
-YACCLIB = -ly
+YACCLIB = 
 
 
 # Installation Variables
 
-prefix      = /home/porsche2/varaiya/marcoz
+prefix      = /usr/local
 exec_prefix = ${prefix}
 
 bindir      = ${exec_prefix}/bin
 includedir  = ${prefix}/include
 libdir      = ${exec_prefix}/lib
 libexecdir  = ${exec_prefix}/libexec
+datarootdir	    = ${prefix}/share
 
-mandir      = ${prefix}/man
+mandir      = ${datarootdir}/man
 
 
 # Build Variables
@@ -72,7 +72,7 @@ mandir      = ${prefix}/man
 top_srcdir  = ..
 srcdir      = .
 
-VPATH       = .:../include
+VPATH       = ../include
 
 
 # Other Variables
@@ -106,10 +106,13 @@ SOURCES = README Makefile $(CSRC) $(HSRC) parser.y scanner.l \
 
 # Generic target for preprocessing by 'hasher'.
 
+# .c.o:
+# 	$(CC) $(CFLAGS) -E $< | ./hasher SYMBOLS > X.c
+# 	$(CC) $(CFLAGS) -c X.c
+# 	mv -f X.o $*.o; rm -f X.c SYMBOLS.h
+
 .c.o:
-	$(CC) $(CFLAGS) -E $< | ./hasher SYMBOLS > X.c
-	$(CC) $(CFLAGS) -c X.c
-	mv -f X.o $*.o; rm -f X.c SYMBOLS.h
+	$(CC) $(CFLAGS) -c $<
 
 
 # The dependency on parser.h forces (hopefully) making parser.h first.

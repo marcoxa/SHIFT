@@ -38,6 +38,9 @@
  * January 1996
  */
 
+#include <stdio.h>
+#include <stdarg.h>
+
 #define LEXERROR  { (void) sprintf(errorBuffer, 
 #define ENDERROR  ); (void) yyerror(errorBuffer); }
 
@@ -58,5 +61,7 @@ int number(char *);
 int intnumber(char *);
 int stringlit(char *);
 lv *identifier(lv *);
+
+void shift_lex_error(const char*, ...);
 
 /* end of file -- scanner.h -- */

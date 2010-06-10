@@ -70,8 +70,8 @@ void
 special_form_generator(lv* sf_form)
 {
   fprintf(cfile, "sf_%s_F%d(_self)",
-	  pname(attr(@sfid, sf_form)),
-	  num(attr(@unique, sf_form)));
+	  pname(attr(intern("sfid"), sf_form)),
+	  num(attr(intern("unique"), sf_form)));
 }
 
 
@@ -99,13 +99,13 @@ generate_find_sf_function(lv* sf_find_form)
   lv* default_form
     = length(args(sf_find_form)) == 2 ? arg2(sf_find_form) : nil;
 
-  int u = num(attr(@unique, sf_find_form));
+  int u = num(attr(intern("unique"), sf_find_form));
   lv* element_expr   = arg1(find_form);
   lv* iterator_exprs = arg2(find_form);
   lv* filter_expr    = arg3(find_form);
 
-  lv* element_type   = arg1(attr(@type, find_form));
-  lv* hashed_element_type = attr(@hashed_type, find_form);
+  lv* element_type   = arg1(attr(intern("type"), find_form));
+  lv* hashed_element_type = attr(intern("hashed_type"), find_form);
 
   int n_iterator_exprs = length(iterator_exprs);
 
@@ -114,13 +114,13 @@ generate_find_sf_function(lv* sf_find_form)
   fputs("extern ", hfile);
   generate_type(element_type, hfile);
   fprintf(hfile, "\nsf_%s_F%d(Component*);\n",
-	  pname(attr(@sfid, sf_find_form)),
+	  pname(attr(intern("sfid"), sf_find_form)),
 	  u);
 
   /* Generate C file function header */
   generate_type(element_type, cfile);
   fprintf(cfile, "\nsf_%s_F%d(Component* _self)\n{\n",
-	  pname(attr(@sfid, sf_find_form)),
+	  pname(attr(intern("sfid"), sf_find_form)),
 	  u);
 
   /* Generate the nested loops */
@@ -166,7 +166,7 @@ generate_find_sf_function(lv* sf_find_form)
       indent_to(indent_level, indent, cfile);
       fprintf(cfile,
 	      "runtime_error(\"sf_%s_F%d: FIND expression did not succeed.\");\n",
-	      pname(attr(@sfid, sf_find_form)),
+	      pname(attr(intern("sfid"), sf_find_form)),
 	      u);
     }
 
@@ -189,13 +189,13 @@ generate_count_sf_function(lv* sf_count_form)
 
   lv* count_form = arg1(sf_count_form);
 
-  int u = num(attr(@unique, sf_count_form));
+  int u = num(attr(intern("unique"), sf_count_form));
   lv* element_expr   = arg1(count_form);
   lv* iterator_exprs = arg2(count_form);
   lv* filter_expr    = arg3(count_form);
 
-  lv* element_type   = arg1(attr(@type, count_form));
-  lv* hashed_element_type = attr(@hashed_type, count_form);
+  lv* element_type   = arg1(attr(intern("type"), count_form));
+  lv* hashed_element_type = attr(intern("hashed_type"), count_form);
 
   int n_iterator_exprs = length(iterator_exprs);
 
@@ -203,12 +203,12 @@ generate_count_sf_function(lv* sf_count_form)
   /* Generate H file function header */
   fputs("extern double", hfile);
   fprintf(hfile, "\nsf_%s_F%d(Component*);\n",
-	  pname(attr(@sfid, sf_count_form)),
+	  pname(attr(intern("sfid"), sf_count_form)),
 	  u);
 
   /* Generate C file function header */
   fprintf(cfile, "double\nsf_%s_F%d(Component* _self)\n{\n",
-	  pname(attr(@sfid, sf_count_form)),
+	  pname(attr(intern("sfid"), sf_count_form)),
 	  u);
 
   /* Generate the count variable name */
@@ -269,13 +269,13 @@ generate_choose_sf_function(lv* sf_choose_form)
   lv* default_form
     = length(args(sf_choose_form)) == 2 ? arg2(sf_choose_form) : nil;
 
-  int u = num(attr(@unique, sf_choose_form));
+  int u = num(attr(intern("unique"), sf_choose_form));
   lv* element_expr   = arg1(choose_form);
   lv* iterator_exprs = arg2(choose_form);
   lv* filter_expr    = arg3(choose_form);
 
-  lv* element_type   = arg1(attr(@type, choose_form));
-  lv* hashed_element_type = attr(@hashed_type, choose_form);
+  lv* element_type   = arg1(attr(intern("type"), choose_form));
+  lv* hashed_element_type = attr(intern("hashed_type"), choose_form);
 
   int n_iterator_exprs = length(iterator_exprs);
 
@@ -284,13 +284,13 @@ generate_choose_sf_function(lv* sf_choose_form)
   fputs("extern ", hfile);
   generate_type(element_type, hfile);
   fprintf(hfile, "\nsf_%s_F%d(Component*);\n",
-	  pname(attr(@sfid, sf_choose_form)),
+	  pname(attr(intern("sfid"), sf_choose_form)),
 	  u);
 
   /* Generate C file function header */
   generate_type(element_type, cfile);
   fprintf(cfile, "\nsf_%s_F%d(Component* _self)\n{\n",
-	  pname(attr(@sfid, sf_choose_form)),
+	  pname(attr(intern("sfid"), sf_choose_form)),
 	  u);
 
   /* Generate auxiliary variables and various declarations. */
@@ -341,10 +341,10 @@ generate_choose_sf_function(lv* sf_choose_form)
 
   indent_to(indent_level + 4, indent, cfile);
   fprintf(cfile, "%s = ", chosen_el_var_name);
-  if (op(element_type) == @number_type)
+  if (op(element_type) == intern("number_type"))
     fputs("__chosen.d;\n", cfile);
-  else if (op(element_type) == @symbol_type
-	   || op(element_type) == @logical_type)
+  else if (op(element_type) == intern("symbol_type")
+	   || op(element_type) == intern("logical_type"))
     fputs("__chosen.i;\n", cfile);
   else
     {
@@ -390,7 +390,7 @@ generate_choose_sf_function(lv* sf_choose_form)
       indent_to(indent_level + 1, indent, cfile);
       fprintf(cfile,
 	      "runtime_error(\"sf_%s_F%d: CHOOSE expression did not succeed.\");\n",
-	      pname(attr(@sfid, sf_choose_form)),
+	      pname(attr(intern("sfid"), sf_choose_form)),
 	      u);
     }
   fputs("\n\n", cfile);
@@ -410,13 +410,13 @@ generate_choose_sf_function(lv* sf_choose_form)
 void
 generate_special_form_function(lv* sf_form)
 {
-  lv* sf_op = attr(@sfid, sf_form);
+  lv* sf_op = attr(intern("sfid"), sf_form);
 
-  if (sf_op == @find)
+  if (sf_op == intern("find"))
     generate_find_sf_function(sf_form);
-  else if (sf_op == @count)
+  else if (sf_op == intern("count"))
     generate_count_sf_function(sf_form);
-  else if (sf_op == @choose)
+  else if (sf_op == intern("choose"))
     generate_choose_sf_function(sf_form);
 }
 

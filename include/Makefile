@@ -1,4 +1,3 @@
-# Generated automatically from Makefile.in by configure.
 # -*- Mode: Makefile -*-
 
 # Copyright (c)1996, 1997, 1998 The Regents of the University of
@@ -34,7 +33,7 @@
 # Many standard variables have been removed to recude clutter.
 #
 # Autoconf/Configure tag.
-# Generated automatically from Makefile.in by configure.
+# include/Makefile.  Generated from Makefile.in by configure.
 
 
 #==============================================================================
@@ -47,7 +46,7 @@ SHELL = /bin/sh
 
 # Installation Variables
 
-prefix      = /home/porsche2/varaiya/marcoz
+prefix      = /usr/local
 
 includedir  = ${prefix}/include
 
@@ -90,4 +89,4 @@ distclean:
 	-rm *~ \#*
 
 # end of file -- Makefile:
-# Generated automatically from Makefile.in by configure.
+# include/Makefile.  Generated from Makefile.in by configure.

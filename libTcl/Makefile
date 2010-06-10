@@ -1,4 +1,3 @@
-# Generated automatically from Makefile.in by configure.
 # -*- Mode: Makefile -*-
 
 # Copyright ©1996, 1997, 1998 The Regents of the University of
@@ -34,7 +33,7 @@
 # project.
 #
 # Autoconf/Configure tag.
-# Generated automatically from Makefile.in by configure.
+# libTcl/Makefile.  Generated from Makefile.in by configure.
 
 
 #==============================================================================
@@ -49,7 +48,7 @@ CXX   = @CXX@
 
 # Installation Variables
 
-prefix      = /home/porsche2/varaiya/marcoz
+prefix      = /usr/local
 exec_prefix = ${prefix}
 
 bindir      = ${exec_prefix}/bin
@@ -57,7 +56,7 @@ includedir  = ${prefix}/include
 libdir      = ${exec_prefix}/lib
 libexecdir  = ${exec_prefix}/libexec
 
-mandir      = ${prefix}/man
+mandir      = ${prefix}/share/man
 
 
 # Build Variables
@@ -65,34 +64,34 @@ mandir      = ${prefix}/man
 top_srcdir  = ..
 srcdir      = .
 
-VPATH       = .:../include
+VPATH       = ../include
 
 # Which libraries to use
 
-LIBS = -LSocket -lBLT -ltk -ltcl -lX11 -lsocket -lnsl -lm -ldl 
+LIBS = -LSocket 
 
 
 # Change the following if needed
 
 # X Window System Stuff
 
-XWSYSTEMLIBDIR     = /usr/openwin/lib
-XWSYSTEMINCLUDEDIR = /usr/openwin/include
+XWSYSTEMLIBDIR     = /usr/X11/lib
+XWSYSTEMINCLUDEDIR = 
 
 
 # TCL/TK
 
-TCLLIBDIR = /usr/path/tclext/lib
-TKLIBDIR  = /usr/path/tclext/lib
+TCLLIBDIR = 
+TKLIBDIR  = 
 
-TCLINCLUDEDIR = /usr/path/tclext/include
-TKINCLUDEDIR  = /usr/path/tclext/include
+TCLINCLUDEDIR = 
+TKINCLUDEDIR  = 
 
 
 # BLT
 
-BLTLIBDIR     = /usr/path/tclext/lib
-BLTINCLUDEDIR = /usr/path/tclext/include
+BLTLIBDIR     = 
+BLTINCLUDEDIR = 
 
 
 # Directory locations
