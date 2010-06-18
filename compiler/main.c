@@ -66,7 +66,10 @@ static char* date = "Mon, 19 May 1997 15:23:04 -0700";
 #include <stdlib.h>
 #include <assert.h>
 
-#include "lisp.h"
+/* #include "lisp.h" */
+#include "crscl.h"
+
+#include "predefined_symbols.h"
 #include "scanner.h"
 #include "parser.h"
 #include "shic.h"
@@ -78,7 +81,9 @@ extern int yydebug;
 extern FILE *yyin;
 
 
-#define CPP "/lib/cpp -B"
+/* #define CPP "/lib/cpp -B" */
+
+#define CPP "/usr/bin/cpp"
 
 
 /* get_path -- get the path (including final '/', if any) of the
@@ -231,11 +236,11 @@ main(int argc, char **argv)
 
   path = get_path (argv[0]);
   
-  if(argc > 1)
+  if (argc > 1)
     {
       filename = 0;
       parse_cmd_line_args(argc, argv);
-      if(! filename)
+      if (! filename)
 	exit(0);
       base_file_name = strdup(filename);
       
@@ -294,7 +299,7 @@ main(int argc, char **argv)
       system(cmd_buffer);
       
       sprintf(cmd_buffer, "%s %s > %s",
-	  cpp, precpp_file_name, cpreproc_file_name);
+	      cpp, precpp_file_name, cpreproc_file_name);
       system(cmd_buffer);
       
       /*
@@ -304,7 +309,7 @@ main(int argc, char **argv)
 	filename,
 	cpp);
 	yyin = popen(cmd_buffer, "r");
-	*/
+      */
       yyin = fopen(cpreproc_file_name, "r");
       if (yyin == NULL)
 	{
@@ -313,6 +318,10 @@ main(int argc, char **argv)
 	  exit(1);
 	}
     } /* if(argc > 1) ... */
+
+  /* Initialize symbols. */
+
+  initialize_symbols();
 
   /* Front end: parser and type checker. */
   initialize_check();
@@ -388,6 +397,18 @@ main(int argc, char **argv)
   fclose(hfile);
   exit(0);
 }
+
+
+void
+initialize_symbols() {
+  char** ps;
+  for (ps = predefined_symbol_names;
+       *ps != NULL;
+       ps++) {
+    intern(*ps);
+  }
+}
+
 
 #endif /* COMPILER_MAIN_I */
 
