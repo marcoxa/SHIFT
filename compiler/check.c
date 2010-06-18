@@ -50,7 +50,10 @@
 #include <stdarg.h>
 #include <limits.h>
 #include <string.h>		/* For 'memset'. */
-#include "lisp.h"
+
+/* #include "lisp.h" */
+#include "crscl.h"
+
 #include "shic.h"
 
 extern int line;
@@ -262,9 +265,10 @@ define_id2(lv *id,
 	}
       else if (! entity)
 	{
-	  entity = node(intern("entity"), nil, alist3(intern("type"), type,
-                                             intern("meaning"), meaning,
-	                                     intern("kind"), kind));
+	  entity = node(intern("entity"), nil,
+			alist3(intern("type"), type,
+			       intern("meaning"), meaning,
+			       intern("kind"), kind));
 	}
     }
   /* Changed add_attr to set_attr: It seems that eventually
@@ -336,7 +340,7 @@ meaning(lv *id)
  * MAK: check for non-nil attr(intern("entity"), id). If nil, then wrong use of var
  * and/or internal error  (unrewritten var).
  */
-  if(!attr(intern("entity"), id))
+  if (!attr(intern("entity"), id))
     {
 #if 0
         user_error(find_leaf(id),"bad variable name");
@@ -367,7 +371,7 @@ lv *rewrite_expression(lv *expr, lv *env);
 lv *
 rewrite_exists(lv *expr, lv *env)
 {
-  lv *v = attr(intern("id"), expr);	               /* identifier to be bound */
+  lv *v = attr(intern("id"), expr);            /* identifier to be bound */
   lv *s = rewrite_expression(arg1(expr), env); /* set expression */
   lv *t = type_of(s);
   lv *eltype;

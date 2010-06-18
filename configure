@@ -3770,9 +3770,9 @@ then
     shift_conf_current_dir=`pwd`
     # The only thing we disallow is to try to configure and install in
     # the current directory
-    if test $shift_conf_saved_dir = $shift_conf_current_dir
+    if test "$shift_conf_saved_dir" = "$shift_conf_current_dir"
     then
-	cd $shift_conf_saved_dir    #  really useless, but what the heck!
+	cd "$shift_conf_saved_dir"    #  really useless, but what the heck!
 	{ { echo "$as_me:$LINENO: error: \'prefix\' cannot be equal to the configuration directory \($shift_conf_current_dir\)" >&5
 echo "$as_me: error: \'prefix\' cannot be equal to the configuration directory \($shift_conf_current_dir\)" >&2;}
    { (exit 1); exit 1; }; }
@@ -3781,7 +3781,7 @@ echo "$as_me: error: \'prefix\' cannot be equal to the configuration directory \
     # 'prefix' (as specified) is fine. We just make sure that we have
     # an absolute path.
     prefix=$shift_conf_current_dir
-    cd $shift_conf_saved_dir
+    cd "$shift_conf_saved_dir"
 fi
 
 

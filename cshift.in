@@ -166,6 +166,7 @@ endif
 foreach cmd_opt ( $argv )
     if ( "$cmd_opt" == '-h' || "$cmd_opt" == '--help') goto print_help
     if ( "$cmd_opt" == '--config' ) goto print_config
+    if ( "$cmd_opt" == '--show-cshift-env' ) set cshift_debugging = 1
     if ( "$cmd_opt" == '-v' || "$cmd_opt" == '--version' ) then
 	shic -v
 	exit 0
@@ -476,8 +477,14 @@ print_config:
 set noglob
 echo 'cshift current configuration:'
 echo "       command used:                "`which $0`
-echo "       C compiler command:          $CC"
-echo "       C preprocessor command:      $CPP"
+if ( $?CC )  then
+    echo "       C compiler command:          $CC"
+endif
+if ( $?CPP ) then
+    echo "       C preprocessor command:      $CPP"
+endif
+echo "       CPP_options:                 $CPP_options"
+echo "       I_options:                   $I_options"
 echo "       graphic environment enabled: $SHIFT_GUI_SETUP_P"
 if ( $SHIFT_GUI_SETUP_P == yes ) then
     echo "       Tcl Library Location:            $TCLLIBPATH"

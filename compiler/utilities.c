@@ -43,7 +43,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "lisp.h"
+
+/* #include "lisp.h" */
+#include "crscl.h"
+
 
 /* indent_to --
  * Puts 'indent_level' 'indent_string' on the file stream 'stream'.
@@ -227,7 +230,7 @@ write_type(lv *type, FILE *fp)
       
       if(name)
 	{
-	  fprintf(fp, pname(name));
+	  fputs(pname(name), fp);
 	}
     }
   else

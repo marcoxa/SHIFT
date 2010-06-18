@@ -53,7 +53,10 @@
 
 #include <stdio.h>
 #include <strings.h>
-#include "lisp.h"
+
+/* include "lisp.h" */
+#include "crscl.h"
+
 #include "scanner.h"
 #include "parser.h"
 %}

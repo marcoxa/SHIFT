@@ -16,8 +16,11 @@ main.o: main.c /usr/include/stdio.h /usr/include/_types.h \
   /usr/include/sys/_endian.h /usr/include/libkern/_OSByteOrder.h \
   /usr/include/libkern/i386/_OSByteOrder.h /usr/include/alloca.h \
   /usr/include/machine/types.h /usr/include/i386/types.h \
-  /usr/include/i386/_types.h /usr/include/assert.h lisp.h scanner.h \
-  parser.h shic.h
+  /usr/include/i386/_types.h /usr/include/assert.h \
+  /opt/local/include/crscl.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdbool.h \
+  predefined_symbols.h scanner.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdarg.h parser.h shic.h
 utilities.o: utilities.c ../include/shift_config.h /usr/include/stdio.h \
   /usr/include/_types.h /usr/include/sys/_types.h \
   /usr/include/sys/cdefs.h /usr/include/machine/_types.h \
@@ -33,68 +36,30 @@ utilities.o: utilities.c ../include/shift_config.h /usr/include/stdio.h \
   /usr/include/sys/_endian.h /usr/include/libkern/_OSByteOrder.h \
   /usr/include/libkern/i386/_OSByteOrder.h /usr/include/alloca.h \
   /usr/include/machine/types.h /usr/include/i386/types.h \
-  /usr/include/i386/_types.h lisp.h
+  /usr/include/i386/_types.h /opt/local/include/crscl.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdbool.h
 scanaux.o: scanaux.c /usr/include/stdio.h /usr/include/_types.h \
   /usr/include/sys/_types.h /usr/include/sys/cdefs.h \
   /usr/include/machine/_types.h /usr/include/i386/_types.h \
-  /usr/include/secure/_stdio.h /usr/include/secure/_common.h lisp.h \
-  scanner.h parser.h shic.h
-lisp.o: lisp.c /usr/include/unistd.h /usr/include/_types.h \
-  /usr/include/sys/_types.h /usr/include/sys/cdefs.h \
-  /usr/include/machine/_types.h /usr/include/i386/_types.h \
-  /usr/include/sys/unistd.h /usr/include/sys/select.h \
-  /usr/include/sys/appleapiopts.h /usr/include/sys/_structs.h \
-  /usr/include/sys/_select.h /usr/include/stdlib.h \
-  /usr/include/Availability.h /usr/include/AvailabilityInternal.h \
-  /usr/include/sys/wait.h /usr/include/sys/signal.h \
+  /usr/include/secure/_stdio.h /usr/include/secure/_common.h \
+  /usr/include/stdlib.h /usr/include/Availability.h \
+  /usr/include/AvailabilityInternal.h /usr/include/sys/wait.h \
+  /usr/include/sys/signal.h /usr/include/sys/appleapiopts.h \
   /usr/include/machine/signal.h /usr/include/i386/signal.h \
-  /usr/include/i386/_structs.h /usr/include/machine/_structs.h \
-  /usr/include/mach/i386/_structs.h /usr/include/sys/resource.h \
-  /usr/include/machine/endian.h /usr/include/i386/endian.h \
-  /usr/include/sys/_endian.h /usr/include/libkern/_OSByteOrder.h \
+  /usr/include/i386/_structs.h /usr/include/sys/_structs.h \
+  /usr/include/machine/_structs.h /usr/include/mach/i386/_structs.h \
+  /usr/include/sys/resource.h /usr/include/machine/endian.h \
+  /usr/include/i386/endian.h /usr/include/sys/_endian.h \
+  /usr/include/libkern/_OSByteOrder.h \
   /usr/include/libkern/i386/_OSByteOrder.h /usr/include/alloca.h \
   /usr/include/machine/types.h /usr/include/i386/types.h \
-  /usr/include/i386/_types.h /usr/include/stdio.h \
-  /usr/include/secure/_stdio.h /usr/include/secure/_common.h \
-  /usr/include/string.h /usr/include/secure/_string.h \
-  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdarg.h \
-  /usr/include/assert.h \
-  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/limits.h \
-  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/syslimits.h \
-  /usr/include/limits.h /usr/include/machine/limits.h \
-  /usr/include/i386/limits.h /usr/include/i386/_limits.h \
-  /usr/include/sys/syslimits.h /usr/include/ctype.h \
-  /usr/include/runetype.h lisp.h
-check.o: check.c /usr/include/assert.h /usr/include/sys/cdefs.h \
-  /usr/include/stdio.h /usr/include/_types.h /usr/include/sys/_types.h \
-  /usr/include/machine/_types.h /usr/include/i386/_types.h \
-  /usr/include/secure/_stdio.h /usr/include/secure/_common.h \
-  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdarg.h \
-  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/limits.h \
-  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/syslimits.h \
-  /usr/include/limits.h /usr/include/machine/limits.h \
-  /usr/include/i386/limits.h /usr/include/i386/_limits.h \
-  /usr/include/sys/syslimits.h lisp.h shic.h
-type.o: type.c /usr/include/stdio.h /usr/include/_types.h \
+  /usr/include/i386/_types.h /opt/local/include/crscl.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdbool.h scanner.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdarg.h parser.h shic.h
+check.o: check.c /usr/include/stdlib.h /usr/include/Availability.h \
+  /usr/include/AvailabilityInternal.h /usr/include/_types.h \
   /usr/include/sys/_types.h /usr/include/sys/cdefs.h \
   /usr/include/machine/_types.h /usr/include/i386/_types.h \
-  /usr/include/secure/_stdio.h /usr/include/secure/_common.h \
-  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdarg.h \
-  /usr/include/assert.h \
-  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/limits.h \
-  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/syslimits.h \
-  /usr/include/limits.h /usr/include/machine/limits.h \
-  /usr/include/i386/limits.h /usr/include/i386/_limits.h \
-  /usr/include/sys/syslimits.h lisp.h shic.h
-generate.o: generate.c ../include/shift_config.h /usr/include/assert.h \
-  /usr/include/sys/cdefs.h /usr/include/stdio.h /usr/include/_types.h \
-  /usr/include/sys/_types.h /usr/include/machine/_types.h \
-  /usr/include/i386/_types.h /usr/include/secure/_stdio.h \
-  /usr/include/secure/_common.h \
-  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdarg.h \
-  /usr/include/string.h /usr/include/secure/_string.h \
-  /usr/include/strings.h lisp.h shic.h utilities.h /usr/include/stdlib.h \
-  /usr/include/Availability.h /usr/include/AvailabilityInternal.h \
   /usr/include/sys/wait.h /usr/include/sys/signal.h \
   /usr/include/sys/appleapiopts.h /usr/include/machine/signal.h \
   /usr/include/i386/signal.h /usr/include/i386/_structs.h \
@@ -104,14 +69,70 @@ generate.o: generate.c ../include/shift_config.h /usr/include/assert.h \
   /usr/include/sys/_endian.h /usr/include/libkern/_OSByteOrder.h \
   /usr/include/libkern/i386/_OSByteOrder.h /usr/include/alloca.h \
   /usr/include/machine/types.h /usr/include/i386/types.h \
+  /usr/include/i386/_types.h /usr/include/assert.h /usr/include/stdio.h \
+  /usr/include/secure/_stdio.h /usr/include/secure/_common.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdarg.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/limits.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/syslimits.h \
+  /usr/include/limits.h /usr/include/machine/limits.h \
+  /usr/include/i386/limits.h /usr/include/i386/_limits.h \
+  /usr/include/sys/syslimits.h /usr/include/string.h \
+  /usr/include/secure/_string.h /opt/local/include/crscl.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdbool.h shic.h
+type.o: type.c /usr/include/stdlib.h /usr/include/Availability.h \
+  /usr/include/AvailabilityInternal.h /usr/include/_types.h \
+  /usr/include/sys/_types.h /usr/include/sys/cdefs.h \
+  /usr/include/machine/_types.h /usr/include/i386/_types.h \
+  /usr/include/sys/wait.h /usr/include/sys/signal.h \
+  /usr/include/sys/appleapiopts.h /usr/include/machine/signal.h \
+  /usr/include/i386/signal.h /usr/include/i386/_structs.h \
+  /usr/include/sys/_structs.h /usr/include/machine/_structs.h \
+  /usr/include/mach/i386/_structs.h /usr/include/sys/resource.h \
+  /usr/include/machine/endian.h /usr/include/i386/endian.h \
+  /usr/include/sys/_endian.h /usr/include/libkern/_OSByteOrder.h \
+  /usr/include/libkern/i386/_OSByteOrder.h /usr/include/alloca.h \
+  /usr/include/machine/types.h /usr/include/i386/types.h \
+  /usr/include/i386/_types.h /usr/include/stdio.h \
+  /usr/include/secure/_stdio.h /usr/include/secure/_common.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdarg.h \
+  /usr/include/assert.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/limits.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/syslimits.h \
+  /usr/include/limits.h /usr/include/machine/limits.h \
+  /usr/include/i386/limits.h /usr/include/i386/_limits.h \
+  /usr/include/sys/syslimits.h /usr/include/string.h \
+  /usr/include/secure/_string.h /opt/local/include/crscl.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdbool.h shic.h
+generate.o: generate.c ../include/shift_config.h /usr/include/assert.h \
+  /usr/include/sys/cdefs.h /usr/include/stdio.h /usr/include/_types.h \
+  /usr/include/sys/_types.h /usr/include/machine/_types.h \
+  /usr/include/i386/_types.h /usr/include/secure/_stdio.h \
+  /usr/include/secure/_common.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdarg.h \
+  /usr/include/string.h /usr/include/secure/_string.h \
+  /usr/include/strings.h /opt/local/include/crscl.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdbool.h shic.h \
+  utilities.h /usr/include/stdlib.h /usr/include/Availability.h \
+  /usr/include/AvailabilityInternal.h /usr/include/sys/wait.h \
+  /usr/include/sys/signal.h /usr/include/sys/appleapiopts.h \
+  /usr/include/machine/signal.h /usr/include/i386/signal.h \
+  /usr/include/i386/_structs.h /usr/include/sys/_structs.h \
+  /usr/include/machine/_structs.h /usr/include/mach/i386/_structs.h \
+  /usr/include/sys/resource.h /usr/include/machine/endian.h \
+  /usr/include/i386/endian.h /usr/include/sys/_endian.h \
+  /usr/include/libkern/_OSByteOrder.h \
+  /usr/include/libkern/i386/_OSByteOrder.h /usr/include/alloca.h \
+  /usr/include/machine/types.h /usr/include/i386/types.h \
   /usr/include/i386/_types.h gen-iterators.h gen-special-forms.h \
   ffi-generators.h
 gen-iterators.o: gen-iterators.c ../include/shift_config.h \
   /usr/include/assert.h /usr/include/sys/cdefs.h /usr/include/stdio.h \
   /usr/include/_types.h /usr/include/sys/_types.h \
   /usr/include/machine/_types.h /usr/include/i386/_types.h \
-  /usr/include/secure/_stdio.h /usr/include/secure/_common.h lisp.h \
-  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdarg.h shic.h \
+  /usr/include/secure/_stdio.h /usr/include/secure/_common.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdarg.h \
+  /opt/local/include/crscl.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdbool.h shic.h \
   utilities.h /usr/include/stdlib.h /usr/include/Availability.h \
   /usr/include/AvailabilityInternal.h /usr/include/sys/wait.h \
   /usr/include/sys/signal.h /usr/include/sys/appleapiopts.h \
@@ -128,8 +149,10 @@ ffi-generators.o: ffi-generators.c ../include/shift_config.h \
   /usr/include/assert.h /usr/include/sys/cdefs.h /usr/include/stdio.h \
   /usr/include/_types.h /usr/include/sys/_types.h \
   /usr/include/machine/_types.h /usr/include/i386/_types.h \
-  /usr/include/secure/_stdio.h /usr/include/secure/_common.h lisp.h \
-  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdarg.h shic.h \
+  /usr/include/secure/_stdio.h /usr/include/secure/_common.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdarg.h \
+  /opt/local/include/crscl.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdbool.h shic.h \
   utilities.h /usr/include/stdlib.h /usr/include/Availability.h \
   /usr/include/AvailabilityInternal.h /usr/include/sys/wait.h \
   /usr/include/sys/signal.h /usr/include/sys/appleapiopts.h \
@@ -164,7 +187,8 @@ transform.o: transform.c /usr/include/stdio.h /usr/include/_types.h \
   /usr/include/sys/_types.h /usr/include/sys/cdefs.h \
   /usr/include/machine/_types.h /usr/include/i386/_types.h \
   /usr/include/secure/_stdio.h /usr/include/secure/_common.h \
-  /usr/include/assert.h lisp.h shic.h
+  /usr/include/assert.h /opt/local/include/crscl.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdbool.h shic.h
 scanner.o: scanner.c /usr/include/stdio.h /usr/include/_types.h \
   /usr/include/sys/_types.h /usr/include/sys/cdefs.h \
   /usr/include/machine/_types.h /usr/include/i386/_types.h \
@@ -181,11 +205,16 @@ scanner.o: scanner.c /usr/include/stdio.h /usr/include/_types.h \
   /usr/include/sys/_endian.h /usr/include/libkern/_OSByteOrder.h \
   /usr/include/libkern/i386/_OSByteOrder.h /usr/include/alloca.h \
   /usr/include/machine/types.h /usr/include/i386/types.h \
-  /usr/include/i386/_types.h /usr/include/strings.h lisp.h scanner.h \
-  parser.h /usr/include/unistd.h /usr/include/sys/unistd.h \
+  /usr/include/i386/_types.h /usr/include/strings.h \
+  /opt/local/include/crscl.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdbool.h scanner.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdarg.h parser.h \
+  /usr/include/unistd.h /usr/include/sys/unistd.h \
   /usr/include/sys/select.h /usr/include/sys/_select.h
 parser.o: parser.c /usr/include/stdio.h /usr/include/_types.h \
   /usr/include/sys/_types.h /usr/include/sys/cdefs.h \
   /usr/include/machine/_types.h /usr/include/i386/_types.h \
-  /usr/include/secure/_stdio.h /usr/include/secure/_common.h lisp.h \
-  scanner.h parser.h shic.h
+  /usr/include/secure/_stdio.h /usr/include/secure/_common.h \
+  /opt/local/include/crscl.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdbool.h scanner.h \
+  /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdarg.h parser.h shic.h

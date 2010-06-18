@@ -36,7 +36,10 @@
 
 #include <stdio.h>
 #include <assert.h>
-#include "lisp.h"
+
+/* #include "lisp.h" */
+#include "crscl.h"
+
 #include "shic.h"
 
 /* lv *zero;

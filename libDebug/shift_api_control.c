@@ -32,7 +32,7 @@
  * ENHANCEMENTS, OR MODIFICATIONS. 
  */
 
-
+#include <stdlib.h>
 #include <shift_config.h>
 #include <ctype.h>
 

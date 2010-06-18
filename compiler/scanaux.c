@@ -45,7 +45,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "lisp.h"
+/* #include "lisp.h" */
+#include "crscl.h"
+
 #include "scanner.h"
 #include "parser.h"
 #include "shic.h"

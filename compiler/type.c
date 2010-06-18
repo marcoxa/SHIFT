@@ -51,7 +51,9 @@
 #include <limits.h>
 #include <string.h>
 
-#include "lisp.h"
+/* #include "lisp.h" */
+#include "crscl.h"
+
 #include "shic.h"
 
 #define LINE_LENGTH 80
@@ -542,7 +544,7 @@ user_error(lv *id, char *format, ...)
       fprintf(stderr, "%s:",
 	      file == nil ? "unknown location" : str(file));
       if (line != nil)
-	fprintf(stderr, "%d: ", num(line));
+	fprintf(stderr, "%d: ", intnum(line));
     }
   else
     {
@@ -674,7 +676,7 @@ summarize(lv *n)
 {
   if (consp(n))
     {
-      printf("list(%d) at 0x%x\n", length(n), n);
+      printf("list(%d) at 0x%p\n", length(n), n);
     }
   else if (nodep(n))
     {
@@ -711,7 +713,7 @@ summarize(lv *n)
     }
   else
     {
-      printf("type %d at 0x%x\n", n->type, n);
+      printf("type %d at 0x%p\n", n->type, n);
     }
 }
 
@@ -739,7 +741,7 @@ browse(lv *n)
   X(up)		return 0;
   X(quit)	return 1;
   X(top)	return browse(tree);
-  X(hex)	printf("0x%x ", n);
+  X(hex)	printf("0x%p ", n);
   X(?) printf("commands: up, top, quit, hex,\n\
 <argument #>, <[! | ^]attribute> (for nodes)\n\
 <element #> first, car, rest, cdr (for lists)\n");

@@ -51,7 +51,7 @@ LATEX	= latex
 
 # Installation Variables
 
-prefix      = /usr/local
+prefix      = /opt/local
 
 mandir      = ${prefix}/share/man
 

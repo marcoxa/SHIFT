@@ -46,7 +46,7 @@ SHELL = /bin/sh
 
 # Installation Variables
 
-prefix      = /usr/local
+prefix      = /opt/local
 
 includedir  = ${prefix}/include
 

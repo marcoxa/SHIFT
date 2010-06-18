@@ -55,8 +55,8 @@ YACCLIB =
 
 # Installation Variables
 
-prefix      = /usr/local
-exec_prefix = ${prefix}
+prefix      = /opt/local
+exec_prefix = /opt/local
 
 bindir      = ${exec_prefix}/bin
 includedir  = ${prefix}/include
@@ -80,10 +80,23 @@ VPATH       = ../include
 # Unused for the time being
 GCINCLUDEFLAG = 
 
+# CSRC = main.c \
+#        utilities.c \
+#        scanaux.c \
+#        lisp.c \
+#        check.c \
+#        type.c \
+#        generate.c \
+#        gen-iterators.c \
+#        ffi-generators.c \
+#        gen-special-forms.c \
+#        transform.c
+#
+# HSRC = lisp.h shic.h scanner.h
+
 CSRC = main.c \
        utilities.c \
        scanaux.c \
-       lisp.c \
        check.c \
        type.c \
        generate.c \
@@ -92,13 +105,15 @@ CSRC = main.c \
        gen-special-forms.c \
        transform.c
 
-HSRC = lisp.h shic.h scanner.h
+HSRC = shic.h scanner.h
 
 C = $(CSRC) scanner.c parser.c
 
-O = $(C:.c=.o) symbols.o
+# O = $(C:.c=.o) symbols.o
+O = $(C:.c=.o)
 
-CFLAGS = -g -I../include
+CFLAGS	= -g -I../include -I${prefix}/include -L${exec_prefix}/lib
+LDFLAGS	= -lcrscl
 
 SOURCES = README Makefile $(CSRC) $(HSRC) parser.y scanner.l \
 	  hasher.c concat.c
@@ -124,26 +139,33 @@ all: parser.h shic shiftprecpp shift_config.h
 symbols.o: hasher SYMBOLS
 	./hasher SYMBOLS symbols.c
 	$(CC) $(CFLAGS) -c symbols.c
-	rm -f symbols.c
+	#	$(RM) symbols.c
 
 
 shiftprecpp: shiftprecpp.c
 	$(CC) $(CFLAGS) -o $@ shiftprecpp.c
 
 
-hasher: hasher.c lisp.c concat.c lisp.h
-	$(CC) $(CFLAGS) -o hasher hasher.c lisp.c concat.c
-	rm -f concat.o
+# hasher: hasher.c lisp.c concat.c lisp.h
+# 	$(CC) $(CFLAGS) -o hasher hasher.c lisp.c concat.c
+# 	rm -f concat.o
+
+hasher: hasher.c concat.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -o hasher hasher.c concat.c
+	$(RM) -f concat.o
+
 
 shic: $(O)
-	$(CC) $(CFLAGS) $(O) -o shic $(YACCLIB) $(LEXLIB)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(O) -o shic $(YACCLIB) $(LEXLIB)
 
 parser.h: y.tab.h
 	cmp -s parser.h y.tab.h || mv y.tab.h parser.h
 
 parser.c y.tab.h: parser.y
 	$(YACC) -d parser.y
-	mv y.tab.c parser.c
+	cp y.tab.c parser.c
+	#	mv y.tab.c parser.c
+
 
 make-depend: $(C) parser.h shift_config.h
 	$(CC) -M $(CFLAGS) $(C) > depend
@@ -154,7 +176,7 @@ clean:
 
 distclean: clean
 	-rm *~ \#*
-	if test -d obsolete; then rm -fr obsolete; fi
+	-if test -d obsolete; then rm -fr obsolete; fi
 
 
 include depend
@@ -164,7 +186,7 @@ install: shic shiftprecpp
 
 
 uninstall:
-	rm -f $(bindir)/shic $(bindir)/shiftprecpp
+	$(RM)$ -f $(bindir)/shic $(bindir)/shiftprecpp
 
 SHIP:
 	rcp -pr $(SOURCES) $(D)

@@ -37,8 +37,11 @@
 
 #include <assert.h>
 #include <stdio.h>
-#include "lisp.h"
 #include <stdarg.h>
+
+/* #include "lisp.h" */
+#include "crscl.h"
+
 #include "shic.h"
 #include "utilities.h"
 

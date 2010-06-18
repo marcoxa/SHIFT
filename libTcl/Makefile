@@ -48,8 +48,8 @@ CXX   = @CXX@
 
 # Installation Variables
 
-prefix      = /usr/local
-exec_prefix = ${prefix}
+prefix      = /opt/local
+exec_prefix = /opt/local
 
 bindir      = ${exec_prefix}/bin
 includedir  = ${prefix}/include

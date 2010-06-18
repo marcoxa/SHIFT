@@ -40,7 +40,10 @@
 
 %{
 #include <stdio.h>
-#include "lisp.h"
+
+/* #include "lisp.h" */
+#include "crscl.h"
+
 #include "scanner.h"
 #include "parser.h"
 #include "shic.h"

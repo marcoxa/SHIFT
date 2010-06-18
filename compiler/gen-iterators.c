@@ -41,8 +41,11 @@
 
 #include <assert.h>
 #include <stdio.h>
-#include "lisp.h"
 #include <stdarg.h>
+
+/* #include "lisp.h" */
+#include "crscl.h"
+
 #include "shic.h"
 #include "utilities.h"
 
@@ -103,9 +106,9 @@ cons_generator(lv *e)
       lv *t = type_of(e);
       /*******MAK***** implementation for null sets - create an overhead */
 
-#define _get_unique_hash_id_(_t_)  num(attr(intern("unique"), \
-				       attr(intern("hashed_type"), \
-				            arg1((_t_)))))
+#define _get_unique_hash_id_(_t_)  intnum(attr(intern("unique"),	\
+					       attr(intern("hashed_type"), \
+						    arg1((_t_)))))
 
       if (intrinsic)
 	{
@@ -140,14 +143,14 @@ cons_generator(lv *e)
 void
 set_former_generator(lv* e)
 {
-  fprintf(cfile, "set_former_F%d(_self)", num(attr(intern("unique"), e)));
+  fprintf(cfile, "set_former_F%d(_self)", intnum(attr(intern("unique"), e)));
 }
 
 
 void
 array_former_generator(lv* e)
 {
-  fprintf(cfile, "array_former_F%d(_self)", num(attr(intern("unique"), e)));
+  fprintf(cfile, "array_former_F%d(_self)", intnum(attr(intern("unique"), e)));
 }
 
 

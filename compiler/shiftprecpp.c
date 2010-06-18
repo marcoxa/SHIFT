@@ -219,10 +219,8 @@ output_char (c)
 		(void) putchar (c);
 }
 
-void
-main(argc, argv)
-	int argc;
-	char **argv;
+int
+main(int argc, char **argv)
 {
   register int c;
   FILE *fp;

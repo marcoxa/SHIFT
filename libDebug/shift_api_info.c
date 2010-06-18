@@ -37,6 +37,8 @@
 #ifndef SHIFT_API_INFO_I
 #define SHIFT_API_INFO_I
 
+#include <stdlib.h>
+
 #include <shift_config.h>
 #include <gc_support.h>
 
