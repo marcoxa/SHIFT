@@ -44,14 +44,18 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#include "lisp.h"
+
+/* #include "lisp.h" */
+#include "crscl.h"
 
 /* Symbol Table Support. 
  * We need to allocate a symbol table here for the only benefit of the
  * 'hasher'.
  */
 
-lv* shtab[L_HSIZE];
+/* lv* shtab[L_HSIZE]; */
+
+INIT_CRSCL_TABLES()
 
 
 char *concat2(char *, char *);
@@ -85,12 +89,16 @@ main(int argc, char** argv)
 
   dolist (s, l)
     {
+      puts(">>> hasher: ");
+      print(s);
+      putchar('\n');
       sindex(s) = index++;
     }
   tsilod;
   if (argc == 2)
     {
       struct lispval *new = 0;
+      rs* standard_input = make_stream_stream(stdin);
       FILE *fp;
 
       printf("#include \"%s.h\"\n", argv[1]);
@@ -104,7 +112,7 @@ main(int argc, char** argv)
 	      putchar(c);
 	      continue;
 	    }
-	  s = read_c_symbol(stdin);
+	  s = read_c_symbol(standard_input);
 	  if (pname(s)[0] == '\0')
 	    {
 	      /* for yacc on freebsd */
@@ -147,20 +155,21 @@ main(int argc, char** argv)
 	  if (sindex(s) == 0)
 	    sindex(s) = index++;
 	}
-      l = 0;
-      for (i = 0; i < L_HSIZE; i++)
-	for (s = shtab[i]; s; s = shlink(s))
+      l = nil;
+      for (i = 0; i < crscl_table_size(); i++)
+	for (s = crscl_table_ref(i); s; s = shlink(s))
 	  push(s, l);
-      assert(length(l) == index - 1);
+      assert(length(l) == index); /* There was a -1 (probably due to the NIL issue). */
 
       if ((fp = fopen(argv[2], "w")) == 0)
 	{
 	  perror(argv[2]);
 	  exit(1);
 	}
-      fprintf(fp, "#include <stdio.h>\n");
-      fprintf(fp, "#include \"lisp.h\"\n");
-      fprintf(fp, "\n");
+      fputs("#include <stdio.h>\n", fp);
+      /* fprintf(fp, "#include \"lisp.h\"\n"); */
+      fputs("#include \"crscl.h\"\n", fp);
+
       dolist (s, l)
 	{
 	  fprintf(fp,
@@ -172,8 +181,8 @@ main(int argc, char** argv)
 	}
       tsilod;
       fprintf(fp, "\nstruct lispval *shtab[] = {\n");
-      for (i = 0; i < L_HSIZE; i++)
-	fprintf(fp, "\t%s,\n", symref(shtab[i], 0));
+      for (i = 0; i < crscl_table_size(); i++)
+	fprintf(fp, "\t%s,\n", symref(crscl_table_ref(i), 0));
       fprintf(fp, "};\n");
       fclose(fp);
     }
@@ -206,3 +215,5 @@ print_string(char* p, FILE* fp)
       putc(c, fp);
   putc('"', fp);
 }
+
+/* end of file -- hasher.c */
