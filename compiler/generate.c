@@ -60,7 +60,10 @@
 #include <stdarg.h>
 #include <string.h>
 #include <strings.h>
-#include "lisp.h"
+
+/* #include "lisp.h" */
+#include "crscl.h"
+
 #include "shic.h"
 #include "utilities.h"
 #include "gen-iterators.h"
@@ -423,7 +426,7 @@ push_formal_out_vars(lv* rhs_expr, lv** listp)
   void push_formal_out_vars_traversing(lv* rhs_expr, lv** listp);
 
   push_formal_out_vars_traversing(rhs_expr, listp);
-  if (*list != nil) set_attr(intern("ffi_out_variables"), rhs_expr, copy_list(*listp));
+  if (*listp != nil) set_attr(intern("ffi_out_variables"), rhs_expr, copy_list(*listp));
 }
 
 
@@ -2052,7 +2055,7 @@ void
 int_generator(lv *e)
 {
   fprintf(cfile, attr(intern("convert"), e) == intern("true") ? "((double) %d)" : "%d",
-	  num(attr(intern("value"), e)));
+	  intnum(attr(intern("value"), e)));
 }
 
 
@@ -2073,10 +2076,10 @@ void
 exists_call_generator(lv *e)
 {
   if (op(arg1(e)) == intern("arrayrange"))
-    fprintf(cfile, "exists_expr_range_F%d(_self)", num(attr(intern("unique"), e)));
+    fprintf(cfile, "exists_expr_range_F%d(_self)", intnum(attr(intern("unique"), e)));
   else
     {
-      fprintf(cfile, "exists_expr_F%d(_self, ", num(attr(intern("unique"), e)));
+      fprintf(cfile, "exists_expr_F%d(_self, ", intnum(attr(intern("unique"), e)));
       generate_expression(arg1(e));
       fprintf(cfile, ")");
     }
@@ -2086,7 +2089,7 @@ exists_call_generator(lv *e)
 void
 minmax_call_generator(lv *e)
 {
-  fprintf(cfile, "minmax_expr_F%d(_self, ", num(attr(intern("unique"), e)));
+  fprintf(cfile, "minmax_expr_F%d(_self, ", intnum(attr(intern("unique"), e)));
   generate_expression(arg1(e));
   fprintf(cfile, ")");
 }
@@ -2119,7 +2122,7 @@ void
 generate_create_allocation_call(lv* e)
 {
   lv *td = meaning(arg1(e));
-  fprintf(cfile, "createF%d()", num(attr(intern("unique"), td)));
+  fprintf(cfile, "createF%d()", intnum(attr(intern("unique"), td)));
 }
 
 
@@ -2138,7 +2141,7 @@ void
 generate_create_setup_call(lv* e)
 {
   lv *td = meaning(arg1(e));
-  fprintf(cfile, "create2F%d(_new)", num(attr(intern("unique"), td)));
+  fprintf(cfile, "create2F%d(_new)", intnum(attr(intern("unique"), td)));
 }
 
 
@@ -2154,8 +2157,8 @@ create_generator_no_initargs(lv *e)
 
   fprintf(cfile,
 	  "create2F%d(createF%d())",
-	  num(attr(intern("unique"), td)),
-	  num(attr(intern("unique"), td)));
+	  intnum(attr(intern("unique"), td)),
+	  intnum(attr(intern("unique"), td)));
 }
 /* END ALEKS ADDED FUNCTIONS */
 
@@ -2170,7 +2173,7 @@ void
 create_generator(lv *e)
 {
   if (tl(args(e))) {
-    fprintf(cfile, "create_expr_X%d(_self)", num(attr(intern("unique"), e)));
+    fprintf(cfile, "create_expr_X%d(_self)", intnum(attr(intern("unique"), e)));
   } else {
     /* ALEKS CHANGED THIS FROM create_generator2(e); */
     create_generator_no_initargs(e);
@@ -2182,7 +2185,7 @@ void
 narrow_generator(lv *e)
 {
   lv *ntd = meaning(arg1(e));
-  int u = num(attr(intern("unique"), ntd));
+  int u = intnum(attr(intern("unique"), ntd));
 
   fprintf(cfile, "(Component *)narrow(&c_typed%d, ", u);
   generate_expression(arg2(e));
@@ -2214,7 +2217,7 @@ generate_expression(lv *e)
 {
   lv *c = assoc(intern("generator"), plist(op(e)));
 
-  if (! c)
+  if (null(c))
     {
       internal_error("unknown generator");
     }
@@ -2239,7 +2242,7 @@ generate_logical_function(int u, lv *expression)
 void
 generate_flow_function(lv *unique, lv *equation)
 {
-  int u = num(unique);
+  int u = intnum(unique);
 
   generate_type(attr(intern("type"), arg2(equation)), hfile);
   fprintf(hfile,
@@ -2279,7 +2282,7 @@ generate_fm(lv *c, lv *x, lv *what)
 void
 generate_fm(lv *c, lv *x, lv* access_type, lv *what)
 {
-  int n = num(attr(intern("offset"), attr(what, x)));
+  int n = intnum(attr(intern("offset"), attr(what, x)));
 
   if (what == intern("mode"))
     fprintf(cfile, "DATA_ITEM(int, ");
@@ -2332,9 +2335,9 @@ generate_mode_definition(lv* id, lv *e, lv *vars)
 
   if (d || a)
     {
-      mode_offset = num(attr(intern("offset"), attr(intern("mode"), e)));
-      flow_offset = num(attr(intern("offset"), attr(intern("flow_function"), e)));
-      context_offset = num(attr(intern("offset"), attr(intern("context"), e)));
+      mode_offset = intnum(attr(intern("offset"), attr(intern("mode"), e)));
+      flow_offset = intnum(attr(intern("offset"), attr(intern("flow_function"), e)));
+      context_offset = intnum(attr(intern("offset"), attr(intern("context"), e)));
       c = assoc(e, vars);
 
       /* Print name of variable for documentation. */
@@ -2343,7 +2346,7 @@ generate_mode_definition(lv* id, lv *e, lv *vars)
       fputs("  /* ", cfile);
       assert(attr(intern("target_variable"), e) != nil);
       assert(attr2(intern("name"), intern("target_variable"), e) != nil);
-      fprintf(cfile, "entity at %d id %s offsets <%d %d %d>",
+      fprintf(cfile, "entity at %p id %s offsets <%d %d %d>",
 	      e,
 	      pname(attr2(intern("name"), intern("target_variable"), e)),
 	      mode_offset, flow_offset, context_offset);
@@ -2365,7 +2368,7 @@ generate_mode_definition(lv* id, lv *e, lv *vars)
 	  /* fprintf(cfile, "  FLOW(_self, %d) = flowF%d;\n", */
 	  fprintf(cfile, "  TFLOW(_self, %d, ", flow_offset);
 	  generate_flow_function_type(type_of(e), cfile);  
-          fprintf(cfile, ") = flowF%d;\n", num(attr(intern("unique"), eq)));
+          fprintf(cfile, ") = flowF%d;\n", intnum(attr(intern("unique"), eq)));
 	  fprintf(cfile, "  MODE(_self, %d) = %s;\n",
 		  mode_offset,
 		  op(eq) == intern("equate") ? "DIFFERENTIAL_MODE" : "ALGEBRAIC_MODE");
@@ -2386,7 +2389,7 @@ void
 generate_entering_function(lv *m, lv *td)
 {
   lv *vars = attr(intern("defined_variables"), m);
-  int u = num(attr(intern("unique"), m));
+  int u = intnum(attr(intern("unique"), m));
   int has_guards = attr(intern("has_guards"), m) != nil;
   lv *mode_name = attr(intern("name"), attr(intern("id"), m));
 
@@ -2588,10 +2591,10 @@ generate_value_mode_updates(lv* var_entity, lv* state_special_defined_vars)
 	*/
        if (current_state_var_mode == intern("algebraic"))
 	 {
-	   v_offset = num(attr(intern("offset"), attr(intern("target_variable"), var_entity)));
-	   mode_offset = num(attr(intern("offset"), attr(intern("mode"), var_entity)));
-	   flow_offset = num(attr(intern("offset"), attr(intern("flow_function"), var_entity)));
-	   context_offset = num(attr(intern("offset"), attr(intern("context"), var_entity)));
+	   v_offset = intnum(attr(intern("offset"), attr(intern("target_variable"), var_entity)));
+	   mode_offset = intnum(attr(intern("offset"), attr(intern("mode"), var_entity)));
+	   flow_offset = intnum(attr(intern("offset"), attr(intern("flow_function"), var_entity)));
+	   context_offset = intnum(attr(intern("offset"), attr(intern("context"), var_entity)));
        
 	   /* Generating code to update the CONSTANT part. */
 	   /* Compare with 'member_generator' output */
@@ -2606,7 +2609,7 @@ generate_value_mode_updates(lv* var_entity, lv* state_special_defined_vars)
 	   indent_to(1, "  ", cfile);
 	   fprintf(cfile, "_VAL_(_self, ");
 	   generate_type(attr(intern("type"), target_variable), cfile);
-	   fprintf(cfile, ", %d) = ", num(attr(intern("offset"), target_variable)));
+	   fprintf(cfile, ", %d) = ", intnum(attr(intern("offset"), target_variable)));
 
 	   member_generator(self_variable, var_entity);
 	   fputs(";\n", cfile);
@@ -2655,11 +2658,11 @@ generate_value_mode_updates(lv* var_entity, lv* state_special_defined_vars)
    */
   if (current_state_var_mode == intern("differential"))
     {
-      v_offset = num(attr(intern("offset"), attr(intern("target_variable"), var_entity)));
-      mode_offset = num(attr(intern("offset"), attr(intern("mode"), var_entity)));
-      flow_offset = num(attr(intern("offset"), attr(intern("flow_function"), var_entity)));
-      state_offset = num(attr(intern("offset"), attr(intern("state"), var_entity)));
-      context_offset = num(attr(intern("offset"), attr(intern("context"), var_entity)));
+      v_offset = intnum(attr(intern("offset"), attr(intern("target_variable"), var_entity)));
+      mode_offset = intnum(attr(intern("offset"), attr(intern("mode"), var_entity)));
+      flow_offset = intnum(attr(intern("offset"), attr(intern("flow_function"), var_entity)));
+      state_offset = intnum(attr(intern("offset"), attr(intern("state"), var_entity)));
+      context_offset = intnum(attr(intern("offset"), attr(intern("context"), var_entity)));
 
       /* Generating code to update the ALGEBRAIC part. */
       fprintf(cfile,
@@ -2707,7 +2710,7 @@ generate_value_mode_updates(lv* var_entity, lv* state_special_defined_vars)
       fprintf(cfile, "  ");
       fprintf(cfile, "_VAL_(_self, ");
       generate_type(attr(intern("type"), target_variable), cfile);
-      fprintf(cfile, ", %d) = ", num(attr(intern("offset"), target_variable)));
+      fprintf(cfile, ", %d) = ", intnum(attr(intern("offset"), target_variable)));
       fprintf(cfile, "_DA_(_self, %d, %d, %d, %d, _step);\n",
 	      mode_offset,
 	      state_offset,
@@ -2721,11 +2724,11 @@ generate_value_mode_updates(lv* var_entity, lv* state_special_defined_vars)
       /* Purely algebraic variables (non differential) do not have the
        * 'state' attribute.
        */
-      v_offset = num(attr(intern("offset"), attr(intern("target_variable"), var_entity)));
-      mode_offset = num(attr(intern("offset"), attr(intern("mode"), var_entity)));
-      flow_offset = num(attr(intern("offset"), attr(intern("flow_function"), var_entity)));
-      /* state_offset = num(attr(intern("offset"), attr(intern("state"), var_entity))); */
-      context_offset = num(attr(intern("offset"), attr(intern("context"), var_entity)));
+      v_offset = intnum(attr(intern("offset"), attr(intern("target_variable"), var_entity)));
+      mode_offset = intnum(attr(intern("offset"), attr(intern("mode"), var_entity)));
+      flow_offset = intnum(attr(intern("offset"), attr(intern("flow_function"), var_entity)));
+      /* state_offset = intnum(attr(intern("offset"), attr(intern("state"), var_entity))); */
+      context_offset = intnum(attr(intern("offset"), attr(intern("context"), var_entity)));
 
       /* If variable may turn into DIFFERENTIAL then generate the
        * assignement.
@@ -2737,7 +2740,7 @@ generate_value_mode_updates(lv* var_entity, lv* state_special_defined_vars)
 	      "  /* Updating Differential part for instance variable '%s' */\n",
 	      pname(attr(intern("name"), target_variable)));
 
-	  state_offset = num(attr(intern("offset"), attr(intern("state"), var_entity)));
+	  state_offset = intnum(attr(intern("offset"), attr(intern("state"), var_entity)));
 	  fprintf(cfile, "  ");
 	  fprintf(cfile, "_DAL_(_self, %d, %d, %d, %d, _step) = ",
 		  mode_offset,
@@ -2764,7 +2767,7 @@ generate_value_mode_updates(lv* var_entity, lv* state_special_defined_vars)
       fprintf(cfile, "  ");
       fprintf(cfile, "_VAL_(_self, ");
       generate_type(attr(intern("type"), target_variable), cfile);
-      fprintf(cfile, ", %d) = ", num(attr(intern("offset"), target_variable)));
+      fprintf(cfile, ", %d) = ", intnum(attr(intern("offset"), target_variable)));
 
 #ifdef NO_MEMBER_GENERATOR
       fprintf(cfile, "_AA_(_self, %d, %d, %d, %d, _step);\n",
@@ -2781,11 +2784,11 @@ generate_value_mode_updates(lv* var_entity, lv* state_special_defined_vars)
     {
       if (diff_p)
 	{
-	  v_offset = num(attr(intern("offset"), attr(intern("target_variable"), var_entity)));
-	  mode_offset = num(attr(intern("offset"), attr(intern("mode"), var_entity)));
-	  flow_offset = num(attr(intern("offset"), attr(intern("flow_function"), var_entity)));
-	  state_offset = num(attr(intern("offset"), attr(intern("state"), var_entity)));
-	  context_offset = num(attr(intern("offset"), attr(intern("context"), var_entity)));
+	  v_offset = intnum(attr(intern("offset"), attr(intern("target_variable"), var_entity)));
+	  mode_offset = intnum(attr(intern("offset"), attr(intern("mode"), var_entity)));
+	  flow_offset = intnum(attr(intern("offset"), attr(intern("flow_function"), var_entity)));
+	  state_offset = intnum(attr(intern("offset"), attr(intern("state"), var_entity)));
+	  context_offset = intnum(attr(intern("offset"), attr(intern("context"), var_entity)));
 
 #if 0
 	  /* This piece of code is useless (see similar note above),
@@ -2807,17 +2810,17 @@ generate_value_mode_updates(lv* var_entity, lv* state_special_defined_vars)
 		  context_offset);
 	  fprintf(cfile, "_VA_(_self, ");
 	  generate_type(attr(intern("type"), target_variable), cfile);
-	  fprintf(cfile, ", %d);\n", num(attr(intern("offset"),
+	  fprintf(cfile, ", %d);\n", intnum(attr(intern("offset"),
 	  target_variable)));
 #endif /* if 0 */
 	}
 
       if (alge_p || diff_p)
 	{
-	  v_offset = num(attr(intern("offset"), attr(intern("target_variable"), var_entity)));
-	  mode_offset = num(attr(intern("offset"), attr(intern("mode"), var_entity)));
-	  flow_offset = num(attr(intern("offset"), attr(intern("flow_function"), var_entity)));
-	  context_offset = num(attr(intern("offset"), attr(intern("context"), var_entity)));
+	  v_offset = intnum(attr(intern("offset"), attr(intern("target_variable"), var_entity)));
+	  mode_offset = intnum(attr(intern("offset"), attr(intern("mode"), var_entity)));
+	  flow_offset = intnum(attr(intern("offset"), attr(intern("flow_function"), var_entity)));
+	  context_offset = intnum(attr(intern("offset"), attr(intern("context"), var_entity)));
 	  /* No state offset for algebraic accessor */
 
 	  /* This update needs to be done iff the variable is truly
@@ -2844,7 +2847,7 @@ generate_value_mode_updates(lv* var_entity, lv* state_special_defined_vars)
 #endif /* NO_MEMBER_GENERATOR */
 	      fprintf(cfile, "_VA_(_self, ");
 	      generate_type(attr(intern("type"), target_variable), cfile);
-	      fprintf(cfile, ", %d);\n", num(attr(intern("offset"), target_variable)));
+	      fprintf(cfile, ", %d);\n", intnum(attr(intern("offset"), target_variable)));
 	    }
 	}
     }
@@ -2856,7 +2859,7 @@ void
 generate_exiting_function(lv* m, lv* td)
 {
   lv* vars = attr(intern("defined_variables"), m);
-  int u = num(attr(intern("unique"), m));
+  int u = intnum(attr(intern("unique"), m));
   
   fprintf(hfile, "void exitingF%d(Component *_self);\n", u);
 
@@ -2892,7 +2895,7 @@ generate_exiting_function(lv* m, lv* td)
 void
 generate_dummy_exiting_function(lv* m, lv* td)
 { 
-  int u = num(attr(intern("unique"), m));
+  int u = intnum(attr(intern("unique"), m));
 
   fprintf(hfile, "void exitingF%d(Component *_self);\n", u);
   fprintf(cfile, "void\nexitingF%d(Component *_self)\n{ ; }\n\n", u);
@@ -2925,11 +2928,11 @@ generate_init(lv *decl)
 void
 generate_creation_functions(lv *td)
 {
-  int u = num(attr(intern("unique"), td));
+  int u = intnum(attr(intern("unique"), td));
   lv *id = attr(intern("id"), td);
   lv *name = attr(intern("name"), id);
   int global = name == intern("global");
-  int size = num(attr(intern("data_size"), td));
+  int size = intnum(attr(intern("data_size"), td));
   /* ALEKS USES THIS FOR SURGERY 2 */
   lv *setup = attr(intern("setup"), td);
   lv *actions, *initializations;
@@ -2953,12 +2956,12 @@ generate_creation_functions(lv *td)
    */
 
   /* Header file stuff */
-  fprintf(hfile, comment);
+  fputs(comment, hfile);
   fprintf(hfile, header_format, "", u);
   fprintf(hfile, ";\n");
 
   /* Code file stuff */
-  fprintf(cfile, comment);
+  fputs(comment, cfile);
   fprintf(cfile, header_format, "\n", u);
   fprintf(cfile, "\n{\n");
   fprintf(cfile, "  static int _n = 0;\n");
@@ -3050,7 +3053,7 @@ generate_creation_functions(lv *td)
     lv *d = attr(intern("discrete"), td);
     if (d)
       fprintf(cfile, "  enteringF%d(_self);\n",
-	      num(attr(intern("unique"), first(d))));
+	      intnum(attr(intern("unique"), first(d))));
     else
       fprintf(cfile, "  _self->M = 0;\n");
   }
@@ -3131,7 +3134,7 @@ generate_link_assignment(lv *l, lv *r)
 	  var = arg1(l);
 	}
       assigner = o == intern("id") ? "link_assign" : "linkset_assign";
-      u = attr(intern("external_events"), var) ? num(attr(intern("unique"), var)) : 0;
+      u = attr(intern("external_events"), var) ? intnum(attr(intern("unique"), var)) : 0;
 
       fprintf(cfile, "    %s(", assigner);
       LHS = 1;
@@ -3278,7 +3281,7 @@ generate_actions_assign(lv *action)
 generate_setup_function(lv *td)
 {
   char comment[160];		/* enough for two lines. */
-  int u = num(attr(intern("unique"), td));
+  int u = intnum(attr(intern("unique"), td));
   lv *setup = attr(intern("setup"), td);
   lv *actions, *definitions, *initializations, *connections;
   lv* type_of_define, *mytvr;
@@ -3296,10 +3299,10 @@ generate_setup_function(lv *td)
 	  "\n/* Setup Function for type\n * %s\n */\n",
 	  pname(attr(intern("name"), attr(intern("id"), td))));
 
-  fprintf(hfile, comment);
+  fputs(comment, hfile);
   fprintf(hfile, "void setupF%d(Component *_self);\n", u);
 
-  fprintf(cfile, comment);
+  fputs(comment, cfile);
   fprintf(cfile, "void\nsetupF%d(Component *_self)\n{\n", u);
 
   /* ALEKS SURGERY 2 REMOVED THE FOLLOWING
@@ -3342,7 +3345,7 @@ generate_setup_function(lv *td)
 	 */
 	
 	generate_flow_info(arg1(a), intern("flow_function"));
-	fprintf(cfile, " = flowF%d;\n  ", num(attr(intern("unique"), a)));
+	fprintf(cfile, " = flowF%d;\n  ", intnum(attr(intern("unique"), a)));
 	generate_flow_info(arg1(a), intern("context"));
 	fprintf(cfile, " = _self;\n");
 
@@ -3366,7 +3369,7 @@ generate_setup_function(lv *td)
 	generate_flow_info(arg1(a), intern("mode"));
 	fprintf(cfile, " = ALGEBRAIC_MODE;\n  ");
 	generate_flow_info(arg1(a), intern("flow_function"));
-	fprintf(cfile, " = flowF%d;\n  ", num(attr(intern("unique"), a)));
+	fprintf(cfile, " = flowF%d;\n  ", intnum(attr(intern("unique"), a)));
 	generate_flow_info(arg1(a), intern("context"));
 	fprintf(cfile, " = _self;\n");
       }
@@ -3421,7 +3424,7 @@ generate_actions_function(int phase, int unique, lv *actions, void (*f)(lv *))
 void
 generate_transition_functions(lv *t)
 {
-  int u = num(attr(intern("unique"), t));
+  int u = intnum(attr(intern("unique"), t));
   lv *actions = attr(intern("do"), t);
   lv *definitions = attr(intern("define"), t);
 
@@ -3454,8 +3457,8 @@ generate_event_descriptor(lv *event)
 {
   lv *entity = attr(intern("entity"), event);
   lv *type = attr(intern("type"), entity);
-  char *kind = nil;
-  int u = num(attr(intern("unique"), entity));
+  char *kind = (char*) nil;
+  int u = intnum(attr(intern("unique"), entity));
 
 
   if (equal_type(type, event_type))
@@ -3477,7 +3480,7 @@ generate_event_descriptor(lv *event)
   fprintf(hfile, "extern TransitionDescriptor *tr4ev%d[];\n", u);
   fprintf(cfile, "TransitionDescriptor *tr4ev%d[] = {\n", u);
   dolist (t, attr(intern("meaning"), entity)) {
-    fprintf(cfile, "  &trans_desc%d,\n", num(attr(intern("unique"), t)));
+    fprintf(cfile, "  &trans_desc%d,\n", intnum(attr(intern("unique"), t)));
   } tsilod;
   fprintf(cfile, "  0\n};\n\n");
 
@@ -3494,7 +3497,7 @@ generate_event_descriptor(lv *event)
 	  u, 
 	  pname(attr(intern("name"), event)), 
 	  u,
-	  num(attr(intern("offset"), attr(intern("sync_set"), entity))),
+	  intnum(attr(intern("offset"), attr(intern("sync_set"), entity))),
 	  kind);
 }
 
@@ -3524,7 +3527,7 @@ generate_ext_event_expression(lv* e, int u, int is_set)
 void
 generate_external_event_descriptor(lv *e)
 {
-  int u = num(attr(intern("unique"), e));
+  int u = intnum(attr(intern("unique"), e));
   lv *link = attr(intern("entity"), arg1(e));
   lv *ee = attr(intern("entity"), arg2(e));
   int is_set = set_type_p(attr(intern("type"), link));
@@ -3538,13 +3541,13 @@ generate_external_event_descriptor(lv *e)
   fprintf(cfile, "ExternalEventDescriptor ext_event%d = {\n", u);
   fprintf(cfile, "  \"%s\",\n", pname(attr(intern("name"), arg2(e))));
   fprintf(cfile, "  %s,\n", is_set ? "SET_CONNECTION" : "SINGLE_CONNECTION");
-  fprintf(cfile, "  %d,\n", num(attr(intern("offset"), attr(intern("target_variable"), link))));
+  fprintf(cfile, "  %d,\n", intnum(attr(intern("offset"), attr(intern("target_variable"), link))));
   fprintf(cfile, "  %d,\n", attr(intern("kind"), link) == intern("GLOBAL"));
   fprintf(cfile, "  %s,\n", rule == intern("all") ? "SYNC_ALL" : "SYNC_ONE");
   fprintf(cfile,
 	  "  %d,\n",
-	  nodep(rule) ? num(attr3(intern("offset"), intern("target_variable"), intern("entity"), rule)) : -1);
-  fprintf(cfile, "  &event_desc%d,\n", num(attr(intern("unique"), ee)));
+	  nodep(rule) ? intnum(attr3(intern("offset"), intern("target_variable"), intern("entity"), rule)) : -1);
+  fprintf(cfile, "  &event_desc%d,\n", intnum(attr(intern("unique"), ee)));
   fprintf(cfile, "  \"%s\",\n", pname(attr(intern("name"), arg1(e))));
   fprintf(cfile, "  ext_event_%s_expr_F%d\n",
 	  is_set ? "set" : "single",
@@ -3554,12 +3557,12 @@ generate_external_event_descriptor(lv *e)
   /*
   fprintf(cfile, "  %s,\n  %d,\n  %d,\n  %s,\n  %d,\n  &event_desc%d\n};\n\n",
 	  is_set ? "SET_CONNECTION" : "SINGLE_CONNECTION",
-	  num(attr(intern("offset"), attr(intern("target_variable"), link))),
+	  intnum(attr(intern("offset"), attr(intern("target_variable"), link))),
 	  attr(intern("kind"), link) == intern("GLOBAL"),
 	  rule == intern("all") ? "SYNC_ALL" : "SYNC_ONE",
-	  nodep(rule) ? num(attr3(intern("offset"), intern("target_variable"), intern("entity"), rule))
+	  nodep(rule) ? intnum(attr3(intern("offset"), intern("target_variable"), intern("entity"), rule))
 	  : -1,
-	  num(attr(intern("unique"), ee)));
+	  intnum(attr(intern("unique"), ee)));
 	  */
 }
 
@@ -3569,7 +3572,7 @@ generate_external_event_descriptor(lv *e)
 void
 generate_transition_descriptor(lv *t)
 {
-  int u = num(attr(intern("unique"), t));
+  int u = intnum(attr(intern("unique"), t));
   lv *guard = attr(intern("guard"), t);
   int i;
 
@@ -3594,7 +3597,7 @@ generate_transition_descriptor(lv *t)
     if (op(e) == intern("id"))
       {
 	fprintf(cfile, "  &event_desc%d,\n",
-		num(attr(intern("unique"), attr(intern("entity"), e))));
+		intnum(attr(intern("unique"), attr(intern("entity"), e))));
       }
   } tsilod;
   fprintf(cfile, "  0\n};\n\n");
@@ -3605,7 +3608,7 @@ generate_transition_descriptor(lv *t)
   dolist (e, attr(intern("events"), t)) {
     if (op(e) == intern("external_event"))
       {
-	fprintf(cfile, "  &ext_event%d,\n", num(attr(intern("unique"), e)));
+	fprintf(cfile, "  &ext_event%d,\n", intnum(attr(intern("unique"), e)));
       }
   } tsilod;
   fprintf(cfile, "  0\n};\n\n");
@@ -3614,7 +3617,7 @@ generate_transition_descriptor(lv *t)
   fprintf(hfile, "extern TransitionDescriptor trans_desc%d;\n", u);
   fprintf(cfile, "TransitionDescriptor trans_desc%d = {\n", u);
   fprintf(cfile, "  &mode_desc%d,\n", 
-	  num(attr(intern("unique"), meaning(attr(intern("to"), t)))));
+	  intnum(attr(intern("unique"), meaning(attr(intern("to"), t)))));
   fprintf(cfile, "  edlist%d,\n", u);
   fprintf(cfile, "  eelist%d,\n", u);
   fprintf(cfile, "  %s%d,\n",
@@ -3647,7 +3650,7 @@ generate_transition_descriptor(lv *t)
 void
 generate_mode_descriptor(lv *d)
 {
-  int u = num(attr(intern("unique"), d));
+  int u = intnum(attr(intern("unique"), d));
   lv *invariant = attr(intern("invariant"), d);
   lv *transitions = attr(intern("outgoing"), d);
   int g = 0;
@@ -3657,7 +3660,7 @@ generate_mode_descriptor(lv *d)
   fprintf(cfile, "TransitionDescriptor *outgoing_desc%d[] = {", u);
   dolist (t, transitions)
     {
-      fprintf(cfile, "\n  &trans_desc%d,", num(attr(intern("unique"), t)));
+      fprintf(cfile, "\n  &trans_desc%d,", intnum(attr(intern("unique"), t)));
       if (!g && attr(intern("guard"), t))
 	{
 	  g = 1;
@@ -3693,12 +3696,12 @@ generate_mode_descriptor(lv *d)
 void
 generate_sync_variable_descriptor(lv *entity)
 {
-  int u = num(attr(intern("unique"), entity));
+  int u = intnum(attr(intern("unique"), entity));
 
   fprintf(hfile, "extern ExternalEventDescriptor *svard%d[];\n", u);
   fprintf(cfile, "ExternalEventDescriptor *svard%d[] = {\n", u);
   dolist (ee, attr(intern("external_events"), entity)) {
-    fprintf(cfile, "  &ext_event%d,\n", num(attr(intern("unique"), ee)));
+    fprintf(cfile, "  &ext_event%d,\n", intnum(attr(intern("unique"), ee)));
   } tsilod;
   fprintf(cfile, "  0\n};\n\n");
 }
@@ -3709,17 +3712,17 @@ generate_vardesc(lv *v)
 {
   char *name = pname(attr(intern("name"), v));
   char *kind = pname(attr(intern("kind"), v));
-  int offset = num(attr(intern("offset"), v));
+  int offset = intnum(attr(intern("offset"), v));
   lv *type = attr(intern("type"), v);
-  int ut = num(attr(intern("unique"), attr(intern("hashed_type"), type)));
+  int ut = intnum(attr(intern("unique"), attr(intern("hashed_type"), type)));
   lv *dif = attr(intern("differential"), v);
   lv *alg = attr(intern("algebraic"), v);
   char *possible_modes =
     dif ? "DIFFERENTIAL" : alg ? "ALGEBRAIC" : "CONSTANT";
-  int mo = dif || alg ? num(attr(intern("offset"), attr(intern("mode"), v))) : 0;
-  int ffo = dif || alg ? num(attr(intern("offset"), attr(intern("flow_function"), v))) : 0;
-  int cxo = dif || alg ? num(attr(intern("offset"), attr(intern("context"), v))) : 0;
-  int so = dif? num(attr(intern("offset"), attr(intern("state"), v))) : 0;
+  int mo = dif || alg ? intnum(attr(intern("offset"), attr(intern("mode"), v))) : 0;
+  int ffo = dif || alg ? intnum(attr(intern("offset"), attr(intern("flow_function"), v))) : 0;
+  int cxo = dif || alg ? intnum(attr(intern("offset"), attr(intern("context"), v))) : 0;
+  int so = dif? intnum(attr(intern("offset"), attr(intern("state"), v))) : 0;
     
   fprintf(cfile, 
 	  "  {\"%s\", %s_KIND, %d, &typed%d, %s_MODE, %d, %d, %d, %d},\n",
@@ -3752,7 +3755,7 @@ void
 generate_component_type_descriptor(lv *td)
 {
   int cache_ctd_hash_code(char*);
-  int unique = num(attr(intern("unique"), td));
+  int unique = intnum(attr(intern("unique"), td));
   lv *parent_id;
   lv *parent;
   char *parent_info = (char *)malloc(13);
@@ -3791,7 +3794,7 @@ generate_component_type_descriptor(lv *td)
   dolist (m, attr(intern("discrete"), td))
     {
       lv *invariant = attr(intern("invariant"), m);
-      int mu = num(attr(intern("unique"), m));
+      int mu = intnum(attr(intern("unique"), m));
 
       if (invariant)
 	{
@@ -3816,8 +3819,8 @@ generate_component_type_descriptor(lv *td)
 	  if (op(eq) == intern("equate"))
 	    {
 	      fprintf(cfile, "  {%d, flowF%d},\n",
-		      num(attr(intern("offset"), attr(intern("state"), entity))),
-		      num(attr(intern("unique"), eq)));
+		      intnum(attr(intern("offset"), attr(intern("state"), entity))),
+		      intnum(attr(intern("unique"), eq)));
 	    }
 	}
       tsilod;
@@ -3833,7 +3836,7 @@ generate_component_type_descriptor(lv *td)
   fprintf(cfile, "ModeDescriptor *modes%d[] = {\n", unique);
   dolist (m, attr(intern("discrete"), td))
     {
-      fprintf(cfile, "  &mode_desc%d,\n", num(attr(intern("unique"), m)));
+      fprintf(cfile, "  &mode_desc%d,\n", intnum(attr(intern("unique"), m)));
     }
   tsilod;
   fprintf(cfile, "  0\n};\n\n");
@@ -3890,7 +3893,7 @@ generate_component_type_descriptor(lv *td)
   dolist (e, attr(intern("export"), td))
     {
       fprintf(cfile, "  &event_desc%d,\n",
-	      num(attr2(intern("unique"), intern("entity"), e)));
+	      intnum(attr2(intern("unique"), intern("entity"), e)));
     }
   tsilod;
   fprintf(cfile, "  0\n};\n\n");
@@ -3901,7 +3904,7 @@ generate_component_type_descriptor(lv *td)
     {
       if (op(a) == intern("sync"))
 	{
-	  int u = num(attr(intern("unique"), a));
+	  int u = intnum(attr(intern("unique"), a));
 	  fprintf(cfile,
 		  "ComponentEventPairDescriptor cepd%d[] = {\n", u);
 	  dolist (ce, args(a))
@@ -3910,8 +3913,8 @@ generate_component_type_descriptor(lv *td)
 	      lv *e = arg2(ce);
 	      fprintf(cfile,
 		      "  {%d, &event_desc%d},\n",
-		      num(attr3(intern("offset"), intern("target_variable"), intern("entity"), c)),
-		      num(attr2(intern("unique"), intern("entity"), e)));
+		      intnum(attr3(intern("offset"), intern("target_variable"), intern("entity"), c)),
+		      intnum(attr2(intern("unique"), intern("entity"), e)));
 	    }
 	  tsilod;
 	  fprintf(cfile, "  {-1, 0}};\n\n");
@@ -3924,7 +3927,7 @@ generate_component_type_descriptor(lv *td)
     {
       if (op(a) == intern("sync"))
 	{
-	  int u = num(attr(intern("unique"), a));
+	  int u = intnum(attr(intern("unique"), a));
 	  fprintf(cfile, "  cepd%d,\n", u);
 	}
     }
@@ -3936,22 +3939,22 @@ generate_component_type_descriptor(lv *td)
   if (parent_id)
     {
       parent = meaning(parent_id);
-      sprintf(parent_info, "&c_typed%d,", num(attr(intern("unique"), parent)));
+      sprintf(parent_info, "&c_typed%d,", intnum(attr(intern("unique"), parent)));
     }
   else
     strcpy(parent_info, "0,\t");
 
   /* Compute information and generate children list (if nay) */
   children_id = attr(intern("children"), td);
-  sprintf(children_info, "children%d,", num(attr(intern("unique"), td)));
+  sprintf(children_info, "children%d,", intnum(attr(intern("unique"), td)));
   fprintf(cfile, 
 	  "ComponentTypeDescriptor *children%d[] = {\n", 
-	  num(attr(intern("unique"), td)));
+	  intnum(attr(intern("unique"), td)));
   if (children_id)
     {
       dolist (child_id, children_id) {
 	child = meaning(child_id);
-	fprintf(cfile, "  &c_typed%d,\n", num(attr(intern("unique"), child)));
+	fprintf(cfile, "  &c_typed%d,\n", intnum(attr(intern("unique"), child)));
       } tsilod;
     }
   fprintf(cfile, "  0\n};\n\n");
@@ -3963,7 +3966,7 @@ generate_component_type_descriptor(lv *td)
   fprintf(cfile, "ComponentTypeDescriptor c_typed%d = {\n", unique);
   fprintf(cfile, "  \"%s\",", pname(attr2(intern("name"), intern("id"), td)));
   fprintf(cfile, "\t/* Type name */\n");
-  fprintf(cfile, "  %d,", num(attr(intern("data_size"), td)));
+  fprintf(cfile, "  %d,", intnum(attr(intern("data_size"), td)));
   fprintf(cfile, "\t\t/* Data size */\n");
   fprintf(cfile, "  events%d,", unique);
   fprintf(cfile, "\t/* Events list pointer name */\n");
@@ -4136,13 +4139,13 @@ find_subexpressions(lv *e, lv **plist)
 void
 generate_create_expr_function(lv *e)
 {
-  int u = num(attr(intern("unique"), e));
+  int u = intnum(attr(intern("unique"), e));
   fprintf(hfile, "extern Component *create_expr_X%d(Component *);\n", u);
   fprintf(cfile, "/* create expression function\n");
   fprintf(cfile, " * type: %s\n", pname(attr(intern("name"), arg1(e))));
   fprintf(cfile, " * at:   %s:%d\n",
 	  str(attr(intern("file"), e)),
-	  num(attr(intern("line"), e)));
+	  intnum(attr(intern("line"), e)));
   fprintf(cfile, " */\n");
   fprintf(cfile, "Component *\ncreate_expr_X%d(Component *_self)\n{\n", u);
   fprintf(cfile, "  Component *_new = ");
@@ -4454,7 +4457,7 @@ generate_type_descriptor(lv *type)
   char *kind;
   int td = -1;
   int ctd = -1;
-  int u = num(attr(intern("unique"), type));
+  int u = intnum(attr(intern("unique"), type));
   lv *x = op(type);
 
   fprintf(hfile, "extern TypeDescriptor typed%d;\n", u);
@@ -4466,12 +4469,12 @@ generate_type_descriptor(lv *type)
   else if (x == intern("array") || x == intern("empty_array"))
     {
       kind = "ARRAY_T";
-      td = num(attr(intern("unique"), attr(intern("hashed_type"), arg1(type))));
+      td = intnum(attr(intern("unique"), attr(intern("hashed_type"), arg1(type))));
     }
   else if (x == intern("set") || x == intern("null_set"))
     {
       kind = "SET_T";
-      td = num(attr(intern("unique"), attr(intern("hashed_type"), arg1(type))));
+      td = intnum(attr(intern("unique"), attr(intern("hashed_type"), arg1(type))));
     }
   else if (x == intern("id"))
     {
@@ -4488,7 +4491,7 @@ generate_type_descriptor(lv *type)
       else
 	{
 	  kind = "COMPONENT_T";
-	  ctd = num(attr(intern("unique"), meaning(type)));
+	  ctd = intnum(attr(intern("unique"), meaning(type)));
 	}
     }
   else
@@ -4557,7 +4560,7 @@ generate_component_type_descriptor_list(lv *program)
 	
 	if ( ! exttypedef || exttypedef != intern("true"))
 	  {
-	  fprintf(cfile, "  &c_typed%d,\n", num(attr(intern("unique"), n)));
+	  fprintf(cfile, "  &c_typed%d,\n", intnum(attr(intern("unique"), n)));
 	  }
       }
   } tsilod;
@@ -4617,14 +4620,14 @@ print_component_type_descriptor_forest(lv *program)
       {
 	printf("  %s (c_typed%d)\n", 
 	       pname(attr(intern("name"), attr(intern("id"), n))), 
-	       num(attr(intern("unique"), n)));
+	       intnum(attr(intern("unique"), n)));
 	parent_id = attr(intern("parent"), n);
 	if (parent_id)
 	  {
 	    parent = meaning(parent_id);
 	    printf("    parent is %s (c_typed%d)\n",
 		   pname(attr(intern("name"), parent_id)),
-		   num(attr(intern("unique"), parent)));
+		   intnum(attr(intern("unique"), parent)));
 	  }
 	children_id = attr(intern("children"), n);
 	if (children_id)
@@ -4634,7 +4637,7 @@ print_component_type_descriptor_forest(lv *program)
 	      child = meaning(child_id);
 	      printf(" %s (c_typed%d)", 
 		     pname(attr(intern("name"), child_id)), 
-		     num(attr(intern("unique"), child)));
+		     intnum(attr(intern("unique"), child)));
 	    } tsilod;
 	    printf("\n");
 	  }
@@ -4648,7 +4651,7 @@ void
 initialize_generate()
 {
 #define gen(op, f) apush(intern("generator"), other((void *) f), plist(intern(#op)))
-#define gen1(op)	gen(op, #op "_generator")
+#define gen1(op)	gen(op, op ## _generator)
 #define genlib(op)	gen(op, library_call_generator)
   gen(+,		binmath_generator);
   gen(*,		binmath_generator);
