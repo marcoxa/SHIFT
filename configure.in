@@ -1,4 +1,6 @@
 #! /bin/sh
+
+dnl -*- Mode: M4 -*-
 # -*- Mode: Shell-script -*-
 
 # Copyright (c)1996, 1997, 1998 The Regents of the University of
@@ -61,7 +63,9 @@ AC_CONFIG_SUBDIRS(extra/mat2scalar)
 
 
 dnl Checks for programs.
+AC_PROG_CPP
 AC_PROG_CC
+AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PROG_LEX
 
