@@ -275,7 +275,7 @@ C_ProcessData(ClientData clientData, Tcl_Interp *interp,
     {
       interp->result = "Usage: ProcessData buffer ";
       return TCL_ERROR;
-    }							
+    }
 
   /*  printf ("am i reached? "); */
 
@@ -310,8 +310,9 @@ C_ProcessData(ClientData clientData, Tcl_Interp *interp,
       Tcl_Eval(interp, tcl_command);
 
       tcl_variable = Tcl_GetVar2(interp,
-				 "InstanceTypeList",
-				 type, TCL_GLOBAL_ONLY);
+				 (const char*) "InstanceTypeList",
+				 (const char*) type,
+				 TCL_GLOBAL_ONLY);
       if (tcl_variable == "")
 	{
 	  sprintf(tcl_command, "bell");

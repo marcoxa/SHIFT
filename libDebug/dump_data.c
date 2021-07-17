@@ -33,6 +33,8 @@
  */
 
 #include <ctype.h>
+#include <math.h>
+
 #include "shift_api_types.h"
 #include "shift_debug.h"
 #include "shift_api_info.h"

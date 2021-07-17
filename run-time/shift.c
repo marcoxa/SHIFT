@@ -185,7 +185,7 @@ serverListen(int timeclick, int STOP_FLAG)
 #endif
 
 
-void
+int
 main(int argc, char** argv)
 {
 #ifdef TIMETESTING
@@ -238,15 +238,15 @@ main(int argc, char** argv)
   if (arg_status == 2) {
     exit(1);
   }
-    /*
-      for (ii = 0; ii < argc; ii++)
-      if (!strcmp(argv[ii], "--varstep"))
-      ISVARSTEP = 1;
-      */
-    /*
-      if (ISVARSTEP)
-      fprintf(stderr, "Variable step integration\n");
-    */
+  /*
+    for (ii = 0; ii < argc; ii++)
+    if (!strcmp(argv[ii], "--varstep"))
+    ISVARSTEP = 1;
+  */
+  /*
+    if (ISVARSTEP)
+    fprintf(stderr, "Variable step integration\n");
+  */
 
   new_components = 0;
   potential_transitions = new_set(&cvp_type);

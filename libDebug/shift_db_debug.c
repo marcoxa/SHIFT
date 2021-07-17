@@ -45,6 +45,8 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+
 #include "shift_debug.h"
 #include "discrete.h"
 #include "shift_tools.h"
@@ -194,11 +196,12 @@ shift_DB_New_cmd(db_cmd* DB_cmd_list,\
 db_cmd*
 shift_DB_initalize()
 {
-  int x=0;
+  int x = 0;
   extern char *FieldSeperator, *EOR;
   db_initalized = 1;
   
-  if (! SET_LOGDIR)shift_DB_Set_LOGDIR((char*)NULL);
+  if (! SET_LOGDIR) shift_DB_Set_LOGDIR((char*)NULL);
+
   /* set field seperator */
   if ( shift_DB_setFieldSeperator(":") != 0)
     {
@@ -471,7 +474,7 @@ DB_Print_Components(db_cmd* dbg_cmd )
 
   if ( num_instances == 0 )
     {
-      fprintf (Tracer->outfile,"%d\n", tclick);
+      fprintf (Tracer->outfile,"%ld\n", tclick);
       return(0);
     }
   /*
@@ -520,13 +523,13 @@ shift_DB_Print_Header_comp(db_cmd* node)
       fprintf(stderr,"cannot opend DB logfile\n");
       return (-1);
     }
-  fprintf(fd,"%stime%sInsance#%smode%s",\
-	  SOR,FieldSeperator,FieldSeperator,\
+  fprintf(fd,"%stime%sInstance#%smode%s",\
+	  SOR, FieldSeperator, FieldSeperator,\
 	  FieldSeperator);
 
 #else
   fprintf(node->fd,"%stime%sInsance#%smode%s",\
-	  SOR,FieldSeperator,FieldSeperator,\
+	  SOR, FieldSeperator, FieldSeperator,\
 	  FieldSeperator);
 #endif
   if (node->tail != NULL )
@@ -721,22 +724,23 @@ shift_DB_Set_description_file(char* string)
   char *mytime;
   time_t t;
 
-   if ( db_initalized == 0 )
+  if (db_initalized == 0)
     {
-      DB_dbg_List=shift_DB_initalize();
+      DB_dbg_List = shift_DB_initalize();
     }
-  sprintf(desc_file_name,"%s/sim_description",LOGDIR);
-  fd=fopen(desc_file_name,"w"); 
-  if ( fd == NULL)
+  sprintf(desc_file_name,"%s/sim_description", LOGDIR);
+  fd = fopen(desc_file_name, "w");
+  if (fd == NULL)
     {
       fprintf(stderr,
-	      "shift_DB_Set_description_file: could not open description");
+	      "shift_DB_Set_description_file: could not open description file '%s'.",
+	      desc_file_name);
       return 0;
     }
   time(&t);
-  mytime=ctime(&t);
-  fprintf(fd,"%s",mytime);
-  fprintf(fd,"%s", string);
+  mytime = ctime(&t);
+  fprintf(fd, "%s", mytime);
+  fprintf(fd, "%s", string);
   return 1;
 }
 
@@ -746,7 +750,7 @@ DB_Print_Component(db_cmd* dbg_cmd, int instance )
 {
   char* char_ptr;
   char* ptr_char;
-  int j=0;
+  int j = 0;
   int num_instances = -1;
   char BUFFER[5000];
   shift_api_user_type* db_type_ptr;
@@ -755,17 +759,16 @@ DB_Print_Component(db_cmd* dbg_cmd, int instance )
   shift_api_instance*  instance_ptr;
   shift_api_value*     var_value;
   shift_api_mode*      inst_mode;
+
   db_type_ptr     = shift_api_find_user_type( dbg_cmd->type );
   num_instances   = shift_api_count_instances(db_type_ptr);
   type_variables  = shift_api_find_local_variables(db_type_ptr);
-   if ( num_instances < 0 )
+  if (num_instances < 0)
     {
-      fprintf (stderr,"cannot track invalid incident\n");
+      fprintf (stderr, "Cannot track invalid incident.\n");
       return(-1);
     }
  
-  j=0;
-
   instance_ptr = shift_api_find_instance(db_type_ptr , instance );
 
   /* This check prevents a crash when the instance is null
@@ -776,10 +779,12 @@ DB_Print_Component(db_cmd* dbg_cmd, int instance )
   if (instance_ptr == NULL) return -1;
 
   inst_mode = shift_api_find_current_mode(instance_ptr);
-  fprintf(Tracer->outfile,"%s%d%s%d%s%s%s",SOR,tclick,FieldSeperator,\
-	   instance, FieldSeperator,\
-	  inst_mode->name,FieldSeperator);
-  while( type_variables[j] ) 
+  fprintf(Tracer->outfile, "%s%ld%s%d%s%s%s",
+	  SOR, tclick, FieldSeperator,
+	  instance, FieldSeperator,
+	  inst_mode->name, FieldSeperator);
+
+  while (type_variables[j])
     {
       if (( char_ptr = strstr(dbg_cmd->tail, "-v")) != NULL)
 	    {

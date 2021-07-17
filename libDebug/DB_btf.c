@@ -103,7 +103,7 @@ DB_btf()
 	/* Print text that describes the Collective Transition only once ! */
 	if (printed == 2)
 	  {
-	    sprintf(buff_ptr,"%d%s", tclick,FieldSeperator);
+	    sprintf(buff_ptr,"%ld%s", tclick, FieldSeperator);
 	    buff_ptr=buff_ptr + strlen(buff_ptr);
 	    sprintf(buff_ptr,"%s", DBprintCollective(sequence));
 	    buff_ptr=buff_ptr + strlen(buff_ptr);
@@ -122,11 +122,11 @@ DB_btf()
 	/* Print text that describes the Collective Transition only once ! */
 	if (printed == 2)
 	  {
-	    fprintf(Tracer->outfile,"%d%s", tclick,FieldSeperator);
+	    fprintf(Tracer->outfile,"%ld%s", tclick, FieldSeperator);
 	    fprintf(Tracer->outfile, "%s",
 		    DBprintCollective(sequence));
 	    printed = 1;
-	    Transition_Info=1;    
+	    Transition_Info = 1;    
 	  }
 	fprintf(Tracer->outfile,
 		"%s",

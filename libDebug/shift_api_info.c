@@ -1952,9 +1952,7 @@ shift_api_find_single_item_in_transition(shift_api_instance * instance,
 shift_api_component_value**
 shift_api_find_all_variable_values_of_a_type(char ** vars,
 					     shift_api_user_type* type) 
-{
-   
-   
+{ 
   shift_api_instance **instances, *instance_curr;
   shift_api_value * value, **values_list;
   int total_instances, instance_index, variable_index, number_of_variables; 
@@ -1964,7 +1962,7 @@ shift_api_find_all_variable_values_of_a_type(char ** vars,
   /* Get the list of instances of type 'type'. */
   instances = shift_api_find_instances(type);
   if (instances == NULL) {
-    fprintf(stderr,"Type %s does not exist...\n");
+    fprintf(stderr, "Type %s does not exist...\n", type->name);
     return NULL;
   }
   

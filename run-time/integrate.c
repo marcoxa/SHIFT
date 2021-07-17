@@ -38,10 +38,11 @@
 #ifndef INTEGRATE_I
 #define INTEGRATE_I
 
-#include "shift_config.h"
-
+#include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 
+#include "shift_config.h"
 #include "shifttypes.h"
 #include "collection.h"
 #include "shiftlib.h"
@@ -64,20 +65,21 @@
 extern double h;
 extern int ISVARSTEP;
 extern long nsteps;
-double CurrentTime=0; 
+double CurrentTime = 0.0; 
 
 /* It would be more efficient to maintain a set of all components
  * that have some differentiable variables in their current state.
  * FOR_ALL_COMPONENTS(c, differential_components) {
  */
 
-#define iterate								     \
-    for (c = continuous_components; c; c = c->continuous_next) {	     \
-	if (c->M) FOR_ALL_DIFFERENTIAL_VARIABLES(v, c) 
+#define iterate								\
+  for (c = continuous_components; c; c = c->continuous_next) {		\
+    if (c->M)								\
+      FOR_ALL_DIFFERENTIAL_VARIABLES(v, c) 
 
-#define end								     \
-	END_FADV;							     \
-    }
+#define end_iterate							\
+  END_FADV;								\
+  }
 
 /***************************************************************************/
 void
@@ -89,115 +91,124 @@ rungekutta_var()
   Component *c;
   if (before_advance_function) before_advance_function();
 
-  /* X(c,v,0) - init. point */
-  /* X(c,v,1) - init. point derivative */
+  /* X(c, v, 0) - init. point */
+  /* X(c, v, 1) - init. point derivative */
 
   iterate {
-    X(c,v,1) = F(c,v,0);
-  } end;
+    X(c, v, 1) = F(c, v, 0);
+  } end_iterate;
 
 
-  /* X(c,v,12) - scaling factor */
+  /* X(c, v, 12) - scaling factor */
   iterate {
-    xx0=(X(c,v,0)<0.0)?-X(c,v,0):X(c,v,0);
-    xx1=(X(c,v,1)<0.0)?-X(c,v,1):X(c,v,1);
-    if((xx0<SCALMIN) &&(xx1<SCALMIN)) 
-      X(c,v,12)=SCALMIN;
+    xx0 = (X(c, v, 0) < 0.0) ? -X(c, v, 0) : X(c, v, 0);
+    xx1 = (X(c, v, 1) < 0.0) ? -X(c, v, 1) : X(c, v, 1);
+    if ((xx0 < SCALMIN) && (xx1 < SCALMIN)) 
+      X(c, v, 12) = SCALMIN;
     else
-      X(c, v, 12) =  xx0 + xx1*h + TINY; 
-  } end;
+      X(c, v, 12) = xx0 + xx1 * h + TINY; 
+  } end_iterate;
 
-  htry=(h<MINISTEP)?MINISTEP:h;
+  htry = (h < MINISTEP) ? MINISTEP : h;
 
-  for(;;){
+  for (;;) {
 
-    hh=htry/2.0;
+    hh = htry / 2.0;
 
     /* RK4_(hh)_1 */
     iterate {
-      X(c,v,2) = X(c,v,0) + hh/2.0 * X(c,v,1);
-    } end;
+      X(c, v, 2) = X(c, v, 0) + hh / 2.0 * X(c,v,1);
+    } end_iterate;
+
     iterate {
-      X(c,v,5) = F(c, v, 2);
-      X(c, v, 3) = X(c,v,0) + hh/2.0 * X(c,v,5);
-    } end;
+      X(c, v, 5) = F(c, v, 2);
+      X(c, v, 3) = X(c, v, 0) + hh / 2.0 * X(c, v, 5);
+    } end_iterate;
+
     iterate {
-      X(c,v,6) = F(c,v,3);
-      X(c,v,4) = X(c,v,0) + hh*X(c,v,6);
-      X(c,v,7) = X(c,v,5) + X(c,v,6);
-    } end;
+      X(c, v, 6) = F(c, v, 3);
+      X(c, v, 4) = X(c, v, 0) + hh * X(c, v, 6);
+      X(c, v, 7) = X(c, v, 5) + X(c, v, 6);
+    } end_iterate;
+
     iterate {
-      X(c,v,8) =
-	X(c,v,0) + hh/6.0 * (X(c,v,1) + F(c,v,4) + 2 * X(c,v,7));
-    } end;
+      X(c, v, 8) =
+	X(c, v, 0) + hh/6.0 * (X(c, v, 1) + F(c, v, 4) + 2 * X(c, v, 7));
+    } end_iterate;
 
     /* RK4_(hh)_2 */
     iterate {
-      X(c,v,9) = F(c,v,8);
-      X(c,v,2) = X(c,v,8) + hh/2.0 * X(c,v,9);
-    } end;
+      X(c, v, 9) = F(c, v, 8);
+      X(c, v, 2) = X(c, v, 8) + hh/ 2.0 * X(c, v, 9);
+    } end_iterate;
+
     iterate {
-      X(c,v,5) = F(c, v, 2);
-      X(c, v, 3) = X(c,v,8) + hh/2.0 * X(c,v,5);
-    } end;
+      X(c, v, 5) = F(c, v, 2);
+      X(c, v, 3) = X(c, v, 8) + hh / 2.0 * X(c, v, 5);
+    } end_iterate;
+
     iterate {
-      X(c,v,6) = F(c,v,3);
-      X(c,v,4) = X(c,v,8) + hh*X(c,v,6);
-      X(c,v,7) = X(c,v,5) + X(c,v,6);
-    } end;
+      X(c, v, 6) = F(c, v, 3);
+      X(c, v, 4) = X(c, v, 8) + hh * X(c, v, 6);
+      X(c, v, 7) = X(c, v, 5) + X(c, v, 6);
+    } end_iterate;
+
     iterate {
-      X(c,v,10) =
-	X(c,v,8) + hh/6.0 * (X(c,v,9) + F(c,v,4) + 2 * X(c,v,7));
-    } end;
+      X(c, v, 10) =
+	X(c, v, 8) + hh / 6.0 * (X(c, v, 9) + F(c, v, 4) + 2 * X(c, v, 7));
+    } end_iterate;
 
     /* RK4_(h) */
     iterate {
-      X(c,v,2) = X(c,v,0) + htry/2.0 * X(c,v,1);
-    } end;
+      X(c, v, 2) = X(c, v, 0) + htry / 2.0 * X(c, v, 1);
+    } end_iterate;
+
     iterate {
-      X(c,v,5) = F(c, v, 2);
-      X(c, v, 3) = X(c,v,0) + htry/2.0 * X(c,v,5);
-    } end;
+      X(c, v, 5) = F(c, v, 2);
+      X(c, v, 3) = X(c, v, 0) + htry / 2.0 * X(c, v, 5);
+    } end_iterate;
+
     iterate {
-      X(c,v,6) = F(c,v,3);
-      X(c,v,4) = X(c,v,0) + htry*X(c,v,6);
-      X(c,v,7) = X(c,v,5) + X(c,v,6);
-    } end;
+      X(c, v, 6) = F(c, v, 3);
+      X(c, v, 4) = X(c, v, 0) + htry * X(c, v, 6);
+      X(c, v, 7) = X(c, v, 5) + X(c, v, 6);
+    } end_iterate;
+
     iterate {
-      X(c,v,11) =
-	X(c,v,0) + htry/6.0 * (X(c,v,1) + F(c,v,4) + 2 * X(c,v,7));
-    } end;
+      X(c, v, 11) =
+	X(c, v, 0) + htry / 6.0 * (X(c, v, 1) + F(c, v, 4) + 2 * X(c, v, 7));
+    } end_iterate;
 
     /*  Now X(c,v,10) contains result of 2 half-steps.
      *      X(c,v,11) contains result of 1 step.
      *      Comparing these we eval. the step to be taken.
      */
-    errmax=0.0;
+    errmax = 0.0;
 
     iterate {
-      X(c,v,11) = X(c,v,10) - X(c,v,11);
-      temp=X(c,v,11)/X(c,v,12);
-      temp=(temp<0)?-temp:temp;
-      if (errmax<temp) errmax=temp;
-    } end;
+      X(c, v, 11) = X(c, v, 10) - X(c, v, 11);
+      temp = X(c, v, 11) / X(c, v, 12);
+      temp = (temp < 0) ? -temp : temp;
+      if (errmax < temp) errmax = temp;
+    } end_iterate;
 
     errmax = errmax / VS_EPS;
 
-    if(errmax <=1.0){
+    if (errmax <= 1.0) {
       /*
-       * htry=(errmax>ERRCON)?SAFETY*htry*exp(PGROW*log(errmax)):4.0*htry;
+       * htry = (errmax > ERRCON) ? SAFETY * htry * exp(PGROW * log(errmax)) : 4.0 * htry;
        */
-      htry=(errmax>ERRCON)?SAFETY*htry*pow(errmax,PGROW):4.0*htry;
-      h=(htry>MAXISTEP)?MAXISTEP:htry;
-      CurrentTime=CurrentTime+h;
+      htry = (errmax > ERRCON) ? SAFETY * htry * pow(errmax, PGROW) : 4.0 * htry;
+      h = (htry > MAXISTEP) ? MAXISTEP : htry;
+      CurrentTime = CurrentTime + h;
       break;
     }
 
-    htry=SAFETY*htry*pow(errmax,PSHRINK);
+    htry = SAFETY * htry * pow(errmax, PSHRINK);
 
-    if(htry<MINISTEP) {
-      h=MINISTEP;
-      CurrentTime=CurrentTime+h;
+    if (htry < MINISTEP) {
+      h = MINISTEP;
+      CurrentTime = CurrentTime+h;
       /** should be run-time warning! **/
       break;
     }
@@ -205,16 +216,16 @@ rungekutta_var()
   } /** end for(;;) **/
  
   iterate {
-    X(c,v,0)=X(c,v,10)+X(c,v,11)*FCOR;
-  } end;
+    X(c, v, 0) = X(c, v, 10) + X(c, v, 11) * FCOR;
+  } end_iterate;
 
-  if (dump_continuous_state) printf("%d %e %e",tclick,h, CurrentTime);
+  if (dump_continuous_state) fprintf(stdout, "%ld %e %e", tclick, h, CurrentTime);
   tclick++;
   iterate {
-    if (dump_continuous_state) printf(" %e", X(c,v,0));
-  } end;
+    if (dump_continuous_state) fprintf(stdout, " %e", X(c, v, 0));
+  } end_iterate;
 
-  if (dump_continuous_state) printf("\n");
+  if (dump_continuous_state) fputc('\n', stdout);
   if (tclick == nsteps) exit(0);
 
   if (after_advance_function) after_advance_function();
@@ -233,32 +244,32 @@ rungekutta_fix()
   iterate {
     F0(c, v) = F(c, v, 0);
     X(c, v, 1) = X(c, v, 0) + h/2 * F0(c, v);
-  } end;
+  } end_iterate;
 
   iterate {
     F1(c, v) = F(c, v, 1);
     X(c, v, 2) = X(c, v, 0) + h/2 * F1(c, v);
-  } end;
+  } end_iterate;
 
   iterate {
     F2(c, v) = F(c, v, 2);
     X(c, v, 3) = X(c, v, 0) + h * F2(c, v);
     DYM(c, v) = F1(c, v) + F2(c, v);
-  } end;
+  } end_iterate;
 
   iterate {
     XNEW(c, v) =
       X(c, v, 0) + h/6 * (F0(c, v) + F(c, v, 3) + 2 * DYM(c, v));
-  } end;
+  } end_iterate;
      
-  CurrentTime=CurrentTime+h;
+  CurrentTime = CurrentTime + h;
 
-  if (dump_continuous_state) printf("%d %e %e",tclick,h, CurrentTime);
+  if (dump_continuous_state) printf("%ld %e %e", tclick, h, CurrentTime);
   tclick++;
   iterate {
     X(c, v, 0) = XNEW(c, v);
     if (dump_continuous_state) printf(" %e", XNEW(c, v));
-  } end;
+  } end_iterate;
 
   if (dump_continuous_state) printf("\n");
   if (tclick == nsteps) exit(0);

@@ -48,6 +48,7 @@ static char sccsid[] = "@(#) tkAppInit.c 1.15 95/06/28 13:14:28";
 #endif /* not lint */
 
 #include <stdlib.h>
+#include <strings.h>
 #include <tcl.h> 
 #include <tk.h>
 
@@ -60,16 +61,22 @@ extern int matherr();
 static int (*dummyMathPtr)() = matherr;
 
 extern int 
-C_ProcessData(ClientData clientData, Tcl_Interp *interp, 
-	      int argc, char *argv[]); 
+C_ProcessData(ClientData clientData,
+	      Tcl_Interp *interp, 
+	      int argc,
+	      const char *argv[]); 
 
 extern int 
-C_stripSpaces(ClientData clientData, Tcl_Interp *interp, 
-	    int argc, char *argv[]); 
+C_stripSpaces(ClientData clientData,
+	      Tcl_Interp *interp, 
+	      int argc,
+	      const char *argv[]); 
 
 extern int 
-C_UpdateItem(ClientData clientData, Tcl_Interp *interp, 
-	    int argc, char *argv[]); 
+C_UpdateItem(ClientData clientData,
+	     Tcl_Interp *interp, 
+	     int argc,
+	     const char *argv[]); 
 
 /*
  *----------------------------------------------------------------------
@@ -88,12 +95,12 @@ C_UpdateItem(ClientData clientData, Tcl_Interp *interp,
  *----------------------------------------------------------------------
  */
 
-void
+int
 main(int argc, char** argv)
-     /* argc -- Number of command-line arguments. */
-     /* argv -- Values of command-line arguments. */
+/* argc -- Number of command-line arguments. */
+/* argv -- Values of command-line arguments. */
 {
-    Tk_Main(argc, argv, Tcl_AppInit);
+  Tk_Main(argc, argv, Tcl_AppInit);
 }
 
 

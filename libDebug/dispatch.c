@@ -38,8 +38,11 @@
 #ifndef DISPATCH_I
 #define DISPATCH_I
 
-#include <shift_config.h>
 #include <limits.h>
+#include <stdlib.h>
+
+#include <shift_config.h>
+
 #include "shift_debug.h"
 #include "shift_api_types.h"
 #include "shift_api_info.h"
@@ -445,7 +448,7 @@ setZeno(char* rS)
       else
 	{
 	  shift_zeno_threshold = new_zeno;
-	  printf("Zeno detection set to %d", shift_zeno_threshold);
+	  printf("Zeno detection set to %ld", shift_zeno_threshold);
 	}
     }
 }

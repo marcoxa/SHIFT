@@ -47,8 +47,10 @@
 #include "tkshift-util.h"
 
 int 
-C_UpdateItem(ClientData clientData, Tcl_Interp *interp, 
-	     int argc, char *argv[])
+C_UpdateItem(ClientData clientData,
+	     Tcl_Interp * interp,
+	     int argc,
+	     char *argv[])
 {
   /* global variable to watch out for */ 
 
@@ -116,19 +118,22 @@ C_UpdateItem(ClientData clientData, Tcl_Interp *interp,
   char * shift_tk_dir;  
   char * image; 
 
-  if (argc != 4) {
-    interp->result = "Usage: UpdateItem canvas_number group data "; 
-    return TCL_ERROR;
-  }							
+  if (argc != 4)
+    {
+      interp->result = "Usage: UpdateItem canvas_number group data "; 
+      return TCL_ERROR;
+    }							
 
   sprintf(tcl_command, "lindex {%s} 0", data); 
   assert(Tcl_Eval(interp, tcl_command) == TCL_OK); 
+
   CanvasXYList = tkshift_safe_malloc(strlen(interp->result) + 2); 
   sprintf(CanvasXYList, "%s", interp->result); 
 
   /* get the correct canvas name to do the update */ 
   sprintf(tcl_command, "set CanvasesArray(%s)", canvas_number);
   assert(Tcl_GlobalEval(interp, tcl_command) == TCL_OK); 		
+
   Canvas = tkshift_safe_malloc(strlen(interp->result)); 
   strcpy(Canvas, interp->result); 
   sprintf(groupTag, "Image%s", group); 
@@ -145,6 +150,7 @@ C_UpdateItem(ClientData clientData, Tcl_Interp *interp,
 
   sprintf(tcl_command, "set ZoomIndex(%s)", canvas_number);
   assert(Tcl_GlobalEval(interp, tcl_command) == TCL_OK); 
+
   ZoomIndex = tkshift_safe_malloc(strlen(interp->result)); 
   strcpy(ZoomIndex, interp->result); 
   
@@ -156,10 +162,10 @@ C_UpdateItem(ClientData clientData, Tcl_Interp *interp,
   assert(Tcl_GlobalEval(interp, tcl_command) == TCL_OK);
  
   /*
-  sprintf(tcl_command, "lindex $Colors_Used %s", group);
-  assert(Tcl_GlobalEval(interp, tcl_command) == TCL_OK); 
-  color = tkshift_safe_malloc(strlen(interp->result)); 
-  strcpy(color, interp->result); 
+    sprintf(tcl_command, "lindex $Colors_Used %s", group);
+    assert(Tcl_GlobalEval(interp, tcl_command) == TCL_OK); 
+    color = tkshift_safe_malloc(strlen(interp->result)); 
+    strcpy(color, interp->result); 
   */ 
 
   sprintf(tcl_command, "llength {%s}", CanvasXYList);
@@ -202,8 +208,8 @@ C_UpdateItem(ClientData clientData, Tcl_Interp *interp,
 
       /*  INT_MAX     2147483647 -> 10 digits */ 
       /* 
-      tag2 = tkshift_safe_malloc(20); 
-      sprintf(tag2, "Vehicle%d", Counter); 
+	 tag2 = tkshift_safe_malloc(20); 
+	 sprintf(tag2, "Vehicle%d", Counter); 
       */ 
 
       sprintf(tcl_command, "set CanvasImage(%s,%s)", canvas_number, group); 
@@ -292,9 +298,9 @@ C_UpdateItem(ClientData clientData, Tcl_Interp *interp,
 	  
 	  /* what would catch give you? */ 
 	  sprintf(tcl_command, 
-	      "catch {%s create oval %f %f %f %f -tags %s -fill %s -outline black}",
-	      Canvas, Xpos - length, Ypos - length, Xpos + length, Ypos + length, 
-	      Tag, color); 
+		  "catch {%s create oval %f %f %f %f -tags %s -fill %s -outline black}",
+		  Canvas, Xpos - length, Ypos - length, Xpos + length, Ypos + length, 
+		  Tag, color); 
 	  /* if this gives trouble I might try Tcl_GlobalEval later */ 
 	  assert(Tcl_Eval(interp, tcl_command) == TCL_OK); 
 	  
@@ -442,7 +448,7 @@ C_UpdateItem(ClientData clientData, Tcl_Interp *interp,
 	      y1 = Ypos + width_cos_result - length_sin_result; 
 	      x2 = Xpos + length_cos_result - width_sin_result; 
 	      y2 = Ypos + length_sin_result + width_cos_result; 
-	     x3 = Xpos + length_cos_result + width_sin_result; 
+	      x3 = Xpos + length_cos_result + width_sin_result; 
 	      y3 = Ypos + length_sin_result - width_cos_result; 
 	      x4 = Xpos + width_sin_result - length_cos_result; 
 	      y4 = Ypos - width_cos_result - length_sin_result; 

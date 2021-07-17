@@ -360,7 +360,3 @@ receive_data(int sockID, char* msg, int msg_len)
 #endif /* shift_socket_i */
 
 /* end of file -- socket.c -- */
-
-
-
-

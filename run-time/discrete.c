@@ -37,9 +37,11 @@
 #ifndef DISCRETE_I
 #define DISCRETE_I
 
-#include <shift_config.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+
+#include <shift_config.h>
 #include "shifttypes.h"
 #include "collection.h"
 #include "shiftlib.h"

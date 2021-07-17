@@ -258,7 +258,7 @@ dbgControl()
   int dots_per_line = 50;
   static int dots_output = 0;
 
-  fprintf(Tracer->outfile, "{TimeStamp %d}\n", tclick);
+  fprintf(Tracer->outfile, "{TimeStamp %ld}\n", tclick);
 
   /* Dump state of all components in time Traced */
   while (CompEl != NULL)
@@ -293,7 +293,7 @@ dbgControl()
     {
       if (dots_output % dots_per_line == 0)
 	{
-	  printf("\n[%d]", tclick);
+	  printf("\n[%ld]", tclick);
 	  dots_output = 0;
 	}
       dots_output++;
@@ -309,7 +309,7 @@ dbgControl()
   else
     {
       /* Time to interact with the user */
-      printf("\nTime is %d.\n\n", tclick);
+      printf("\nTime is %ld.\n\n", tclick);
       userInteract();
     }
   return;

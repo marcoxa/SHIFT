@@ -102,7 +102,7 @@ make-depend: $(C) parser.h
 	$(CC) -M $(CFLAGS) $(C) > depend
 
 
-scanner.o: scanner.c
+scanner.o: scanner.c parser.h
 	$(CC) $(CFLAGS) -c scanner.c
 
 mat2scalar: $(O)

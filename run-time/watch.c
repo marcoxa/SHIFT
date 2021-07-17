@@ -31,6 +31,9 @@
  * ENHANCEMENTS, OR MODIFICATIONS. 
  */
 
+#ifndef SHIFT_RT_WATCH_I
+#define SHIFT_RT_WATCH_I
+
 #include <stdio.h>
 #include <sys/time.h>
 #include "watch.h"
@@ -38,43 +41,51 @@
 
 struct timezone tz;
 
-
-void start_timer(Watch *watch) {
-
-  gettimeofday(&(watch->start_time), &tz );
-
-}
-
-void increase_loop(Watch *watch){
- watch->loop++;
-}
-
-void end_timer(Watch *watch) {
-
-  gettimeofday(&(watch->end_time), &tz );
-
+void
+start_timer(Watch *watch)
+{
+  gettimeofday(&(watch->start_time), &tz);
 }
 
 
-void get_time_diff(Watch *watch) {
+void
+increase_loop(Watch *watch)
+{
+  watch->loop++;
+}
 
 
+void
+end_timer(Watch *watch)
+{
+  gettimeofday(&(watch->end_time), &tz);
+}
+
+
+void
+get_time_diff(Watch *watch)
+{
   watch->diff_time.tv_sec = watch->end_time.tv_sec - watch->start_time.tv_sec;
   watch->diff_time.tv_usec = watch->end_time.tv_usec - watch->start_time.tv_usec;
 
-  if (watch->start_time.tv_usec > watch->end_time.tv_usec) {
-    watch->diff_time.tv_usec += 1000000;
-    watch->diff_time.tv_sec--;
-  }
-  watch->total_time=((double)watch->diff_time.tv_sec + ((double)watch->diff_time.tv_usec/1000000.));
-
-}
-
-void reset_watch(Watch *watch) {
-
-  watch->total_time=0;
+  if (watch->start_time.tv_usec > watch->end_time.tv_usec)
+    {
+      watch->diff_time.tv_usec += 1000000;
+      watch->diff_time.tv_sec--;
+    }
+  watch->total_time
+    = ((double)watch->diff_time.tv_sec + ((double)watch->diff_time.tv_usec / 1000000.));
 
 }
 
 
- 
+void
+reset_watch(Watch *watch)
+{
+  watch->total_time = 0;
+}
+
+
+#endif /* SHIFT_RT_WATCH_I */
+
+/* end of file -- watch.c */

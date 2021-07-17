@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "scanner.h"
+#include "parser.h"
 #include "analyzer.h"
 
 
@@ -59,8 +60,6 @@ fatal_error(char* msg, ...)
 int
 main(int argc, char** argv)
 {
-
- 
   char filename[30];
   int i;
   FILE * file;
@@ -128,7 +127,7 @@ matrix_to_file(FILE * f, node * eq)
 
   for (i = 0; i< rows; i++)
     for (j = 0; j < columns; j++)
-      fprintf(f, "%s;\n", eq->u.e.matrix->u.m.matrix[i][j]);
+      fprintf(f, "%s;\n", eq->u.e.matrix->u.m.matrix[i][j].entry);
 }
 
 
